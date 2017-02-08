@@ -9,10 +9,28 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  Button
 } from 'react-native';
+import FBSDK, {LoginManager} from 'react-native-fbsdk'
 
 export default class Blink extends Component {
+  _fbAuth() {
+    LoginManager.logInWithReadPermissions(['public_profile']).then(
+      function(result) {
+        if (result.isCancelled) {
+          alert('Login cancelled');
+        } else {
+          alert('Login success with permissions: '
+            +result.grantedPermissions.toString());
+        }
+      },
+      function(error) {
+        alert('Login fail with error: ' + error);
+      }
+    )
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -26,6 +44,8 @@ export default class Blink extends Component {
           Double tap R on your keyboard to reload,{'\n'}
           Shake or press menu button for dev menu
         </Text>
+        <Button onPress={this._fbAuth}
+          title="Ok!"/>
       </View>
     );
   }

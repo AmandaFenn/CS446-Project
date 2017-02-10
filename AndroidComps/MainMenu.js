@@ -10,56 +10,80 @@ import {
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
 
 export default class MainMenu extends Component {
-  _responseInfoCallback(error: ?Object, result: ?Object) {
-    if (error) {
-      alert('Error fetching data: ' + error.toString());
-    } else {
-      alert('Success fetching data: ' + result.toString());
+  constructor(props){
+    super(props)
+    this.state = {
+      name : '',
+      pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'
+    }
+    this._loadPersonalInfo()
+  }
+
+  _onBack() {
+    if (this.props.route.index > 0) {
+      this.props.navigator.pop();
     }
   }
 
-  _onPressButton() {
+  _loadPersonalInfo() {
     AccessToken.getCurrentAccessToken().then(
-            (data) => {
-              let accessToken = data.accessToken
-              alert(accessToken.toString())
+      (data) => {
+        let accessToken = data.accessToken
+        //alert(accessToken.toString())
+        const responseInfoCallback = (error, result) => {
+          if (error) {
+            console.log(error)
+            alert('Fail to fetch facebook information: ' + error.toString());
+          } else {
+            console.log(result)
+            //alert('Success fetching data: ' + result.picture.data.url.toString());
+            this.setState({
+              name : result.name,
+              pic : result.picture.data.url
+            });
+          }
+        }
 
-              const responseInfoCallback = (error, result) => {
-                if (error) {
-                  console.log(error)
-                  alert('Error fetching data: ' + error.toString());
-                } else {
-                  console.log(result)
-                  alert('Success fetching data: ' + result.toString());
-                }
+        const infoRequest = new GraphRequest(
+          '/me',
+          {
+            accessToken: accessToken,
+            parameters: {
+              fields: {
+                string: 'email, name, picture'
               }
-
-              const infoRequest = new GraphRequest(
-                '/me',
-                {
-                  accessToken: accessToken,
-                  parameters: {
-                    fields: {
-                      string: 'email,name,first_name,middle_name,last_name'
-                    }
-                  }
-                },
-                responseInfoCallback
-              );
-
-              // Start the graph request.
-              new GraphRequestManager().addRequest(infoRequest).start()
-
             }
-          )
+          },
+          responseInfoCallback
+        );
 
+        // Start the graph request.
+        new GraphRequestManager().addRequest(infoRequest).start()
+
+      }
+    )
   }
 
   render() {
     return (
-      <TouchableHighlight onPress={this._onPressButton}>
-        <Text> Test </Text>
-      </TouchableHighlight>
+      <Image source={require('../img/menu.jpg')} style={styles.container}>
+        <View style={styles.container1}>
+          <View style={styles.profile}>
+            <Image source={{uri: this.state.pic}}
+              style={{width: 80, height: 80}} />
+            <Text style={styles.text}>
+              {this.state.name}
+            </Text>
+          </View>
+          <TouchableHighlight onPress = {this._onBack.bind(this)}>
+            <Text style={styles.button}> Find Events </Text>
+          </TouchableHighlight>
+          <TouchableHighlight>
+            <Text style={styles.button}> Create Events </Text>
+          </TouchableHighlight>
+        </View>
+        <View style={styles.container2}></View>
+      </Image>
     );
   }
 }
@@ -67,35 +91,39 @@ export default class MainMenu extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  background: {
-    flex:1,
     width: null,
     height: null,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 70,
+    paddingBottom:10,
+  },
+  container1: {
+    flex: 2,
     justifyContent: 'space-around',
     alignItems: 'center',
   },
-  welcome: {
-    fontSize: 30,
-    fontWeight: '900',
+  container2: {
+    flex: 3,
+  },
+  profile: {
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  button: {
+    fontSize: 15,
+    fontWeight: '600',
+    width: 200,
+    color: '#fffff0',
+    backgroundColor: '#008080',
     textAlign: 'center',
-    margin: 10,
-    color: '#008b8b',
-    backgroundColor: 'transparent'
+    paddingVertical:10
   },
-  texts: {
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  instructions: {
+  text: {
+    color: '#fffff0',
     fontSize: 20,
     fontWeight: '600',
-    textAlign: 'center',
-    width: 200,
-    color: '#708090',
-    marginBottom: 5,
     backgroundColor: 'transparent'
   },
 });

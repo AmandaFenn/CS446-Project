@@ -13,16 +13,16 @@ export default class MainMenu extends Component {
   constructor(props){
     super(props)
     this.state = {
-      name : '', 
+      name : '',
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'
     }
     this._loadPersonalInfo()
-  }  
+  }
 
   _handleBackPress() {
     this.props.navigator.pop();
   }
-  
+
   _loadPersonalInfo() {
     AccessToken.getCurrentAccessToken().then(
       (data) => {
@@ -35,7 +35,7 @@ export default class MainMenu extends Component {
           } else {
             console.log(result)
             //alert('Success fetching data: ' + result.picture.data.url.toString());
-            this.setState({ 
+            this.setState({
               name : result.name,
               pic : result.picture.data.url
             });
@@ -62,12 +62,6 @@ export default class MainMenu extends Component {
     )
   }
 
-  _onBack() {
-    if (this.props.route.index > 0) {
-      this.props.navigator.pop();
-    } 
-  }
-  
   render() {
     return (
       <Image source={require('../img/menu.jpg')} style={styles.container}>
@@ -78,7 +72,7 @@ export default class MainMenu extends Component {
             <Text style={styles.text}>
               {this.state.name}
             </Text>
-          </View>  
+          </View>
           <TouchableHighlight>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
@@ -87,7 +81,7 @@ export default class MainMenu extends Component {
           </TouchableHighlight>
         </View>
         <View style={styles.container2}></View>
-      </Image>  
+      </Image>
     );
   }
 }
@@ -101,7 +95,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 60,
-    paddingBottom:10,    
+    paddingBottom:10,
   },
   container1: {
     flex: 2,

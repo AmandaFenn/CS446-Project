@@ -37,7 +37,7 @@ export default class Welcome extends Component {
           </Text>
         </View>
         <TouchableHighlight onPress={this._onPressButton.bind(this)}>
-          <Text> Test </Text>
+          <Text style={styles.button}> Get Started! </Text>
         </TouchableHighlight>
         <LoginButton
           readPermissions={["public_profile"]}
@@ -48,10 +48,7 @@ export default class Welcome extends Component {
               } else if (result.isCancelled) {
                 alert("Login was cancelled");
               } else {
-                this.props.navigator.push({
-                  title: 'MainMenu',
-                  index: 1
-                });
+                this._onPressButton();
                 //alert("Login was successful with permissions: " + result.grantedPermissions)
               }
             }
@@ -74,6 +71,7 @@ const styles = StyleSheet.create({
     height: null,
     justifyContent: 'space-around',
     alignItems: 'center',
+    paddingBottom:100
   },
   welcome: {
     fontSize: 30,
@@ -86,6 +84,13 @@ const styles = StyleSheet.create({
   texts: {
     justifyContent: 'space-around',
     alignItems: 'center',
+  },
+  button: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fffff0',
+    backgroundColor: '#008080',
+    padding:10
   },
   instructions: {
     fontSize: 20,

@@ -16,6 +16,18 @@ export default class Welcome extends Component {
       index: 1
     });
   }
+
+  _onLogOut() {
+    this.props.firebaseApp.auth().signOut().then(function() {
+      // Sign-out successful.
+      console.log("Firebase log out")
+    }, function(error) {
+      console.log("Firebase log out failed")
+      // An error happened.
+    });
+    alert("User logged out")
+  }
+
   render() {
     return (
       <Image source={require('../img/blink.jpg')} style={styles.background}>
@@ -53,7 +65,7 @@ export default class Welcome extends Component {
               }
             }
           }
-          onLogoutFinished={() => alert("User logged out")}/>
+          onLogoutFinished={this._onLogOut.bind(this)}/>
       </Image>
     );
   }

@@ -14,9 +14,19 @@ import {
   BackAndroid,
   TouchableHighlight
 } from 'react-native';
+import * as firebase from 'firebase';
 
 import Welcome from './AndroidComps/Welcome';
 import MainMenu from './AndroidComps/MainMenu';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8G1jarjew06jjORJf7nA3DBvb0ks56LE",
+  authDomain: "blink-b568e.firebaseapp.com",
+  databaseURL: "https://blink-b568e.firebaseio.com",
+  storageBucket: "blink-b568e.appspot.com",
+  messagingSenderId: "600861396413"
+};
+const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 export default class Blink extends Component {
   componentWillMount() {
@@ -30,9 +40,9 @@ export default class Blink extends Component {
   renderScene(route, navigator) {
     switch (route.index) {
       case 0:
-        return (<Welcome navigator = {navigator} />)
+        return (<Welcome navigator = {navigator} firebaseApp = {firebaseApp}/>)
       case 1:
-        return (<MainMenu route = {route} navigator = {navigator}/>)
+        return (<MainMenu route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
     }
   }
 

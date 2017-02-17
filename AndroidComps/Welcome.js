@@ -52,7 +52,7 @@ export default class Welcome extends Component {
           <Text style={styles.button}> Get Started! </Text>
         </TouchableHighlight>
         <LoginButton
-          readPermissions={["public_profile"]}
+          readPermissions={["public_profile", "user_friends"]}
           onLoginFinished={
             (error, result) => {
               if (error) {

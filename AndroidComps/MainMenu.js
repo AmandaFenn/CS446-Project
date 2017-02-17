@@ -43,6 +43,7 @@ export default class MainMenu extends Component {
               name : result.name,
               pic : result.picture.data.url
             });
+            //console.log(result.friends)
           }
         }
 
@@ -52,7 +53,7 @@ export default class MainMenu extends Component {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'email, name, picture'
+                string: 'email, name, picture, friends'
               }
             }
           },

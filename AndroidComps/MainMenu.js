@@ -5,7 +5,8 @@ import {
   Text,
   View,
   Image,
-  TouchableHighlight
+  TouchableHighlight,
+  ListView
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
 import * as firebase from 'firebase';
@@ -13,17 +14,42 @@ import * as firebase from 'firebase';
 export default class MainMenu extends Component {
   constructor(props){
     super(props)
+    //const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
       name : '',
-      pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'
+      pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
+      dataSource: this._createListdataSource([]),
+      starCountRef : this.props.firebaseApp.database().ref('Events/')
     }
     this._loadPersonalInfo()
+  }
+
+  componentDidMount() {
+    this._updateEvents()
+  }
+
+  _createListdataSource(array) {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return ds.cloneWithRows(array)
   }
 
   _onBack() {
     if (this.props.route.index > 0) {
       this.props.navigator.pop();
     }
+  }
+
+  _eventsChangeCallBack(snapshot) {
+    var events = []
+    snapshot.forEach(function(data) {
+      events.push(data.key)
+      //console.log("The " + data.key + " score is " + data.val());
+    });
+    this.setState({ dataSource: this._createListdataSource(events) });
+  }
+
+  _updateEvents() {
+    this.state.starCountRef.on('value', snapshot => this._eventsChangeCallBack(snapshot));
   }
 
   _loadPersonalInfo() {
@@ -100,11 +126,16 @@ export default class MainMenu extends Component {
           <TouchableHighlight onPress = {this._onBack.bind(this)}>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
-          <TouchableHighlight>
+          <TouchableHighlight onPress = {this._onBack.bind(this)}>
             <Text style={styles.button}> Create Events </Text>
           </TouchableHighlight>
         </View>
-        <View style={styles.container2}></View>
+        <View style={styles.container2}>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+          enableEmptySections={true} />
+        </View>
       </Image>
     );
   }
@@ -128,6 +159,8 @@ const styles = StyleSheet.create({
   },
   container2: {
     flex: 3,
+    width: 400,
+    backgroundColor: 'purple'
   },
   profile: {
     justifyContent: 'space-around',
@@ -148,6 +181,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     backgroundColor: 'transparent'
   },
+  text1: {
+    color: '#fffff0',
+    fontSize: 40,
+    fontWeight: '600',
+    backgroundColor: 'transparent'
+  }
 });
 
 AppRegistry.registerComponent('MainMenu', () => MainMenu);

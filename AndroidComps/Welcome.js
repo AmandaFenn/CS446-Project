@@ -18,13 +18,7 @@ export default class Welcome extends Component {
   }
 
   _onLogOut() {
-    this.props.firebaseApp.auth().signOut().then(function() {
-      // Sign-out successful.
-      console.log("Firebase log out")
-    }, function(error) {
-      console.log("Firebase log out failed")
-      // An error happened.
-    });
+
     alert("User logged out")
   }
 

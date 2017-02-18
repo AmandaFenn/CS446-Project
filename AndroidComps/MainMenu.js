@@ -14,7 +14,6 @@ import * as firebase from 'firebase';
 export default class MainMenu extends Component {
   constructor(props){
     super(props)
-    //const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
       name : '',
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
@@ -35,7 +34,7 @@ export default class MainMenu extends Component {
       this.props.navigator.pop();
     }
   }
-  
+
   _createListdataSource(array) {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return ds.cloneWithRows(array)
@@ -51,7 +50,9 @@ export default class MainMenu extends Component {
   }
 
   _updateEvents() {
-    this.state.starCountRef.on('value', this.state.eventsChangeCallBack);
+    this.state.starCountRef.on('value', this.state.eventsChangeCallBack, function(error) {
+      console.error(error);
+    });
   }
 
   _loadPersonalInfo() {
@@ -109,7 +110,6 @@ export default class MainMenu extends Component {
             console.error(error);
           }
         });
-
       }
     )
   }

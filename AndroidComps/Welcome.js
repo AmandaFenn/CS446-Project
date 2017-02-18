@@ -10,7 +10,7 @@ import {
 import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
 
 export default class Welcome extends Component {
-  _onPressButton() {
+  _onForward() {
     this.props.navigator.push({
       title: 'MainMenu',
       index: 1
@@ -48,7 +48,7 @@ export default class Welcome extends Component {
             in the blink of an eye.
           </Text>
         </View>
-        <TouchableHighlight onPress={this._onPressButton.bind(this)}>
+        <TouchableHighlight onPress={this._onForward.bind(this)}>
           <Text style={styles.button}> Get Started! </Text>
         </TouchableHighlight>
         <LoginButton
@@ -60,7 +60,7 @@ export default class Welcome extends Component {
               } else if (result.isCancelled) {
                 alert("Login was cancelled");
               } else {
-                this._onPressButton();
+                this._onForward();
                 //alert("Login was successful with permissions: " + result.grantedPermissions)
               }
             }

@@ -19,24 +19,26 @@ export default class MainMenu extends Component {
       name : '',
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
       dataSource: this._createListdataSource([]),
-      starCountRef : this.props.firebaseApp.database().ref('Events/')
+      starCountRef : this.props.firebaseApp.database().ref('Events/'),
+      eventsChangeCallBack: this._eventsChangeCallBack.bind(this)
     }
     this._loadPersonalInfo()
-  }
-
-  componentDidMount() {
     this._updateEvents()
   }
 
-  _createListdataSource(array) {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return ds.cloneWithRows(array)
+  componentWillUnmount() {
+    this.state.starCountRef.off('value', this.state.eventsChangeCallBack);
   }
 
   _onBack() {
     if (this.props.route.index > 0) {
       this.props.navigator.pop();
     }
+  }
+  
+  _createListdataSource(array) {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return ds.cloneWithRows(array)
   }
 
   _eventsChangeCallBack(snapshot) {
@@ -49,7 +51,7 @@ export default class MainMenu extends Component {
   }
 
   _updateEvents() {
-    this.state.starCountRef.on('value', snapshot => this._eventsChangeCallBack(snapshot));
+    this.state.starCountRef.on('value', this.state.eventsChangeCallBack);
   }
 
   _loadPersonalInfo() {
@@ -131,10 +133,10 @@ export default class MainMenu extends Component {
           </TouchableHighlight>
         </View>
         <View style={styles.container2}>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
-          enableEmptySections={true} />
+          <ListView
+            dataSource={this.state.dataSource}
+            renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+            enableEmptySections={true} />
         </View>
       </Image>
     );

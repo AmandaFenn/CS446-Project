@@ -18,7 +18,7 @@ export default class Welcome extends Component {
   }
 
   _onLogOut() {
-
+    // Do not call Firebase signout here.
     alert("User logged out")
   }
 

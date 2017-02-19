@@ -6,7 +6,8 @@ import {
   View,
   Image,
   TouchableHighlight,
-  ListView
+  ListView,
+  PermissionsAndroid
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
 import * as firebase from 'firebase';
@@ -43,8 +44,8 @@ export default class MainMenu extends Component {
   _eventsChangeCallBack(snapshot) {
     var events = []
     snapshot.forEach(function(data) {
-      events.push(data.key)
-      //console.log("The " + data.key + " score is " + data.val());
+      events.push(data.val().Name)
+      console.log("The " + data.key + " score is " + data.val().Name);
     });
     this.setState({ dataSource: this._createListdataSource(events) });
   }
@@ -53,6 +54,48 @@ export default class MainMenu extends Component {
     this.state.starCountRef.on('value', this.state.eventsChangeCallBack, function(error) {
       console.error(error);
     });
+  }
+
+  _createEventTest() {
+    var test = this.props.firebaseApp.database().ref('Events/').push()
+    test.set({
+      'Name': this.state.name + '\'s Event',
+      'Date': new Date(),
+      'Location': 'Waterloo',
+      'Description': '',
+      'Participants': {123456: {
+        'Name': this.state.name,
+        'Host': true,
+        'Status': 0
+      }},
+    })
+  }
+
+  _deleteEventTest1(snapshot) {
+    var test = '1'
+    snapshot.forEach(function(data) {
+      if (data.val().Name == 'event2') {
+        console.log(data.key)
+        test = data.key
+      }
+    })
+    //console.log(test)
+    this.props.firebaseApp.database().ref('Events/' + test).remove()
+  }
+
+  async _deleteEventTest() {
+    //this.props.firebaseApp.database().ref('Events/eventtesst').remove()
+    //console.log(new Date())
+    this.state.starCountRef.once('value').then(this._deleteEventTest1.bind(this))
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        var initialPosition = JSON.stringify(position);
+        console.log(initialPosition)
+      },
+      (error) => alert(JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 5000, maximumAge: 5000}
+    );
   }
 
   _loadPersonalInfo() {
@@ -125,10 +168,10 @@ export default class MainMenu extends Component {
               {this.state.name}
             </Text>
           </View>
-          <TouchableHighlight onPress = {this._onBack.bind(this)}>
+          <TouchableHighlight onPress = {this._createEventTest.bind(this)}>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
-          <TouchableHighlight onPress = {this._onBack.bind(this)}>
+          <TouchableHighlight onPress = {this._deleteEventTest.bind(this)}>
             <Text style={styles.button}> Create Events </Text>
           </TouchableHighlight>
         </View>

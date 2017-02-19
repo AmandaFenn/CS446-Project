@@ -11,11 +11,14 @@ import {
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
 import * as firebase from 'firebase';
 
+import CreateEvent from '../iOSComps/CreateEvent';
+
 export default class MainMenu extends Component {
   constructor(props){
     super(props)
     this.state = {
       name : '',
+      fbId : 0,
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
       dataSource: this._createListdataSource([]),
       starCountRef : this.props.firebaseApp.database().ref('Events/'),
@@ -24,7 +27,7 @@ export default class MainMenu extends Component {
     this._loadPersonalInfo()
     this._updateEvents()
   }
-
+  
   componentWillUnmount() {
     this.state.starCountRef.off('value', this.state.eventsChangeCallBack);
     console.log("UnmountUnmountUnmountUnmountUnmountUnmount")
@@ -42,7 +45,7 @@ export default class MainMenu extends Component {
   _eventsChangeCallBack(snapshot) {
     var events = []
     snapshot.forEach(function(data) {
-      events.push(data.key)
+      events.push(data.val().Name)
       //console.log("The " + data.key + " score is " + data.val());
     });
     this.setState({ dataSource: this._createListdataSource(events) });
@@ -51,6 +54,63 @@ export default class MainMenu extends Component {
 
   _updateEvents() {
     this.state.starCountRef.on('value', this.state.eventsChangeCallBack);
+  }
+  
+  _onCreateEvent() {
+    this.props.navigator.push({
+      component: CreateEvent,
+      title: 'New Event',
+      backButtonTitle: 'Back',
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        name : this.state.name,
+        fbId : this.state.fbId
+      }
+    });
+  }
+  
+  _createEventTest() {
+    var eventlistRef = this.props.firebaseApp.database().ref('Events/').push()
+    var date = new Date()
+    eventlistRef.set({
+      'Name': this.state.name + '\'s Event',
+      'Date': date.toLocaleString(),
+      'Location': 'Waterloo',
+      'Description': '',
+    })
+    var addHost = {};
+    var hostData = {
+       'Name': this.state.name,
+       'Host': true,
+       'Status': 0
+    }
+    var newPostKey = eventlistRef.key
+    addHost['/Events/' + newPostKey + '/Participants/' + this.state.fbId] = hostData;
+    this.props.firebaseApp.database().ref().update(addHost)
+  }
+  
+  _deleteEventTest1(snapshot) {
+    var test = '1'
+    snapshot.forEach(function(data) {
+      if (data.val().Location == 'Waterloo') {
+        console.log(data.key)
+        test = data.key
+      }
+    })
+    //console.log(test)
+    var guestData = {
+       'Name': 'Guest',
+       'Host': false,
+       'Status': 0
+    }
+    // add new participants
+    this.props.firebaseApp.database().ref('Events/' + test + '/Participants/123456').set(guestData)
+    
+    //this.props.firebaseApp.database().ref('Events/' + test).remove()
+  }
+  
+  _deleteEventTest() {
+    this.state.starCountRef.once('value').then(this._deleteEventTest1.bind(this))
   }
   
   _loadPersonalInfo() {
@@ -68,7 +128,8 @@ export default class MainMenu extends Component {
             //alert('Success fetching data: ' + result.picture.data.url.toString());
             this.setState({
               name : result.name,
-              pic : result.picture.data.url
+              pic : result.picture.data.url,
+              fbId : result.id
             });
           }
         }
@@ -79,7 +140,7 @@ export default class MainMenu extends Component {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'email, name, picture, friends'
+                string: 'id, email, name, picture, friends'
               }
             }
           },
@@ -123,10 +184,10 @@ export default class MainMenu extends Component {
               {this.state.name}
             </Text>
           </View>
-          <TouchableHighlight onPress = {this._handleBackPress.bind(this)}>
+          <TouchableHighlight onPress = {this._deleteEventTest.bind(this)}>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
-          <TouchableHighlight onPress = {this._handleBackPress.bind(this)}>
+          <TouchableHighlight onPress = {this._onCreateEvent.bind(this)}>
             <Text style={styles.button}> Create Events </Text>
           </TouchableHighlight>
         </View>

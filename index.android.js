@@ -18,6 +18,7 @@ import * as firebase from 'firebase';
 
 import Welcome from './AndroidComps/Welcome';
 import MainMenu from './AndroidComps/MainMenu';
+import CreateEvent from './AndroidComps/CreateEvent';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA8G1jarjew06jjORJf7nA3DBvb0ks56LE",
@@ -43,6 +44,8 @@ export default class Blink extends Component {
         return (<Welcome navigator = {navigator} firebaseApp = {firebaseApp}/>)
       case 1:
         return (<MainMenu route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+      case 2:
+        return (<CreateEvent route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
     }
   }
 
@@ -82,7 +85,7 @@ var routeMapper = {
  RightButton(route, navigator, index, navState)
    { return null; },
  Title(route, navigator, index, navState)
-   { return (<Text style={styles.text}> Blink </Text>); },
+   { return (<Text style={styles.text}> {route.title} </Text>); },
  };
 
 

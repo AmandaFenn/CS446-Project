@@ -17,6 +17,7 @@ export default class MainMenu extends Component {
     super(props)
     this.state = {
       name : '',
+      fbId : 0,
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
       dataSource: this._createListdataSource([]),
       starCountRef : this.props.firebaseApp.database().ref('Events/'),
@@ -56,6 +57,15 @@ export default class MainMenu extends Component {
     });
   }
 
+  _onCreateEvent() {
+    this.props.navigator.push({
+      title : 'New Event',
+      index : 2,
+      name : this.state.name,
+      fbId : this.state.fbId
+    });
+  }
+
   _createEventTest() {
     var test = this.props.firebaseApp.database().ref('Events/').push()
     test.set({
@@ -83,7 +93,8 @@ export default class MainMenu extends Component {
     this.props.firebaseApp.database().ref('Events/' + test).remove()
   }
 
-  async _deleteEventTest() {
+  _deleteEventTest() {
+    // test for location
     //this.props.firebaseApp.database().ref('Events/eventtesst').remove()
     //console.log(new Date())
     this.state.starCountRef.once('value').then(this._deleteEventTest1.bind(this))
@@ -113,7 +124,8 @@ export default class MainMenu extends Component {
             //alert('Success fetching data: ' + result.picture.data.url.toString());
             this.setState({
               name : result.name,
-              pic : result.picture.data.url
+              pic : result.picture.data.url,
+              fbId: result.id
             });
             //console.log(result.friends)
           }
@@ -125,7 +137,7 @@ export default class MainMenu extends Component {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'email, name, picture, friends'
+                string: 'id, email, name, picture, friends'
               }
             }
           },
@@ -168,10 +180,10 @@ export default class MainMenu extends Component {
               {this.state.name}
             </Text>
           </View>
-          <TouchableHighlight onPress = {this._createEventTest.bind(this)}>
+          <TouchableHighlight onPress = {this._deleteEventTest.bind(this)}>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
-          <TouchableHighlight onPress = {this._deleteEventTest.bind(this)}>
+          <TouchableHighlight onPress = {this._onCreateEvent.bind(this)}>
             <Text style={styles.button}> Create Events </Text>
           </TouchableHighlight>
         </View>

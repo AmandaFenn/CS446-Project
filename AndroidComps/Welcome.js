@@ -12,7 +12,7 @@ import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
 export default class Welcome extends Component {
   _onForward() {
     this.props.navigator.push({
-      title: 'MainMenu',
+      title: 'Blink',
       index: 1
     });
   }

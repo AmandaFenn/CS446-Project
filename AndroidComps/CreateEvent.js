@@ -7,8 +7,9 @@ import {
   Image,
   TouchableHighlight,
   TextInput,
-  DatePickerIOS,
-  PickerIOS
+  DatePickerAndroid,
+  TimePickerAndroid,
+  Picker
 } from 'react-native';
 
 export default class CreateEvent extends Component {
@@ -20,10 +21,13 @@ export default class CreateEvent extends Component {
       location : '',
       date: new Date(),
     }
+    console.log('fbid---------------------------------' + this.props.route.fbId)
   }
 
   _onBack() {
-    this.props.navigator.pop();
+    if (this.props.route.index > 0) {
+      this.props.navigator.pop();
+    }
   }
 
   _checkInfo() {
@@ -56,12 +60,12 @@ export default class CreateEvent extends Component {
     })
     var addHost = {};
     var hostData = {
-       'Name': this.props.name,
+       'Name': this.props.route.name,
        'Host': true,
        'Status': 0
     }
     var newPostKey = eventlistRef.key
-    addHost['/Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
+    addHost['/Events/' + newPostKey + '/Participants/' + this.props.route.fbId] = hostData;
     this.props.firebaseApp.database().ref().update(addHost)
   }
 
@@ -76,30 +80,59 @@ export default class CreateEvent extends Component {
     this.setState({date: date});
   };
 
+  async _showDatePicker() {
+    try {
+      const {action, year, month, day} = await DatePickerAndroid.open({date: this.state.date, minDate: new Date(), mode: 'default'});
+      if (action === DatePickerAndroid.dismissedAction) {
+      } else {
+        var date = new Date(year, month, day);
+      }
+      this.setState({date: date});
+    } catch ({code, message}) {
+      console.warn(`Error in setting date: `, message);
+    }
+  };
+
+  async _showTimePicker() {
+    try {
+      const {action, minute, hour} = await TimePickerAndroid.open({is24Hour:false, hour: this.state.date.getHours(), minute: this.state.date.getMinutes()});
+      if (action === TimePickerAndroid.timeSetAction) {
+        var date = this.state.date
+        date.setMinutes(minute)
+        date.setHours(hour)
+        this.setState({date : date})
+      }
+    } catch ({code, message}) {
+      console.warn(`Error in setting time: `, message);
+    }
+  };
+
   render() {
     return (
       <View style={styles.background}>
         <TextInput
-          style={{height: 40}}
+          style={{height: 40, width : 200}}
           placeholder="Type event name."
           onChangeText={(text) => this.setState({name : text})}
         />
         <TextInput
-          style={{height: 40}}
+          style={{height: 40, width : 200}}
           placeholder="Type event description!"
           onChangeText={(text) => this.setState({description : text})}
         />
         <TextInput
-          style={{height: 40}}
+          style={{height: 40, width : 200}}
           placeholder="Type event location"
           onChangeText={(text) => this.setState({location : text})}
         />
-        <DatePickerIOS style={styles.date}
-          date={this.state.date}
-          mode="datetime"
-          minimumDate = {new Date()}
-          onDateChange={this.onDateChange}
-        />
+        <TouchableHighlight
+          onPress={this._showDatePicker.bind(this)}>
+          <Text style={styles.text}>{this.state.date.toLocaleDateString()}</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          onPress={this._showTimePicker.bind(this)}>
+          <Text style={styles.text}>{this.state.date.toLocaleTimeString()}</Text>
+        </TouchableHighlight>
         <TouchableHighlight onPress={this._submit.bind(this)}>
           <Text style={styles.button}> Create </Text>
         </TouchableHighlight>

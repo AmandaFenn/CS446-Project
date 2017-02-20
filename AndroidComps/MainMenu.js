@@ -19,16 +19,14 @@ export default class MainMenu extends Component {
       name : '',
       fbId : 0,
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
-      dataSource: this._createListdataSource([]),
-      starCountRef : this.props.firebaseApp.database().ref('Events/'),
-      eventsChangeCallBack: this._eventsChangeCallBack.bind(this)
+      myevents: this._createListdataSource([]),
+      eventsRef : this.props.firebaseApp.database().ref('Events/'),
     }
     this._loadPersonalInfo()
-    this._updateEvents()
   }
 
   componentWillUnmount() {
-    this.state.starCountRef.off('value', this.state.eventsChangeCallBack);
+    this.state.eventsRef.off('value', this._eventsChangeCallBack);
   }
 
   _onBack() {
@@ -44,15 +42,18 @@ export default class MainMenu extends Component {
 
   _eventsChangeCallBack(snapshot) {
     var events = []
+    var fbId = this.state.fbId.toString()
     snapshot.forEach(function(data) {
-      events.push(data.val().Name)
-      console.log("The " + data.key + " score is " + data.val().Name);
+      if (data.child('Participants').hasChild(fbId)) {
+        events.push(data.val().Name)
+      }
+      //console.log("The " + data.key + " score is " + data.val().Name);
     });
-    this.setState({ dataSource: this._createListdataSource(events) });
+    this.setState({ myevents: this._createListdataSource(events)});
   }
 
   _updateEvents() {
-    this.state.starCountRef.on('value', this.state.eventsChangeCallBack, function(error) {
+    this.state.eventsRef.on('value', this._eventsChangeCallBack, function(error) {
       console.error(error);
     });
   }
@@ -97,7 +98,7 @@ export default class MainMenu extends Component {
     // test for location
     //this.props.firebaseApp.database().ref('Events/eventtesst').remove()
     //console.log(new Date())
-    this.state.starCountRef.once('value').then(this._deleteEventTest1.bind(this))
+    this.state.eventsRef.once('value').then(this._deleteEventTest1.bind(this))
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -127,6 +128,8 @@ export default class MainMenu extends Component {
               pic : result.picture.data.url,
               fbId: result.id
             });
+            this._eventsChangeCallBack = this._eventsChangeCallBack.bind(this)
+            this._updateEvents()
             //console.log(result.friends)
           }
         }
@@ -143,9 +146,6 @@ export default class MainMenu extends Component {
           },
           responseInfoCallback
         );
-
-        // Start the graph request.
-        new GraphRequestManager().addRequest(infoRequest).start()
 
         // Firebase authentication
         const provider = firebase.auth.FacebookAuthProvider;
@@ -165,6 +165,9 @@ export default class MainMenu extends Component {
             console.error(error);
           }
         });
+        
+        // Start the graph request.
+        new GraphRequestManager().addRequest(infoRequest).start()
       }
     )
   }
@@ -189,7 +192,7 @@ export default class MainMenu extends Component {
         </View>
         <View style={styles.container2}>
           <ListView
-            dataSource={this.state.dataSource}
+            dataSource={this.state.myevents}
             renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
             enableEmptySections={true} />
         </View>

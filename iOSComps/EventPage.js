@@ -10,17 +10,20 @@ import {
   DatePickerIOS,
   PickerIOS,
   ScrollView,
+  ListView
 } from 'react-native';
 
-export default class CreateEvent extends Component {
+export default class EvengPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      name : '',
-      description : '',
-      location : '',
+      name : 'EventPageTest',
+      description : 'None',
+      location : 'Waterloo',
       date: new Date(),
-      datePickerVisible: false
+      datePickerVisible: false,
+      guests: 1,
+      comments: this._createListdataSource(['test1','comment2','comment3']),
     }
   }
 
@@ -28,6 +31,11 @@ export default class CreateEvent extends Component {
     this.props.navigator.pop();
   }
 
+  _createListdataSource(array) {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return ds.cloneWithRows(array)
+  }
+  
   _checkInfo() {
     var check = false
     var checkInfo = ''
@@ -47,7 +55,7 @@ export default class CreateEvent extends Component {
     return check
   }
 
-  _createEvent() {
+  _updateEvent() {
     var eventlistRef = this.props.firebaseApp.database().ref('Events/').push()
     eventlistRef.set({
       'Name': this.state.name,
@@ -69,8 +77,7 @@ export default class CreateEvent extends Component {
 
   _submit() {
     if (!this._checkInfo()) {
-      this._createEvent()
-      this._onBack()
+      this._updateEvent()
     }
   }
 
@@ -85,13 +92,14 @@ export default class CreateEvent extends Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.textinputview}>
-          <TextInput style={styles.textinput}
-            placeholder="Type event name."
-            onChangeText={(text) => this.setState({name : text})}
-          />
-        </View>  
-        <View style={styles.emptyview} /> 
+        <TextInput
+          style={styles.textinput1}
+          placeholder="Type event description!"
+          defaultValue={this.state.description}
+          onChangeText={(text) => this.setState({description : text})}
+          multiline={true}
+        />
+        <View style={styles.emptyview} />
         <View>
           <TouchableHighlight 
             style={styles.datetime}
@@ -106,29 +114,53 @@ export default class CreateEvent extends Component {
             onDateChange={this.onDateChange}
           />}
         </View>  
+        
         <View style={styles.emptyview} />
-        <View style={styles.textinputview}>
-          <TextInput
-            style={styles.textinput}
-            placeholder="Type event location"
-            onChangeText={(text) => this.setState({location : text})}
-          />
-        </View>  
+        
+        <View style={styles.location} >
+          <View style={styles.textinputview1}>
+            <TextInput
+              style={styles.textinput}
+              placeholder="Type event location"
+              defaultValue={this.state.location}
+              onChangeText={(text) => this.setState({location : text})}
+            />
+          </View>
+          <TouchableHighlight
+            style={styles.button}
+            onPress={this._onBack.bind(this)}>
+            <Text style={styles.buttontext}> Sugeest</Text>
+          </TouchableHighlight>
+        </View>
+        
         <View style={styles.emptyview} />
-        <TextInput
-          style={styles.textinput1}
-          placeholder="Type event description!"
-          onChangeText={(text) => this.setState({description : text})}
-          multiline={true}
-        />
+        
+        <View style={styles.location}>
+          <Text>Guests: {this.state.guests}</Text>
+          <TouchableHighlight
+            style={styles.button}
+            onPress={this._onBack.bind(this)}>
+            <Text style={styles.buttontext}> Manage </Text>
+          </TouchableHighlight>
+        </View>
+        
+        <View style={styles.emptyview} />
+        
+        <Text>Comments</Text>
+        <View style={styles.container2}>
+          <ListView 
+            dataSource={this.state.comments}
+            renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+            enableEmptySections={true}
+            automaticallyAdjustContentInsets={false} />
+        </View>
+        
         <View style={styles.emptyview} />
         <TouchableHighlight
           style={styles.button}
-          onPress={this._submit.bind(this)}>
-          <Text style={styles.buttontext}> Create </Text>
+          onPress={this._onBack.bind(this)}>
+          <Text style={styles.buttontext}> Save </Text>
         </TouchableHighlight>
-        <View style={styles.emptyview} />
-        <View style={styles.emptyview} />
       </ScrollView>
     )
   }
@@ -137,7 +169,12 @@ export default class CreateEvent extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
-    paddingTop: 40,
+    paddingTop: 40
+  },
+  container2: {
+    flex: 3,
+    width: 360,
+    backgroundColor: 'purple'
   },
   emptyview: {
     height: 40
@@ -148,13 +185,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     backgroundColor: 'white',
   },
+  textinputview1: {
+    borderColor: 'grey',
+    borderWidth: 0.5,
+    backgroundColor: 'white',
+    flex:2,
+  },
   textinput: {
     height: 45,
     fontSize: 30,
     padding: 5
   },
   textinput1: {
-    height: 180,
+    height: 150,
     borderColor: 'grey',
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
@@ -173,18 +216,30 @@ const styles = StyleSheet.create({
     fontSize: 30,
     padding: 5
   },
+  location: {
+    flex : 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   button: {
-    alignItems: 'center',  
-    marginHorizontal: 100,
-    backgroundColor: '#008080',
+    alignItems: 'center',
+    width: 100,
+    backgroundColor: '#008080',    
+    flex:3
   },
   buttontext: {
     fontSize: 30,
     fontWeight: '600',
     color: '#fffff0',
     textAlign: 'center',
-    paddingVertical:10,
+    paddingVertical:10
   },
+  text1: {
+    color: '#fffff0',
+    fontSize: 40,
+    fontWeight: '600',
+    backgroundColor: 'transparent'
+  }
 });
 
-AppRegistry.registerComponent('CreateEvent', () => CreateEvent);
+AppRegistry.registerComponent('EvengPage', () => EvengPage);

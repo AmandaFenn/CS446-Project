@@ -12,6 +12,7 @@ import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphReques
 import * as firebase from 'firebase';
 
 import CreateEvent from '../iOSComps/CreateEvent';
+import EventPage from '../iOSComps/EventPage';
 
 export default class MainMenu extends Component {
   constructor(props){
@@ -20,16 +21,16 @@ export default class MainMenu extends Component {
       name : '',
       fbId : 0,
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
-      dataSource: this._createListdataSource([]),
-      starCountRef : this.props.firebaseApp.database().ref('Events/'),
-      eventsChangeCallBack: this._eventsChangeCallBack.bind(this)
+      myevents: this._createListdataSource([]),
+      myeventIds: [],
+      eventsRef : this.props.firebaseApp.database().ref('Events/'),
     }
     this._loadPersonalInfo()
-    this._updateEvents()
   }
   
+  
   componentWillUnmount() {
-    this.state.starCountRef.off('value', this.state.eventsChangeCallBack);
+    this.state.eventsRef.off('value', this._eventsChangeCallBack);
     console.log("UnmountUnmountUnmountUnmountUnmountUnmount")
   }
   
@@ -44,16 +45,23 @@ export default class MainMenu extends Component {
   
   _eventsChangeCallBack(snapshot) {
     var events = []
+    var eventIds = []
+    var fbId = this.state.fbId.toString()
     snapshot.forEach(function(data) {
-      events.push(data.val().Name)
-      //console.log("The " + data.key + " score is " + data.val());
+      if (data.child('Participants').hasChild(fbId)) {
+        events.push(data.val().Name)
+        eventIds.push(data.key)
+      }
     });
-    this.setState({ dataSource: this._createListdataSource(events) });
-    console.log("set new state")
+    this.setState({ 
+      myevents: this._createListdataSource(events),
+      myeventIds: eventIds
+    });
+    //console.log("set new state")
   }
 
   _updateEvents() {
-    this.state.starCountRef.on('value', this.state.eventsChangeCallBack);
+    this.state.eventsRef.on('value', this._eventsChangeCallBack);
   }
   
   _onCreateEvent() {
@@ -110,7 +118,7 @@ export default class MainMenu extends Component {
   }
   
   _deleteEventTest() {
-    this.state.starCountRef.once('value').then(this._deleteEventTest1.bind(this))
+    this.state.eventsRef.once('value').then(this._deleteEventTest1.bind(this))
   }
   
   _loadPersonalInfo() {
@@ -129,8 +137,10 @@ export default class MainMenu extends Component {
             this.setState({
               name : result.name,
               pic : result.picture.data.url,
-              fbId : result.id
+              fbId : result.id,
             });
+            this._eventsChangeCallBack = this._eventsChangeCallBack.bind(this)
+            this._updateEvents()
           }
         }
 
@@ -146,10 +156,7 @@ export default class MainMenu extends Component {
           },
           responseInfoCallback
         );
-
-        // Start the graph request.
-        new GraphRequestManager().addRequest(infoRequest).start()
-        
+       
         // Firebase authentication
         const provider = firebase.auth.FacebookAuthProvider;
         const credential = provider.credential(accessToken);
@@ -168,11 +175,35 @@ export default class MainMenu extends Component {
             console.error(error);
           }
         });
+        
+        // Start the graph request.
+        new GraphRequestManager().addRequest(infoRequest).start()
 
       }
     )
   }
-
+  
+  _onMyEvent(rowData, rowID) {
+    this.props.navigator.push({
+      component: EventPage,
+      title: rowData,
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        name : this.state.name,
+        fbId : this.state.fbId
+      }
+    });
+    //console.log(this.state.myeventIds[rowID])
+  }
+  
+  _renderRow(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <TouchableHighlight onPress = {this._onMyEvent.bind(this, rowData, rowID)}>
+        <Text style = {styles.text1}> {rowData} </Text>
+      </TouchableHighlight>
+    )
+  }
+  
   render() {
     return (
       <Image source={require('../img/menu.jpg')} style={styles.container}>
@@ -193,8 +224,8 @@ export default class MainMenu extends Component {
         </View>
         <View style={styles.container2}>
           <ListView 
-            dataSource={this.state.dataSource}
-            renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+            dataSource={this.state.myevents}
+            renderRow={this._renderRow.bind(this)}
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false} />
         </View>

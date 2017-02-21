@@ -20,6 +20,7 @@ export default class MainMenu extends Component {
       fbId : 0,
       pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
       myevents: this._createListdataSource([]),
+      myeventIds: [],
       eventsRef : this.props.firebaseApp.database().ref('Events/'),
     }
     this._loadPersonalInfo()
@@ -42,14 +43,19 @@ export default class MainMenu extends Component {
 
   _eventsChangeCallBack(snapshot) {
     var events = []
+    var eventIds = []
     var fbId = this.state.fbId.toString()
     snapshot.forEach(function(data) {
       if (data.child('Participants').hasChild(fbId)) {
         events.push(data.val().Name)
+        eventIds.push(data.key)
       }
       //console.log("The " + data.key + " score is " + data.val().Name);
     });
-    this.setState({ myevents: this._createListdataSource(events)});
+    this.setState({
+      myevents: this._createListdataSource(events),
+      myeventIds: eventIds
+    });
   }
 
   _updateEvents() {
@@ -121,7 +127,7 @@ export default class MainMenu extends Component {
             console.log(error)
             alert('Fail to fetch facebook information: ' + error.toString());
           } else {
-            console.log(result)
+            //console.log(result)
             //alert('Success fetching data: ' + result.picture.data.url.toString());
             this.setState({
               name : result.name,
@@ -165,10 +171,29 @@ export default class MainMenu extends Component {
             console.error(error);
           }
         });
-        
+
         // Start the graph request.
         new GraphRequestManager().addRequest(infoRequest).start()
       }
+    )
+  }
+
+  _onMyEvent(rowData, rowID) {
+    this.props.navigator.push({
+      title : rowData,
+      index : 3,
+      name : this.state.name,         // host name
+      fbId : this.state.fbId,
+      eventId : this.state.myeventIds[rowID]
+    });
+    //console.log(this.state.myeventIds[rowID])
+  }
+
+  _renderRow(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <TouchableHighlight onPress = {this._onMyEvent.bind(this, rowData, rowID)}>
+        <Text style = {styles.text1}> {rowData} </Text>
+      </TouchableHighlight>
     )
   }
 
@@ -193,7 +218,7 @@ export default class MainMenu extends Component {
         <View style={styles.container2}>
           <ListView
             dataSource={this.state.myevents}
-            renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+            renderRow={this._renderRow.bind(this)}
             enableEmptySections={true} />
         </View>
       </Image>

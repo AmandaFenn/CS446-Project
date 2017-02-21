@@ -9,7 +9,8 @@ import {
   TextInput,
   DatePickerAndroid,
   TimePickerAndroid,
-  Picker
+  Picker,
+  ScrollView
 } from 'react-native';
 
 export default class CreateEvent extends Component {
@@ -85,9 +86,13 @@ export default class CreateEvent extends Component {
       const {action, year, month, day} = await DatePickerAndroid.open({date: this.state.date, minDate: new Date(), mode: 'default'});
       if (action === DatePickerAndroid.dismissedAction) {
       } else {
-        var date = new Date(year, month, day);
+        var date = this.state.date
+        date.setYear(year)
+        date.setMonth(month)
+        date.setDate(day)
+        this.setState({date: date});
       }
-      this.setState({date: date});
+
     } catch ({code, message}) {
       console.warn(`Error in setting date: `, message);
     }
@@ -109,64 +114,109 @@ export default class CreateEvent extends Component {
 
   render() {
     return (
-      <View style={styles.background}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.emptyview}><Text style={styles.title}>Name:</Text></View>
+        <View style={styles.textinputview}>
+          <TextInput style={styles.textinput}
+            placeholder="Type event name"
+            onChangeText={(text) => this.setState({name : text})}
+            />
+        </View>
+
+        <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
+
+        <View style={styles.datetime}>
+          <TouchableHighlight
+            onPress={this._showDatePicker.bind(this)}>
+            <Text style={styles.text}>{this.state.date.toLocaleDateString()}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            onPress={this._showTimePicker.bind(this)}>
+            <Text style={styles.text}>{this.state.date.toLocaleTimeString()}</Text>
+          </TouchableHighlight>
+        </View>
+
+        <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
+
+        <View style={styles.textinputview}>
+          <TextInput
+            style = {styles.textinput}
+            placeholder="Type event location"
+            onChangeText={(text) => this.setState({location : text})}
+            />
+        </View>
+
+        <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
+
         <TextInput
-          style={{height: 40, width : 200}}
-          placeholder="Type event name."
-          onChangeText={(text) => this.setState({name : text})}
+          style = {styles.textinput1}
+          placeholder = "Type event description"
+          onChangeText = {(text) => this.setState({description : text})}
+          multiline={true}
+          underlineColorAndroid = 'transparent'
         />
-        <TextInput
-          style={{height: 40, width : 200}}
-          placeholder="Type event description!"
-          onChangeText={(text) => this.setState({description : text})}
-        />
-        <TextInput
-          style={{height: 40, width : 200}}
-          placeholder="Type event location"
-          onChangeText={(text) => this.setState({location : text})}
-        />
+
+        <View style={styles.emptyview} />
+
         <TouchableHighlight
-          onPress={this._showDatePicker.bind(this)}>
-          <Text style={styles.text}>{this.state.date.toLocaleDateString()}</Text>
+          style={styles.button}
+          onPress={this._submit.bind(this)}>
+          <Text style={styles.buttontext}> Create </Text>
         </TouchableHighlight>
-        <TouchableHighlight
-          onPress={this._showTimePicker.bind(this)}>
-          <Text style={styles.text}>{this.state.date.toLocaleTimeString()}</Text>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={this._submit.bind(this)}>
-          <Text style={styles.button}> Create </Text>
-        </TouchableHighlight>
-      </View>
+      </ScrollView>
     )
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'ghostwhite',
+    paddingTop: 80,
+    paddingHorizontal: 5
   },
-  background: {
+  emptyview: {
+    height: 40
+  },
+  title: {
+    fontSize:30,
+    color:'deepskyblue'
+  },
+  textinputview: {
+    backgroundColor: 'white',
+  },
+  textinput: {
+    height: 45,
+    fontSize: 30,
+    padding: 5
+  },
+  textinput1: {
+    height: 150,
+    borderColor: 'grey',
+    borderWidth: 1,
+    backgroundColor: 'white',
+    fontSize: 30,
+    padding: 5
+  },
+  datetime: {
     flex:1,
-    width: null,
-    height: null,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom:100,
-    paddingTop: 100,
-    backgroundColor: 'purple'
+    flexDirection:'row'
   },
-  date: {
-    flex: 1,
-    width: 400,
+  text: {
+    color: 'grey',
+    fontSize: 30,
+    padding: 5
   },
   button: {
-    fontSize: 15,
+    alignItems: 'center',
+    marginHorizontal: 100,
+    backgroundColor: 'lightgray',
+  },
+  buttontext: {
+    fontSize: 30,
     fontWeight: '600',
-    color: '#fffff0',
-    backgroundColor: '#008080',
-    padding:10
+    color: 'black',
+    textAlign: 'center',
+    paddingVertical:10,
   },
 });
 

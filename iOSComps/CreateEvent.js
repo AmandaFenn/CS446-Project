@@ -15,11 +15,13 @@ import {
 export default class CreateEvent extends Component {
   constructor(props) {
     super(props)
+    var date = new Date()
+    date.setSeconds(0)
     this.state = {
       name : '',
       description : '',
       location : '',
-      date: new Date(),
+      date: date,
       datePickerVisible: false
     }
   }

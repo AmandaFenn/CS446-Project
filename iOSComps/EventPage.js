@@ -13,6 +13,8 @@ import {
   ListView
 } from 'react-native';
 
+import GuestList from '../iOSComps/GuestList';
+
 export default class EvengPage extends Component {
   constructor(props) {
     super(props)
@@ -73,7 +75,17 @@ export default class EvengPage extends Component {
   }
   
   _guest() {
-    console.log('test-guest')
+    this.props.navigator.push({
+      component: GuestList,
+      title: 'Guests',
+      leftButtonTitle: 'Back',
+      onLeftButtonPress: ()=>{this.props.navigator.pop()},
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        fbId : this.state.fbId,
+        eventId : this.props.eventId
+      }
+    });
   }
   
   _updateEvent() {

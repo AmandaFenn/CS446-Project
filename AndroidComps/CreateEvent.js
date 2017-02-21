@@ -16,11 +16,13 @@ import {
 export default class CreateEvent extends Component {
   constructor(props) {
     super(props)
+    var date = new Date()
+    date.setSeconds(0)
     this.state = {
       name : '',
       description : '',
       location : '',
-      date: new Date(),
+      date: date,
     }
     console.log('fbid---------------------------------' + this.props.route.fbId)
   }
@@ -105,6 +107,7 @@ export default class CreateEvent extends Component {
         var date = this.state.date
         date.setMinutes(minute)
         date.setHours(hour)
+        date.setSeconds(0)
         this.setState({date : date})
       }
     } catch ({code, message}) {

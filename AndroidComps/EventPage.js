@@ -73,6 +73,15 @@ export default class EvengPage extends Component {
     eventRef.once('value').then(this._initDataRead.bind(this))
   }
 
+  _guest() {
+    this.props.navigator.push({
+      title : this.props.route.title,
+      index : 4,
+      fbId : this.state.fbId,
+      eventId : this.props.route.eventId
+    });
+  }
+
   _updateEvent() {
     var eventRef = this.props.firebaseApp.database().ref('Events/'+ this.props.route.eventId)
     var newData = {}
@@ -182,6 +191,7 @@ export default class EvengPage extends Component {
           placeholder="Type event location"
           defaultValue={this.state.location}
           onChangeText={(text) => this.setState({location : text, locationModified: true})}
+          underlineColorAndroid = 'transparent'
         />
 
         <View style={styles.emptyview}><Text style={styles.title}>View Guest List:</Text></View>
@@ -190,8 +200,7 @@ export default class EvengPage extends Component {
           <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
           <TouchableHighlight
             style={styles.button}
-            onPress={this._onBack.bind(this)}
-            underlineColorAndroid = 'transparent'>
+            onPress={this._guest.bind(this)}>
             <Text style={styles.buttontext}> Manage </Text>
           </TouchableHighlight>
         </View>
@@ -229,7 +238,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
     paddingTop: 80,
-    paddingHorizontal: 5
   },
   container2: {
     flex: 3,

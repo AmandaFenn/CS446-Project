@@ -11,6 +11,7 @@ import {
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
 import * as firebase from 'firebase';
 
+import SearchEvent from '../iOSComps/SearchEvent';
 import CreateEvent from '../iOSComps/CreateEvent';
 import EventPage from '../iOSComps/EventPage';
 
@@ -31,7 +32,6 @@ export default class MainMenu extends Component {
   
   componentWillUnmount() {
     this.state.eventsRef.off('value', this._eventsChangeCallBack);
-    console.log("UnmountUnmountUnmountUnmountUnmountUnmount")
   }
   
   _handleBackPress() {
@@ -62,6 +62,18 @@ export default class MainMenu extends Component {
 
   _updateEvents() {
     this.state.eventsRef.on('value', this._eventsChangeCallBack);
+  }
+  
+  _onSearchEvent() {
+    this.props.navigator.push({
+      component: SearchEvent,
+      title: 'Find Events',
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        name : this.state.name,
+        fbId : this.state.fbId
+      }
+    });
   }
   
   _onCreateEvent() {
@@ -216,7 +228,7 @@ export default class MainMenu extends Component {
               {this.state.name}
             </Text>
           </View>
-          <TouchableHighlight onPress = {this._deleteEventTest.bind(this)}>
+          <TouchableHighlight onPress = {this._onSearchEvent.bind(this)}>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
           <TouchableHighlight onPress = {this._onCreateEvent.bind(this)}>

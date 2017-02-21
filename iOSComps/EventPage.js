@@ -24,7 +24,12 @@ export default class EvengPage extends Component {
       datePickerVisible: false,
       guests: 1,
       comments: this._createListdataSource(['test1','comment2','comment3']),
+      descriptionModified: false,
+      locationModified: false,
+      dateModified: false,
+      timeModified: false,
     }
+    this._initData()
   }
 
   _onBack() {
@@ -39,10 +44,6 @@ export default class EvengPage extends Component {
   _checkInfo() {
     var check = false
     var checkInfo = ''
-    if (this.state.name == '') {
-      check = true
-      checkInfo += 'Please enter the event name!\n'
-    }
 
     if (this.state.location == '') {
       check = true
@@ -55,30 +56,59 @@ export default class EvengPage extends Component {
     return check
   }
 
-  _updateEvent() {
-    var eventlistRef = this.props.firebaseApp.database().ref('Events/').push()
-    eventlistRef.set({
-      'Name': this.state.name,
-      'Date': this.state.date.toLocaleDateString(),
-      'Time': this.state.date.toLocaleTimeString(),
-      'Location': this.state.location,
-      'Description': this.state.description,
+  _initDataRead(snapshot) {
+    var snapshotdata = snapshot.val()
+    var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
+    this.setState({
+      description:snapshotdata.Description,
+      location:snapshotdata.Location,
+      date: date,
+
     })
-    var addHost = {};
-    var hostData = {
-       'Name': this.props.name,
-       'Host': true,
-       'Status': 0
+  }
+
+  _initData() {
+    var eventRef = this.props.firebaseApp.database().ref('Events/'+ this.props.eventId)
+    eventRef.once('value').then(this._initDataRead.bind(this))
+  }
+  
+  _guest() {
+    console.log('test-guest')
+  }
+  
+  _updateEvent() {
+    var eventRef = this.props.firebaseApp.database().ref('Events/'+ this.props.eventId)
+    var newData = {}
+    if (this.state.descriptionModified) {
+      newData['Description'] = this.state.description
     }
-    var newPostKey = eventlistRef.key
-    addHost['/Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
-    this.props.firebaseApp.database().ref().update(addHost)
+    if (this.state.dateModified) {
+      newData['Date'] = this.state.date.toLocaleDateString()
+    }
+    if (this.state.timeModified) {
+      newData['Time'] = this.state.date.toLocaleTimeString()
+    }
+    if (this.state.locationModified) {
+      newData['Location'] = this.state.location
+    }
+    eventRef.update(newData)
   }
 
   _submit() {
-    if (!this._checkInfo()) {
-      this._updateEvent()
+    if ((
+      this.state.descriptionModified ||
+      this.state.dateModified ||
+      this.state.timeModified ||
+      this.state.locationModified) &&
+      !this._checkInfo()) {
+        this._updateEvent()
+        this._onBack()
     }
+  }
+  
+  _deleteEvent() {
+    this.props.firebaseApp.database().ref('Events/'+ this.props.eventId).remove()
+    this._onBack()
   }
 
   onDateChange = (date) => {
@@ -92,14 +122,17 @@ export default class EvengPage extends Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
-          style={styles.textinput1}
+          style={styles.description}
           placeholder="Type event description!"
           defaultValue={this.state.description}
-          onChangeText={(text) => this.setState({description : text})}
+          onChangeText={(text) => this.setState({description : text, descriptionModified:true})}
           multiline={true}
         />
-        <View style={styles.emptyview} />
+        
+        <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
+        
         <View>
           <TouchableHighlight 
             style={styles.datetime}
@@ -115,52 +148,55 @@ export default class EvengPage extends Component {
           />}
         </View>  
         
-        <View style={styles.emptyview} />
-        
         <View style={styles.location} >
-          <View style={styles.textinputview1}>
-            <TextInput
-              style={styles.textinput}
-              placeholder="Type event location"
-              defaultValue={this.state.location}
-              onChangeText={(text) => this.setState({location : text})}
-            />
-          </View>
+          <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
           <TouchableHighlight
             style={styles.button}
             onPress={this._onBack.bind(this)}>
-            <Text style={styles.buttontext}> Sugeest</Text>
+            <Text style={styles.buttontext}> Sugeest Location</Text>
           </TouchableHighlight>
         </View>
         
-        <View style={styles.emptyview} />
+        <TextInput
+          style={styles.textinput}
+          placeholder="Type event location"
+          defaultValue={this.state.location}
+          onChangeText={(text) => this.setState({location : text, locationModified: true})}
+        />
         
         <View style={styles.location}>
-          <Text>Guests: {this.state.guests}</Text>
+          <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
           <TouchableHighlight
             style={styles.button}
-            onPress={this._onBack.bind(this)}>
+            onPress={this._guest.bind(this)}>
             <Text style={styles.buttontext}> Manage </Text>
           </TouchableHighlight>
         </View>
         
-        <View style={styles.emptyview} />
-        
-        <Text>Comments</Text>
-        <View style={styles.container2}>
+        <View style={styles.emptyview}><Text style={styles.title}>Comments:</Text></View>
+
+        <View style={styles.comments}>
           <ListView 
             dataSource={this.state.comments}
-            renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+            renderRow={(rowData) => <Text style = {styles.commenttext}>{rowData}</Text>}
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false} />
         </View>
         
         <View style={styles.emptyview} />
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this._onBack.bind(this)}>
-          <Text style={styles.buttontext}> Save </Text>
-        </TouchableHighlight>
+
+        <View style={styles.buttonlayout}>
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._submit.bind(this)}>
+            <Text style={styles.buttontext1}> Save </Text>
+            </TouchableHighlight>
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._deleteEvent.bind(this)}>
+            <Text style={styles.buttontext1}> Delete </Text>
+          </TouchableHighlight>
+        </View>
       </ScrollView>
     )
   }
@@ -169,34 +205,16 @@ export default class EvengPage extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
-    paddingTop: 40
-  },
-  container2: {
-    flex: 3,
-    width: 360,
-    backgroundColor: 'purple'
+    paddingHorizontal: 5
   },
   emptyview: {
-    height: 40
+    height: 40,
   },
-  textinputview: {
-    borderColor: 'grey',
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    backgroundColor: 'white',
+  title: {
+    fontSize:30,
+    color:'blue'
   },
-  textinputview1: {
-    borderColor: 'grey',
-    borderWidth: 0.5,
-    backgroundColor: 'white',
-    flex:2,
-  },
-  textinput: {
-    height: 45,
-    fontSize: 30,
-    padding: 5
-  },
-  textinput1: {
+  description: {
     height: 150,
     borderColor: 'grey',
     borderTopWidth: 0.5,
@@ -219,27 +237,59 @@ const styles = StyleSheet.create({
   location: {
     flex : 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   button: {
     alignItems: 'center',
-    width: 100,
-    backgroundColor: '#008080',    
-    flex:3
+    backgroundColor: 'lightgray',
   },
   buttontext: {
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: '600',
-    color: '#fffff0',
+    width:180,
+    color: 'black',
     textAlign: 'center',
-    paddingVertical:10
+    paddingVertical:10,
+    paddingHorizontal:5
   },
-  text1: {
+  textinput: {
+    height: 45,
+    fontSize: 30,
+    paddingHorizontal: 5
+  },
+  comments: {
+    width: 360,
+    backgroundColor: 'purple'
+  },
+  commenttext: {
     color: '#fffff0',
     fontSize: 40,
     fontWeight: '600',
     backgroundColor: 'transparent'
-  }
+  },
+  guest: {
+    fontSize:30,
+    color: 'black'
+  },
+  buttonlayout: {
+    flex : 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  buttontext1: {
+    fontSize: 20,
+    fontWeight: '600',
+    width:100,
+    color: 'black',
+    textAlign: 'center',
+    paddingVertical:10,
+    paddingHorizontal:5
+  },
+  button1: {
+    alignItems: 'center',
+    backgroundColor: 'lightgray',
+    marginHorizontal: 40,
+  },
 });
 
 AppRegistry.registerComponent('EvengPage', () => EvengPage);

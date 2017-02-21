@@ -109,7 +109,7 @@ export default class EvengPage extends Component {
       !this._checkInfo()) {
         this._updateEvent()
         this._onBack()
-      }
+    }
   }
 
   _deleteEvent() {

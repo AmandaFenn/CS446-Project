@@ -190,7 +190,8 @@ export default class MainMenu extends Component {
       passProps: { 
         firebaseApp : this.props.firebaseApp,
         name : this.state.name,
-        fbId : this.state.fbId
+        fbId : this.state.fbId,
+        eventId : this.state.myeventIds[rowID]
       }
     });
     //console.log(this.state.myeventIds[rowID])

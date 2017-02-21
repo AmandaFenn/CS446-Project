@@ -75,7 +75,7 @@ export default class EvengPage extends Component {
 
   _guest() {
     this.props.navigator.push({
-      title : this.props.route.title,
+      title : 'Guests',
       index : 4,
       fbId : this.state.fbId,
       eventId : this.props.route.eventId

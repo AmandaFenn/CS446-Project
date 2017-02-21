@@ -15,8 +15,10 @@ export default class GuestList extends Component {
   constructor(props){
     super(props)
     this.state = {
-      guests: [],
+      guestsDataSource: this._createListdataSource([]),
       partsRef : this.props.firebaseApp.database().ref('Events/'+ this.props.route.eventId + '/Participants'),
+      guests: [],
+      guestIds : []
     }
   }
 
@@ -30,9 +32,7 @@ export default class GuestList extends Component {
   }
 
   _onBack() {
-    if (this.props.route.index > 0) {
-      this.props.navigator.pop();
-    }
+    this.props.navigator.pop();
   }
 
   _createListdataSource(array) {
@@ -41,46 +41,45 @@ export default class GuestList extends Component {
   }
 
   _loadGuestsCallBack(snapshot) {
+    var guestsName = []
     var guestIds = []
     snapshot.forEach(function(data) {
-      //guests.push(data.val().Name)
+      guestsName.push({'Name' : data.val().Name})
       guestIds.push(data.key)
     });
     for (i=0; i<guestIds.length;i++) {
       this._loadfbInfo(i, guestIds[i])
     }
+    this.setState({
+      guestIds: guestIds
+    });
   }
 
   _loadGuests() {
     this.state.partsRef.on('value', this._loadGuestsCallBack, function(error) {
       console.error(error);
     });
-
   }
 
-  _doNothing() {
-
+  _doNothing(rowID) {
   }
 
-  _loadfbInfo(rowID, fbId) {
-    return AccessToken.getCurrentAccessToken().then(
+  _loadfbInfo(i, fbId) {
+    AccessToken.getCurrentAccessToken().then(
       (data) => {
         let accessToken = data.accessToken
         const responseInfoCallback = (error, result) => {
-          var guests = this.state.guests
           if (error) {
             console.log(error)
-            //guests[rowID] = 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'
-            guests[rowID] = 'test'
-            //guests[rowID] = {fbId, {'name': '', 'pic':'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'}}
             alert('Fail to fetch facebook information: ' + error.toString());
           } else {
-            //guests[rowID] = result.picture.data.url
-            guests[rowID] = result.name
-            //guests[rowID] = {fbId: {'name': result.name,'pic':result.picture.data.url}
-            console.log(result.picture.data.url + '  ' + rowID)
+            var guests = this.state.guests
+            guests[i] = {'Name': result.name, 'pic' : result.picture.data.url}
+            this.setState({
+              guestsDataSource: this._createListdataSource(guests),
+              guests: guests
+            });
           }
-          this.setState({guests: this._createListdataSource(guests)})
         }
 
         const infoRequest = new GraphRequest(
@@ -95,20 +94,19 @@ export default class GuestList extends Component {
           },
           responseInfoCallback
         );
-
+        // Start the graph request.
         new GraphRequestManager().addRequest(infoRequest).start()
       }
     )
   }
 
   _renderRow(rowData, sectionID, rowID, highlightRow) {
-    console.log(rowData[rowID])
     return (
-      <View>
-        <Image source={{uri: rowData[rowID]}}
-          style={{width: 40, height: 40}} />
-        <TouchableHighlight onPress = {this._doNothing.bind(this)}>
-          <Text style = {styles.text1}>{rowData[rowID]} </Text>
+      <View style = {styles.profile}>
+        <Image source={{uri: rowData.pic}}
+              style={{width:50, height: 50}} />
+        <TouchableHighlight onPress = {this._doNothing.bind(this, rowID)}>
+          <Text style = {styles.text1}> {rowData.Name} </Text>
         </TouchableHighlight>
       </View>
     )
@@ -119,9 +117,10 @@ export default class GuestList extends Component {
       <View style={styles.container}>
         <View style={styles.container2}>
           <ListView
-            dataSource={this._createListdataSource(this.state.guests)}
+            dataSource={this.state.guestsDataSource}
             renderRow={this._renderRow.bind(this)}
-            enableEmptySections={true} />
+            enableEmptySections={true}
+            automaticallyAdjustContentInsets={false} />
           </View>
       </View>
     );
@@ -142,25 +141,13 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: 'purple'
+    backgroundColor: 'purple',
+    padding: 10
   },
   profile: {
-    alignItems: 'center',
-  },
-  button: {
-    fontSize: 15,
-    fontWeight: '600',
-    width: 200,
-    color: '#fffff0',
-    backgroundColor: '#008080',
-    textAlign: 'center',
-    paddingVertical:10
-  },
-  text: {
-    color: '#fffff0',
-    fontSize: 20,
-    fontWeight: '600',
-    backgroundColor: 'transparent'
+    flex : 1,
+    flexDirection: 'row',
+    padding : 10
   },
   text1: {
     color: '#fffff0',

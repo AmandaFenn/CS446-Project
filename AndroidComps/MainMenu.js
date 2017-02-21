@@ -64,6 +64,15 @@ export default class MainMenu extends Component {
     });
   }
 
+  _onSearchEvent() {
+    this.props.navigator.push({
+      title : 'Find Events',
+      index : 5,
+      name : this.state.name,
+      fbId : this.state.fbId
+    });
+  }
+
   _onCreateEvent() {
     this.props.navigator.push({
       title : 'New Event',
@@ -208,7 +217,7 @@ export default class MainMenu extends Component {
               {this.state.name}
             </Text>
           </View>
-          <TouchableHighlight onPress = {this._deleteEventTest.bind(this)}>
+          <TouchableHighlight onPress = {this._onSearchEvent.bind(this)}>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
           <TouchableHighlight onPress = {this._onCreateEvent.bind(this)}>

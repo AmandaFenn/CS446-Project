@@ -5,7 +5,9 @@ import {
   Text,
   View,
   Image,
-  TouchableHighlight
+  TouchableHighlight,
+  ListView,
+  PermissionsAndroid
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
 import * as firebase from 'firebase';
@@ -15,15 +17,112 @@ export default class MainMenu extends Component {
     super(props)
     this.state = {
       name : '',
-      pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'
+      fbId : 0,
+      pic : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
+      myevents: this._createListdataSource([]),
+      myeventIds: [],
+      eventsRef : this.props.firebaseApp.database().ref('Events/'),
     }
     this._loadPersonalInfo()
+  }
+
+  componentWillUnmount() {
+    this.state.eventsRef.off('value', this._eventsChangeCallBack);
   }
 
   _onBack() {
     if (this.props.route.index > 0) {
       this.props.navigator.pop();
     }
+  }
+
+  _createListdataSource(array) {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    return ds.cloneWithRows(array)
+  }
+
+  _eventsChangeCallBack(snapshot) {
+    var events = []
+    var eventIds = []
+    var fbId = this.state.fbId.toString()
+    snapshot.forEach(function(data) {
+      if (data.child('Participants').hasChild(fbId)) {
+        events.push(data.val().Name)
+        eventIds.push(data.key)
+      }
+      //console.log("The " + data.key + " score is " + data.val().Name);
+    });
+    this.setState({
+      myevents: this._createListdataSource(events),
+      myeventIds: eventIds
+    });
+  }
+
+  _updateEvents() {
+    this.state.eventsRef.on('value', this._eventsChangeCallBack, function(error) {
+      console.error(error);
+    });
+  }
+
+  _onSearchEvent() {
+    this.props.navigator.push({
+      title : 'Find Events',
+      index : 5,
+      name : this.state.name,
+      fbId : this.state.fbId
+    });
+  }
+
+  _onCreateEvent() {
+    this.props.navigator.push({
+      title : 'New Event',
+      index : 2,
+      name : this.state.name,
+      fbId : this.state.fbId
+    });
+  }
+
+  _createEventTest() {
+    var test = this.props.firebaseApp.database().ref('Events/').push()
+    test.set({
+      'Name': this.state.name + '\'s Event',
+      'Date': new Date(),
+      'Location': 'Waterloo',
+      'Description': '',
+      'Participants': {123456: {
+        'Name': this.state.name,
+        'Host': true,
+        'Status': 0
+      }},
+    })
+  }
+
+  _deleteEventTest1(snapshot) {
+    var test = '1'
+    snapshot.forEach(function(data) {
+      if (data.val().Name == 'event2') {
+        console.log(data.key)
+        test = data.key
+      }
+    })
+    //console.log(test)
+    this.props.firebaseApp.database().ref('Events/' + test).remove()
+  }
+
+  _deleteEventTest() {
+    // test for location
+    //this.props.firebaseApp.database().ref('Events/eventtesst').remove()
+    //console.log(new Date())
+    this.state.eventsRef.once('value').then(this._deleteEventTest1.bind(this))
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        var initialPosition = JSON.stringify(position);
+        console.log(initialPosition)
+      },
+      (error) => alert(JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 5000, maximumAge: 5000}
+    );
   }
 
   _loadPersonalInfo() {
@@ -37,12 +136,16 @@ export default class MainMenu extends Component {
             console.log(error)
             alert('Fail to fetch facebook information: ' + error.toString());
           } else {
-            console.log(result)
+            console.log(result.friends)
             //alert('Success fetching data: ' + result.picture.data.url.toString());
             this.setState({
               name : result.name,
-              pic : result.picture.data.url
+              pic : result.picture.data.url,
+              fbId: result.id
             });
+            this._eventsChangeCallBack = this._eventsChangeCallBack.bind(this)
+            this._updateEvents()
+            //console.log(result.friends)
           }
         }
 
@@ -52,15 +155,12 @@ export default class MainMenu extends Component {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'email, name, picture'
+                string: 'id, email, name, picture, friends{picture}'
               }
             }
           },
           responseInfoCallback
         );
-
-        // Start the graph request.
-        new GraphRequestManager().addRequest(infoRequest).start()
 
         // Firebase authentication
         const provider = firebase.auth.FacebookAuthProvider;
@@ -81,7 +181,28 @@ export default class MainMenu extends Component {
           }
         });
 
+        // Start the graph request.
+        new GraphRequestManager().addRequest(infoRequest).start()
       }
+    )
+  }
+
+  _onMyEvent(rowData, rowID) {
+    this.props.navigator.push({
+      title : rowData,
+      index : 3,
+      name : this.state.name,         // host name
+      fbId : this.state.fbId,
+      eventId : this.state.myeventIds[rowID]
+    });
+    //console.log(this.state.myeventIds[rowID])
+  }
+
+  _renderRow(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <TouchableHighlight onPress = {this._onMyEvent.bind(this, rowData, rowID)}>
+        <Text style = {styles.text1}> {rowData} </Text>
+      </TouchableHighlight>
     )
   }
 
@@ -96,14 +217,19 @@ export default class MainMenu extends Component {
               {this.state.name}
             </Text>
           </View>
-          <TouchableHighlight onPress = {this._onBack.bind(this)}>
+          <TouchableHighlight onPress = {this._onSearchEvent.bind(this)}>
             <Text style={styles.button}> Find Events </Text>
           </TouchableHighlight>
-          <TouchableHighlight>
+          <TouchableHighlight onPress = {this._onCreateEvent.bind(this)}>
             <Text style={styles.button}> Create Events </Text>
           </TouchableHighlight>
         </View>
-        <View style={styles.container2}></View>
+        <View style={styles.container2}>
+          <ListView
+            dataSource={this.state.myevents}
+            renderRow={this._renderRow.bind(this)}
+            enableEmptySections={true} />
+        </View>
       </Image>
     );
   }
@@ -127,6 +253,8 @@ const styles = StyleSheet.create({
   },
   container2: {
     flex: 3,
+    width: 400,
+    backgroundColor: 'purple'
   },
   profile: {
     justifyContent: 'space-around',
@@ -147,6 +275,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     backgroundColor: 'transparent'
   },
+  text1: {
+    color: '#fffff0',
+    fontSize: 40,
+    fontWeight: '600',
+    backgroundColor: 'transparent'
+  }
 });
 
 AppRegistry.registerComponent('MainMenu', () => MainMenu);

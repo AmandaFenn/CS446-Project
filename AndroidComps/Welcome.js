@@ -10,21 +10,15 @@ import {
 import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
 
 export default class Welcome extends Component {
-  _onPressButton() {
+  _onForward() {
     this.props.navigator.push({
-      title: 'MainMenu',
+      title: 'Blink',
       index: 1
     });
   }
 
   _onLogOut() {
-    this.props.firebaseApp.auth().signOut().then(function() {
-      // Sign-out successful.
-      console.log("Firebase log out")
-    }, function(error) {
-      console.log("Firebase log out failed")
-      // An error happened.
-    });
+    // Do not call Firebase signout here.
     alert("User logged out")
   }
 
@@ -48,11 +42,11 @@ export default class Welcome extends Component {
             in the blink of an eye.
           </Text>
         </View>
-        <TouchableHighlight onPress={this._onPressButton.bind(this)}>
+        <TouchableHighlight onPress={this._onForward.bind(this)}>
           <Text style={styles.button}> Get Started! </Text>
         </TouchableHighlight>
         <LoginButton
-          readPermissions={["public_profile"]}
+          readPermissions={["public_profile", "user_friends"]}
           onLoginFinished={
             (error, result) => {
               if (error) {
@@ -60,7 +54,7 @@ export default class Welcome extends Component {
               } else if (result.isCancelled) {
                 alert("Login was cancelled");
               } else {
-                this._onPressButton();
+                this._onForward();
                 //alert("Login was successful with permissions: " + result.grantedPermissions)
               }
             }

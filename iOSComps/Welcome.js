@@ -11,14 +11,19 @@ import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
 import MainMenu from '../iOSComps/MainMenu';
 
 export default class Welcome extends Component {
-  _onForward(nextRoute) {
-    this.props.navigator.push(nextRoute);
-  }
-  render() {
-    const nextRoute = {
+  _onForward() {
+    this.props.navigator.push({
       component: MainMenu,
       title: 'Main Menu',
-    };
+      passProps: { firebaseApp : this.props.firebaseApp }
+    });
+  }
+
+  _onLogOut() {
+    alert("User logged out")
+  }
+
+  render() {
     return (
       <Image source={require('../img/blink.jpg')} style={styles.background}>
         <View style={styles.texts}>
@@ -38,11 +43,11 @@ export default class Welcome extends Component {
             in the blink of an eye.
           </Text>
         </View>
-        <TouchableHighlight onPress={() => this._onForward(nextRoute)}>
+        <TouchableHighlight onPress={this._onForward.bind(this)}>
           <Text style={styles.button}> Get Started! </Text>
         </TouchableHighlight>
         <LoginButton
-          readPermissions={["public_profile"]}
+          readPermissions={["public_profile", "user_friends"]}
           onLoginFinished={
             (error, result) => {
               if (error) {
@@ -50,15 +55,12 @@ export default class Welcome extends Component {
               } else if (result.isCancelled) {
                 alert("Login was cancelled");
               } else {
-                this.props.navigator.push({
-                  component: MainMenu,
-                  title: 'Main Menu',
-                });
+                this._onForward()
                 //alert("Login was successful with permissions: " + result.grantedPermissions)
               }
             }
           }
-          onLogoutFinished={() => alert("User logged out")}/>
+          onLogoutFinished={this._onLogOut.bind(this)}/>
       </Image>
     );
   }

@@ -15,21 +15,27 @@ export default class GuestList extends Component {
   constructor(props){
     super(props)
     this.state = {
-      //ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
       guestsDataSource: this._createListdataSource([]),
       partsRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId + '/Participants'),
       guests: [],
       guestIds : []
     }
+    if (!this.props.guest) {
+      this._loadfbInfo(-1, this.props.fbId)
+    }
   }
 
   componentWillMount() {
-    this._loadGuestsCallBack = this._loadGuestsCallBack.bind(this)
-    this._loadGuests()
+    if (this.props.guest) {
+      this._loadGuestsCallBack = this._loadGuestsCallBack.bind(this)
+      this._loadGuests()
+    }
   }
 
   componentWillUnmount() {
-    this.state.partsRef.off('value', this._loadGuestsCallBack);
+    if (this.props.guest) {
+      this.state.partsRef.off('value', this._loadGuestsCallBack);
+    }  
   }
 
   _onBack() {
@@ -61,8 +67,45 @@ export default class GuestList extends Component {
       console.error(error);
     });
   }
+  
+  _deleteOrInvite(rowID) {
+    var id = this.state.guestIds[rowID]
+    if (this.props.guest) {
+      if (id != this.props.fbId) {
+        this.setState({
+          guests: [],
+          guestIds: []
+        })
+        this.state.partsRef.child(id).remove()
+      }
+    } else {
+      var newPart = {}
+      newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
+      this.state.partsRef.update(newPart)
+    }
+  }
 
-  _doNothing(rowID) {
+  _addGuest(i, data) {
+    var guests = this.state.guests
+    guests[i] = {'Name': data.name, 'pic' : data.picture.data.url}
+    this.setState({
+      guestsDataSource: this._createListdataSource(guests),
+      guests: guests
+    });
+  }
+
+  _addFriends(data) {
+    var friends = []
+    var friendIds = []
+    for (k = 0; k < data.length; k++) {
+      friends[k] = {'Name': data[k].name, 'pic' : data[k].picture.data.url}
+      friendIds[k] = data[k].id
+    }
+    this.setState({
+      guestsDataSource: this._createListdataSource(friends),
+      guests: friends,
+      guestIds: friendIds
+    });
   }
 
   _loadfbInfo(i, fbId) {
@@ -74,22 +117,28 @@ export default class GuestList extends Component {
             console.log(error)
             alert('Fail to fetch facebook information: ' + error.toString());
           } else {
-            var guests = this.state.guests
-            guests[i] = {'Name': result.name, 'pic' : result.picture.data.url}
-            this.setState({
-              guestsDataSource: this._createListdataSource(guests),
-              guests: guests
-            });
+            if (i >= 0) {
+              this._addGuest(i, result)
+            } else {
+              console.log(result)
+              this._addFriends(result.friends.data)
+            }
           }
         }
-
+        
+        var requestID = this.props.guest ? fbId : 'me'
+        var requestStr = 'name, picture'
+        if (!this.props.guest) {
+          requestStr = requestStr + ', friends{name, picture}'
+        }
+        
         const infoRequest = new GraphRequest(
-          '/' + fbId,
+          '/' + requestID,
           {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'name, picture'
+                string: requestStr
               }
             }
           },
@@ -106,8 +155,11 @@ export default class GuestList extends Component {
       <View style = {styles.profile}>
         <Image source={{uri: rowData.pic}}
               style={{width:50, height: 50}} />
-        <TouchableHighlight onPress = {this._doNothing.bind(this, rowID)}>
-          <Text style = {styles.text1}> {rowData.Name} </Text>
+        <Text style = {styles.text1}> {rowData.Name} </Text>
+        <TouchableHighlight
+          style={styles.button}
+          onPress = {this._deleteOrInvite.bind(this, rowID)}>
+          <Text style = {styles.buttontext}> {this.props.guest ? 'Delete' : 'Invite'} </Text>
         </TouchableHighlight>
       </View>
     )
@@ -151,11 +203,26 @@ const styles = StyleSheet.create({
     padding : 10
   },
   text1: {
+    flex: 5,
     color: '#fffff0',
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: '600',
     backgroundColor: 'transparent'
-  }
+  },
+  button: {
+    flex: 3,
+    alignItems: 'center',
+    backgroundColor: 'lightgray',
+    padding: 5
+  },
+  buttontext: {
+    fontSize: 25,
+    fontWeight: '600',
+    width:100,
+    color: 'black',
+    textAlign: 'center',
+    padding: 5,
+  },
 });
 
 AppRegistry.registerComponent('GuestList', () => GuestList);

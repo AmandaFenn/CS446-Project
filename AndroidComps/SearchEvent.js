@@ -17,7 +17,6 @@ export default class SearchEvent extends Component {
     super(props)
     this.state = {
       name : '',
-      fbId : 0,
       searchEvents: this._createListdataSource([]),
       searchEventIds: [],
       eventsRef : this.props.firebaseApp.database().ref('Events/'),
@@ -70,8 +69,8 @@ export default class SearchEvent extends Component {
     this.props.navigator.push({
       title : rowData,
       index : 3,
-      name : this.state.name,
-      fbId : this.state.fbId,
+      name : this.props.route.name,
+      fbId : this.props.route.fbId,
       eventId : this.state.myeventIds[rowID]
     });
   }

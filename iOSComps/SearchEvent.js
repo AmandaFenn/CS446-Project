@@ -19,7 +19,6 @@ export default class SearchEvent extends Component {
     super(props)
     this.state = {
       name : '',
-      fbId : 0,
       searchEvents: this._createListdataSource([]),
       searchEventIds: [],
       eventsRef : this.props.firebaseApp.database().ref('Events/'),
@@ -49,7 +48,6 @@ export default class SearchEvent extends Component {
   _searchEventsCallBack(snapshot) {
     var events = []
     var eventIds = []
-    var fbId = this.state.fbId.toString()
     var searchName = this.state.name
     snapshot.forEach(function(data) {
       var dataVal = data.val()
@@ -74,8 +72,8 @@ export default class SearchEvent extends Component {
       title: rowData,
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        name : this.state.name,
-        fbId : this.state.fbId,
+        name : this.props.name,
+        fbId : this.props.fbId,
         eventId : this.state.myeventIds[rowID]
       }
     });

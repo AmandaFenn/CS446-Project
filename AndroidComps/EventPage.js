@@ -21,8 +21,9 @@ export default class EvengPage extends Component {
       description : '',
       location : '',
       date: new Date(),
-      guests: 1,
-      comments: this._createListdataSource(['test1','comment2','comment3']),
+      guests: 0,
+      eventRef : this.props.firebaseApp.database().ref('Events/'+ this.props.route.eventId),
+      comments: this._createListdataSource(['User1: comment1','User2: comment2','User3: comment3']),
       descriptionModified: false,
       locationModified: false,
       dateModified: false,
@@ -31,7 +32,14 @@ export default class EvengPage extends Component {
     this._initData()
   }
 
+  componentWillMount() {
+    this._loadEventCallBack = this._loadEventCallBack.bind(this)
+    this._loadEvent()
+  }
 
+  componentWillUnmount() {
+    this.state.eventRef.off('value', this._loadEventCallBack);
+  }
 
   _onBack() {
     this.props.navigator.pop();
@@ -40,6 +48,18 @@ export default class EvengPage extends Component {
   _createListdataSource(array) {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return ds.cloneWithRows(array)
+  }
+
+  _loadEventCallBack(snapshot) {
+    this.setState({
+      guests: snapshot.child('Participants').numChildren()
+    });
+  }
+
+  _loadEvent() {
+    this.state.eventRef.on('value', this._loadEventCallBack, function(error) {
+      console.error(error);
+    });
   }
 
   _checkInfo() {
@@ -77,8 +97,19 @@ export default class EvengPage extends Component {
     this.props.navigator.push({
       title : 'Guests',
       index : 4,
-      fbId : this.state.fbId,
-      eventId : this.props.route.eventId
+      fbId : this.props.route.fbId,
+      eventId : this.props.route.eventId,
+      guest: true
+    });
+  }
+
+  _friend() {
+    this.props.navigator.push({
+      title : 'Friends',
+      index : 4,
+      fbId : this.props.route.fbId,
+      eventId : this.props.route.eventId,
+      guest: false
     });
   }
 
@@ -199,9 +230,14 @@ export default class EvengPage extends Component {
         <View style={styles.location}>
           <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
           <TouchableHighlight
-            style={styles.button}
+            style={styles.button1}
             onPress={this._guest.bind(this)}>
-            <Text style={styles.buttontext}> Manage </Text>
+            <Text style={styles.buttontext1}> Manage </Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._friend.bind(this)}>
+            <Text style={styles.buttontext1}> Invite </Text>
           </TouchableHighlight>
         </View>
 
@@ -219,14 +255,14 @@ export default class EvengPage extends Component {
 
         <View style={styles.buttonlayout}>
           <TouchableHighlight
-            style={styles.button1}
+            style={styles.button2}
             onPress={this._submit.bind(this)}>
-            <Text style={styles.buttontext1}> Save </Text>
+            <Text style={styles.buttontext2}> Save </Text>
             </TouchableHighlight>
           <TouchableHighlight
-            style={styles.button1}
+            style={styles.button2}
             onPress={this._deleteEvent.bind(this)}>
-            <Text style={styles.buttontext1}> Delete </Text>
+            <Text style={styles.buttontext2}> Delete </Text>
           </TouchableHighlight>
         </View>
       </ScrollView>
@@ -301,6 +337,11 @@ const styles = StyleSheet.create({
   button1: {
     alignItems: 'center',
     backgroundColor: 'lightgray',
+    marginHorizontal: 25,
+  },
+  button2: {
+    alignItems: 'center',
+    backgroundColor: 'lightgray',
     marginHorizontal: 50,
   },
   buttontext: {
@@ -313,6 +354,15 @@ const styles = StyleSheet.create({
     paddingHorizontal:5
   },
   buttontext1: {
+    fontSize: 20,
+    fontWeight: '600',
+    width:100,
+    color: 'black',
+    textAlign: 'center',
+    paddingVertical:10,
+    paddingHorizontal:5
+  },
+  buttontext2: {
     fontSize: 20,
     fontWeight: '600',
     width:100,

@@ -136,7 +136,7 @@ export default class MainMenu extends Component {
             console.log(error)
             alert('Fail to fetch facebook information: ' + error.toString());
           } else {
-            //console.log(result)
+            console.log(result.friends)
             //alert('Success fetching data: ' + result.picture.data.url.toString());
             this.setState({
               name : result.name,
@@ -155,7 +155,7 @@ export default class MainMenu extends Component {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'id, email, name, picture, friends'
+                string: 'id, email, name, picture, friends{picture}'
               }
             }
           },

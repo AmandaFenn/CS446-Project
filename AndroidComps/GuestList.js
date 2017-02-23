@@ -20,15 +20,22 @@ export default class GuestList extends Component {
       guests: [],
       guestIds : []
     }
+    if (!this.props.route.guest) {
+      this._loadfbInfo(-1, this.props.route.fbId)
+    }
   }
 
   componentWillMount() {
-    this._loadGuestsCallBack = this._loadGuestsCallBack.bind(this)
-    this._loadGuests()
+    if (this.props.route.guest) {
+      this._loadGuestsCallBack = this._loadGuestsCallBack.bind(this)
+      this._loadGuests()
+    }
   }
 
   componentWillUnmount() {
-    this.state.partsRef.off('value', this._loadGuestsCallBack);
+    if (this.props.route.guest) {
+      this.state.partsRef.off('value', this._loadGuestsCallBack);
+    }
   }
 
   _onBack() {
@@ -61,7 +68,45 @@ export default class GuestList extends Component {
     });
   }
 
-  _doNothing(rowID) {
+  _deleteOrInvite(rowID) {
+    var id = this.state.guestIds[rowID]
+    if (this.props.route.guest) {
+      if (id != this.props.route.fbId) {
+        this.setState({
+          guests: [],
+          guestIds: []
+        })
+        this.state.partsRef.child(id).remove()
+
+      }
+    } else {
+      var newPart = {}
+      newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
+      this.state.partsRef.update(newPart)
+    }
+  }
+
+  _addGuest(i, data) {
+    var guests = this.state.guests
+    guests[i] = {'Name': data.name, 'pic' : data.picture.data.url}
+    this.setState({
+      guestsDataSource: this._createListdataSource(guests),
+      guests: guests
+    });
+  }
+
+  _addFriends(data) {
+    var friends = []
+    var friendIds = []
+    for (k = 0; k < data.length; k++) {
+      friends[k] = {'Name': data[k].name, 'pic' : data[k].picture.data.url}
+      friendIds[k] = data[k].id
+    }
+    this.setState({
+      guestsDataSource: this._createListdataSource(friends),
+      guests: friends,
+      guestIds: friendIds
+    });
   }
 
   _loadfbInfo(i, fbId) {
@@ -73,22 +118,26 @@ export default class GuestList extends Component {
             console.log(error)
             alert('Fail to fetch facebook information: ' + error.toString());
           } else {
-            var guests = this.state.guests
-            guests[i] = {'Name': result.name, 'pic' : result.picture.data.url}
-            this.setState({
-              guestsDataSource: this._createListdataSource(guests),
-              guests: guests
-            });
+            if (i >= 0) {
+              this._addGuest(i, result)
+            } else {
+              this._addFriends(result.friends.data)
+            }
           }
         }
 
+        var requestID = this.props.route.guest ? fbId : 'me'
+        var requestStr = 'name, picture'
+        if (!this.props.route.guest) {
+          requestStr = requestStr + ', friends{name, picture}'
+        }
         const infoRequest = new GraphRequest(
-          '/' + fbId,
+          '/' + requestID,
           {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'name, picture'
+                string: requestStr
               }
             }
           },
@@ -105,8 +154,11 @@ export default class GuestList extends Component {
       <View style = {styles.profile}>
         <Image source={{uri: rowData.pic}}
               style={{width:50, height: 50}} />
-        <TouchableHighlight onPress = {this._doNothing.bind(this, rowID)}>
-          <Text style = {styles.text1}> {rowData.Name} </Text>
+        <Text style = {styles.text1}> {rowData.Name} </Text>
+        <TouchableHighlight
+          style={styles.button}
+          onPress = {this._deleteOrInvite.bind(this, rowID)}>
+          <Text style = {styles.buttontext}> {this.props.route.guest ? 'Delete' : 'Invite'} </Text>
         </TouchableHighlight>
       </View>
     )
@@ -150,11 +202,27 @@ const styles = StyleSheet.create({
     padding : 10
   },
   text1: {
+    flex: 5,
     color: '#fffff0',
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: '600',
     backgroundColor: 'transparent'
-  }
+  },
+  button: {
+    flex: 2,
+    alignItems: 'center',
+    backgroundColor: 'lightgray',
+    marginHorizontal: 5,
+  },
+  buttontext: {
+    fontSize: 20,
+    fontWeight: '600',
+    width:100,
+    color: 'black',
+    textAlign: 'center',
+    paddingVertical:10,
+    paddingHorizontal:5
+  },
 });
 
 AppRegistry.registerComponent('GuestList', () => GuestList);

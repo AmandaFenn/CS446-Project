@@ -46,6 +46,7 @@ export default class SearchEvent extends Component {
   _searchEventsCallBack(snapshot) {
     var events = []
     var eventIds = []
+    var fbId = this.state.fbId.toString()
     var searchName = this.state.name
     snapshot.forEach(function(data) {
       var dataVal = data.val()
@@ -84,7 +85,7 @@ export default class SearchEvent extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <Image source={require('../img/menu.jpg')} style={styles.container}>
         <View style={styles.container1}>
           <TextInput
             style={styles.textinput}
@@ -102,7 +103,7 @@ export default class SearchEvent extends Component {
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false} />
         </View>
-      </View>
+      </Image>
     );
   }
 }
@@ -131,14 +132,14 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: '#C5CAE9'
+    backgroundColor: 'purple'
   },
   button: {
     fontSize: 15,
     fontWeight: '600',
     width: 200,
     color: '#fffff0',
-    backgroundColor: '#303F9F',
+    backgroundColor: '#008080',
     textAlign: 'center',
     paddingVertical:10
   },

@@ -100,13 +100,12 @@ var routeMapper = {
 
  const styles = StyleSheet.create({
    bar: {
-     backgroundColor: '#3F51B5',
+     backgroundColor: 'grey',
    },
    text: {
      color: '#fffff0',
-     fontSize: 20,
+     fontSize: 30,
      textAlign: 'center',
-     alignItems: 'center'
    },
  });
 

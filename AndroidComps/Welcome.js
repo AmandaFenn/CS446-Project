@@ -5,11 +5,13 @@ import {
   Text,
   View,
   Image,
-  TouchableHighlight
+  TouchableHighlight,
+  StatusBar,
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
 
 export default class Welcome extends Component {
+
   _onForward() {
     this.props.navigator.push({
       title: 'Blink',
@@ -24,30 +26,38 @@ export default class Welcome extends Component {
 
   render() {
     return (
-      <Image source={require('../img/blink.jpg')} style={styles.background}>
-        <View style={styles.texts}>
-          <Text style={styles.welcome}>
-            Welcome to Blink!
-          </Text>
-          <Text style={styles.instructions}>
-            Enabling you to do
-          </Text>
-          <Text style={styles.instructions}>
-            what you want,
-          </Text>
-          <Text style={styles.instructions}>
-            with who you want,
-          </Text>
-          <Text style={styles.instructions}>
-            in the blink of an eye.
-          </Text>
+//      <Image source={require('../img/blink.jpg')} style={styles.background}>
+      <View style={styles.container} >
+        <StatusBar
+          backgroundColor="#303F9F"
+          barStyle="light-content"/>
+
+        <Image source={require('../img/eye.png')} style={styles.icon}/>
+        <Text style={styles.welcome}>
+          Welcome to Blink!
+        </Text>
+        <Text style={styles.instructions}>
+          Enabling you to do
+        </Text>
+        <Text style={styles.instructions}>
+          what you want,
+        </Text>
+        <Text style={styles.instructions}>
+          with who you want,
+        </Text>
+        <Text style={styles.instructions}>
+          in the blink of an eye.
+        </Text>
+        <View elevation={3} backgroundColor="black">
+          <TouchableHighlight onPress={this._onForward.bind(this)}>
+            <Text style={styles.button}> Get Started! </Text>
+          </TouchableHighlight>
         </View>
-        <TouchableHighlight onPress={this._onForward.bind(this)}>
-          <Text style={styles.button}> Get Started! </Text>
-        </TouchableHighlight>
-        <LoginButton
-          readPermissions={["public_profile", "user_friends"]}
-          onLoginFinished={
+        <View style={styles.space}/>
+        <View elevation={3} backgroundColor="black">
+          <LoginButton
+            readPermissions={["public_profile", "user_friends"]}
+            onLoginFinished={
             (error, result) => {
               if (error) {
                 alert("Login failed with error: " + result.error);
@@ -59,8 +69,10 @@ export default class Welcome extends Component {
               }
             }
           }
-          onLogoutFinished={this._onLogOut.bind(this)}/>
-      </Image>
+            onLogoutFinished={this._onLogOut.bind(this)}/>
+        </View>
+      </View>
+      //     </Image>
     );
   }
 }
@@ -70,6 +82,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#3F51B5',
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderRadius: 50/2,
+    borderWidth: 2,
+    borderColor: '#303F9F',
+
   },
   background: {
     flex:1,
@@ -84,7 +107,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     textAlign: 'center',
     margin: 10,
-    color: '#008b8b',
+    color: '#C5CAE9',
     backgroundColor: 'transparent'
   },
   texts: {
@@ -92,21 +115,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
+    elevation: 10,
     fontSize: 15,
     fontWeight: '600',
     color: '#fffff0',
-    backgroundColor: '#008080',
-    padding:10
+    backgroundColor: '#303F9F',
+    padding:10,
+    paddingBottom:10,
   },
   instructions: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '400',
+    fontFamily: 'sans-serif',
     textAlign: 'center',
     width: 200,
-    color: '#708090',
+    color: '#FFFFFF',
     marginBottom: 5,
     backgroundColor: 'transparent'
   },
+  space: {
+    padding:6,
+  }
 });
 
 AppRegistry.registerComponent('Welcome', () => Welcome);

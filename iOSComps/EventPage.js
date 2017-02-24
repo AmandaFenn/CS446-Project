@@ -24,14 +24,24 @@ export default class EvengPage extends Component {
       location : 'Waterloo',
       date: new Date(),
       datePickerVisible: false,
-      guests: 1,
-      comments: this._createListdataSource(['test1','comment2','comment3']),
+      guests: 0,
+      eventRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId),
+      comments: this._createListdataSource(['User1: comment1','User2: comment2','User3: comment3']),
       descriptionModified: false,
       locationModified: false,
       dateModified: false,
       timeModified: false,
     }
     this._initData()
+  }
+  
+  componentWillMount() {
+    this._loadEventCallBack = this._loadEventCallBack.bind(this)
+    this._loadEvent()
+  }
+
+  componentWillUnmount() {
+    this.state.eventRef.off('value', this._loadEventCallBack);
   }
 
   _onBack() {
@@ -41,6 +51,18 @@ export default class EvengPage extends Component {
   _createListdataSource(array) {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return ds.cloneWithRows(array)
+  }
+  
+  _loadEventCallBack(snapshot) {
+    this.setState({
+      guests: snapshot.child('Participants').numChildren()
+    });
+  }
+
+  _loadEvent() {
+    this.state.eventRef.on('value', this._loadEventCallBack, function(error) {
+      console.error(error);
+    });
   }
   
   _checkInfo() {
@@ -82,8 +104,24 @@ export default class EvengPage extends Component {
       onLeftButtonPress: ()=>{this.props.navigator.pop()},
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        fbId : this.state.fbId,
-        eventId : this.props.eventId
+        fbId : this.props.fbId,
+        eventId : this.props.eventId,
+        guest: true
+      }
+    });
+  }
+  
+  _friend() {
+    this.props.navigator.push({
+      component: GuestList,
+      title : 'Friends',
+      leftButtonTitle: 'Back',
+      onLeftButtonPress: ()=>{this.props.navigator.pop()},
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        fbId : this.props.fbId,
+        eventId : this.props.eventId,
+        guest: false
       }
     });
   }
@@ -179,9 +217,14 @@ export default class EvengPage extends Component {
         <View style={styles.location}>
           <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
           <TouchableHighlight
-            style={styles.button}
+            style={styles.button1}
             onPress={this._guest.bind(this)}>
-            <Text style={styles.buttontext}> Manage </Text>
+            <Text style={styles.buttontext1}> Manage </Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._friend.bind(this)}>
+            <Text style={styles.buttontext1}> Invite </Text>
           </TouchableHighlight>
         </View>
         
@@ -199,14 +242,14 @@ export default class EvengPage extends Component {
 
         <View style={styles.buttonlayout}>
           <TouchableHighlight
-            style={styles.button1}
+            style={styles.button2}
             onPress={this._submit.bind(this)}>
             <Text style={styles.buttontext1}> Save </Text>
             </TouchableHighlight>
           <TouchableHighlight
-            style={styles.button1}
+            style={styles.button2}
             onPress={this._deleteEvent.bind(this)}>
-            <Text style={styles.buttontext1}> Delete </Text>
+            <Text style={styles.buttontext2}> Delete </Text>
           </TouchableHighlight>
         </View>
       </ScrollView>
@@ -264,6 +307,20 @@ const styles = StyleSheet.create({
     paddingVertical:10,
     paddingHorizontal:5
   },
+  button1: {
+    alignItems: 'center',
+    backgroundColor: 'lightgray',
+    marginHorizontal: 12
+  },
+  buttontext1: {
+    fontSize: 20,
+    fontWeight: '600',
+    width:100,
+    color: 'black',
+    textAlign: 'center',
+    paddingVertical:10,
+    paddingHorizontal:5
+  },
   textinput: {
     height: 45,
     fontSize: 30,
@@ -288,7 +345,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
-  buttontext1: {
+  button2: {
+    alignItems: 'center',
+    backgroundColor: 'lightgray',
+    marginHorizontal: 40,
+  },
+  buttontext2: {
     fontSize: 20,
     fontWeight: '600',
     width:100,
@@ -296,11 +358,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical:10,
     paddingHorizontal:5
-  },
-  button1: {
-    alignItems: 'center',
-    backgroundColor: 'lightgray',
-    marginHorizontal: 40,
   },
 });
 

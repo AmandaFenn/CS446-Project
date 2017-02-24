@@ -205,26 +205,14 @@ export default class MainMenu extends Component {
       </TouchableHighlight>
     )
   }
-  _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
+
+  render() {
     return (
-      <View
-        key={`${sectionID}-${rowID}`}
-        style={{
-        height: adjacentRowHighlighted ? 4 : 1,
-        backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
-      }}
-      />
-    );
-    }
-   render() {
-    return (
-      <View style={styles.container}>
+      <Image source={require('../img/menu.jpg')} style={styles.container}>
         <View style={styles.container1}>
           <View style={styles.profile}>
             <Image source={{uri: this.state.pic}}
-              style={{width: 80, height: 80}}
-              boarderWidth="2"
-              borderColor="black"/>
+              style={{width: 80, height: 80}} />
             <Text style={styles.text}>
               {this.state.name}
             </Text>
@@ -240,10 +228,9 @@ export default class MainMenu extends Component {
           <ListView
             dataSource={this.state.myevents}
             renderRow={this._renderRow.bind(this)}
-            enableEmptySections={true}
-            renderSeparator={this._renderSeparator}/>
+            enableEmptySections={true} />
         </View>
-      </View>
+      </Image>
     );
   }
 }
@@ -267,7 +254,7 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: 'white',
+    backgroundColor: 'purple'
   },
   profile: {
     justifyContent: 'space-around',
@@ -278,21 +265,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     width: 200,
     color: '#fffff0',
-    backgroundColor: '#303F9F',
+    backgroundColor: '#008080',
     textAlign: 'center',
     paddingVertical:10
   },
   text: {
-    color: '#212121',
+    color: '#fffff0',
     fontSize: 20,
-    fontWeight: '300',
+    fontWeight: '600',
     backgroundColor: 'transparent'
   },
   text1: {
-    color: '#303F9F',
-    fontSize: 30,
-    fontFamily: 'sans-serif',
-    fontWeight: '300',
+    color: '#fffff0',
+    fontSize: 40,
+    fontWeight: '600',
     backgroundColor: 'transparent'
   }
 });

@@ -253,7 +253,7 @@ export default class EvengPage extends Component {
 
         <View style={styles.emptyview} />
 
-        <View style={styles.buttonlayout}>
+        <View style={styles.buttonlayout} elevation={3}>
           <TouchableHighlight
             style={styles.button2}
             onPress={this._submit.bind(this)}>
@@ -278,22 +278,22 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: 'purple'
+    backgroundColor: '#C5CAE9'
   },
   emptyview: {
     height: 40
   },
   title: {
-    fontSize:30,
-    color:'deepskyblue'
+    fontSize:20,
+    color:'#455A64'
   },
   guest: {
-    fontSize:30,
+    fontSize:20,
     color: 'black'
   },
   textinput: {
-    height: 45,
-    fontSize: 30,
+    height: 30,
+    fontSize: 20,
     padding: 5
   },
   textinput1: {
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
     backgroundColor: 'white',
-    fontSize: 30,
+    fontSize: 25,
     padding: 5
   },
   datetime: {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   text1: {
     color: '#fffff0',
     fontSize: 40,
-    fontWeight: '600',
+    fontWeight: '300',
     backgroundColor: 'transparent'
   },
   location: {
@@ -345,17 +345,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 50,
   },
   buttontext: {
-    fontSize: 20,
-    fontWeight: '600',
-    width:180,
+    fontSize: 25,
+    fontWeight: '300',
     color: 'black',
     textAlign: 'center',
-    paddingVertical:10,
-    paddingHorizontal:5
+    paddingVertical:6,
   },
   buttontext1: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '300',
     width:100,
     color: 'black',
     textAlign: 'center',
@@ -363,8 +361,8 @@ const styles = StyleSheet.create({
     paddingHorizontal:5
   },
   buttontext2: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '300',
     width:100,
     color: 'black',
     textAlign: 'center',

@@ -46,7 +46,6 @@ export default class SearchEvent extends Component {
   _searchEventsCallBack(snapshot) {
     var events = []
     var eventIds = []
-    var fbId = this.state.fbId.toString()
     var searchName = this.state.name
     snapshot.forEach(function(data) {
       var dataVal = data.val()

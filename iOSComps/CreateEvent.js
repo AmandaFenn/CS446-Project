@@ -87,13 +87,14 @@ export default class CreateEvent extends Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.emptyview}><Text style={styles.title}>Name:</Text></View>
         <View style={styles.textinputview}>
           <TextInput style={styles.textinput}
             placeholder="Type event name."
             onChangeText={(text) => this.setState({name : text})}
           />
         </View>  
-        <View style={styles.emptyview} /> 
+        <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
         <View>
           <TouchableHighlight 
             style={styles.datetime}
@@ -108,7 +109,7 @@ export default class CreateEvent extends Component {
             onDateChange={this.onDateChange}
           />}
         </View>  
-        <View style={styles.emptyview} />
+        <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
         <View style={styles.textinputview}>
           <TextInput
             style={styles.textinput}
@@ -116,7 +117,7 @@ export default class CreateEvent extends Component {
             onChangeText={(text) => this.setState({location : text})}
           />
         </View>  
-        <View style={styles.emptyview} />
+        <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.textinput1}
           placeholder="Type event description!"
@@ -139,10 +140,16 @@ export default class CreateEvent extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
-    paddingTop: 40,
+    paddingHorizontal: 5,
+    //paddingTop: 40,
   },
   emptyview: {
-    height: 40
+    height: 40,
+  },
+  title: {
+    fontSize:20,
+    color:'rgba(5, 123, 253, 1.0)',
+    paddingTop: 10
   },
   textinputview: {
     borderColor: 'grey',
@@ -151,8 +158,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   textinput: {
-    height: 45,
-    fontSize: 30,
+    height: 30,
+    fontSize: 20,
     padding: 5
   },
   textinput1: {
@@ -161,7 +168,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
     backgroundColor: 'white',
-    fontSize: 30,
+    fontSize: 25,
     padding: 5
   },
   datetime: {
@@ -172,20 +179,20 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'grey',
-    fontSize: 30,
-    padding: 5
+    fontSize: 25,
+    padding: 10
   },
   button: {
     alignItems: 'center',  
     marginHorizontal: 100,
-    backgroundColor: '#008080',
+    backgroundColor: '#303F9F',
   },
   buttontext: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: '600',
     color: '#fffff0',
     textAlign: 'center',
-    paddingVertical:10,
+    paddingVertical:6,
   },
 });
 

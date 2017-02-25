@@ -212,18 +212,36 @@ export default class MainMenu extends Component {
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight onPress = {this._onMyEvent.bind(this, rowData, rowID)}>
-        <Text style = {styles.text1}> {rowData} </Text>
+        <Text style = {styles.text1}
+          numberOfLines={1}> 
+          {rowData} 
+      </Text>
       </TouchableHighlight>
     )
   }
   
+  _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
+    return (
+      <View
+        key={`${sectionID}-${rowID}`}
+        style={{
+        height: adjacentRowHighlighted ? 4 : 1,
+        backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
+      }}
+      />
+    );
+  }
+  
   render() {
     return (
-      <Image source={require('../img/menu.jpg')} style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.container1}>
           <View style={styles.profile}>
-            <Image source={{uri: this.state.pic}}
-              style={{width: 80, height: 80}} />
+            <Image 
+              source={{uri: this.state.pic}}
+              style={{width: 80, height: 80}}
+              boarderWidth="2"
+              borderColor="black" />
             <Text style={styles.text}>
               {this.state.name}
             </Text>
@@ -240,9 +258,9 @@ export default class MainMenu extends Component {
             dataSource={this.state.myevents}
             renderRow={this._renderRow.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+            renderSeparator={this._renderSeparator} />
         </View>
-      </Image>
+      </View>
     );
   }
 }
@@ -266,7 +284,7 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 360,
-    backgroundColor: 'purple'
+    backgroundColor: 'white'
   },
   profile: {
     justifyContent: 'space-around',
@@ -277,20 +295,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     width: 200,
     color: '#fffff0',
-    backgroundColor: '#008080',
+    backgroundColor: '#303F9F',
     textAlign: 'center',
     paddingVertical:10
   },
   text: {
-    color: '#fffff0',
+    color: '#212121',
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '300',
     backgroundColor: 'transparent'
   },
   text1: {
-    color: '#fffff0',
-    fontSize: 40,
-    fontWeight: '600',
+    color: '#303F9F',
+    fontSize: 30,
+    //fontFamily: 'sans-serif',
+    fontWeight: '300',
     backgroundColor: 'transparent'
   }
 });

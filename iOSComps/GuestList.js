@@ -155,7 +155,10 @@ export default class GuestList extends Component {
       <View style = {styles.profile}>
         <Image source={{uri: rowData.pic}}
               style={{width:50, height: 50}} />
-        <Text style = {styles.text1}> {rowData.Name} </Text>
+        <Text style = {styles.text1}
+          numberOfLines={1}> 
+          {rowData.Name} 
+        </Text>
         <TouchableHighlight
           style={styles.button}
           onPress = {this._deleteOrInvite.bind(this, rowID)}>
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: 'purple',
+    backgroundColor: '#C5CAE9',
     padding: 10
   },
   profile: {
@@ -205,21 +208,23 @@ const styles = StyleSheet.create({
   text1: {
     flex: 5,
     color: '#fffff0',
-    fontSize: 35,
+    fontSize: 20,
     fontWeight: '600',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    paddingTop: 10,
+    paddingLeft: 5
   },
   button: {
     flex: 3,
     alignItems: 'center',
-    backgroundColor: 'lightgray',
+    backgroundColor: '#303F9F',
     padding: 5
   },
   buttontext: {
+    color: 'white',
     fontSize: 25,
     fontWeight: '600',
     width:100,
-    color: 'black',
     textAlign: 'center',
     padding: 5,
   },

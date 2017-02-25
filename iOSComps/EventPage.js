@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import GuestList from '../iOSComps/GuestList';
+import SuggestMap from '../iOSComps/SuggestMap';
 
 export default class EvengPage extends Component {
   constructor(props) {
@@ -94,6 +95,21 @@ export default class EvengPage extends Component {
   _initData() {
     var eventRef = this.props.firebaseApp.database().ref('Events/'+ this.props.eventId)
     eventRef.once('value').then(this._initDataRead.bind(this))
+  }
+  
+  _onSuggest() {
+    this.props.navigator.push({
+      component: SuggestMap,
+      title: 'Map',
+      leftButtonTitle: 'Back',
+      onLeftButtonPress: ()=>{this.props.navigator.pop()},
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        fbId : this.props.fbId,
+        eventId : this.props.eventId,
+        guest: true
+      }
+    });
   }
   
   _guest() {
@@ -202,7 +218,7 @@ export default class EvengPage extends Component {
           <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
           <TouchableHighlight
             style={styles.button}
-            onPress={this._onBack.bind(this)}>
+            onPress={this._onSuggest.bind(this)}>
             <Text style={styles.buttontext}> Sugeest Location</Text>
           </TouchableHighlight>
         </View>
@@ -266,8 +282,9 @@ const styles = StyleSheet.create({
     height: 40,
   },
   title: {
-    fontSize:30,
-    color:'blue'
+    fontSize:20,
+    color:'rgba(5, 123, 253, 1.0)',
+    paddingTop:10
   },
   description: {
     height: 150,
@@ -275,7 +292,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
     backgroundColor: 'white',
-    fontSize: 30,
+    fontSize: 25,
     padding: 5
   },
   datetime: {
@@ -300,12 +317,10 @@ const styles = StyleSheet.create({
   },
   buttontext: {
     fontSize: 20,
-    fontWeight: '600',
-    width:180,
+    fontWeight: '300',
     color: 'black',
     textAlign: 'center',
-    paddingVertical:10,
-    paddingHorizontal:5
+    paddingVertical:6,
   },
   button1: {
     alignItems: 'center',
@@ -313,8 +328,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 12
   },
   buttontext1: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '300',
     width:100,
     color: 'black',
     textAlign: 'center',
@@ -322,23 +337,25 @@ const styles = StyleSheet.create({
     paddingHorizontal:5
   },
   textinput: {
-    height: 45,
-    fontSize: 30,
+    height: 30,
+    fontSize: 20,
     paddingHorizontal: 5
   },
   comments: {
     width: 360,
-    backgroundColor: 'purple'
+    backgroundColor: '#C5CAE9',
+    paddingHorizontal: 5
   },
   commenttext: {
     color: '#fffff0',
     fontSize: 40,
-    fontWeight: '600',
+    fontWeight: '300',
     backgroundColor: 'transparent'
   },
   guest: {
-    fontSize:30,
-    color: 'black'
+    fontSize:20,
+    color: 'black',
+    paddingTop: 10
   },
   buttonlayout: {
     flex : 1,
@@ -351,8 +368,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 40,
   },
   buttontext2: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '300',
     width:100,
     color: 'black',
     textAlign: 'center',

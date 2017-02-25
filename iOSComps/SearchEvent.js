@@ -77,20 +77,22 @@ export default class SearchEvent extends Component {
         eventId : this.state.myeventIds[rowID]
       }
     });
-    //console.log(this.state.myeventIds[rowID])
   }
   
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight onPress = {this._onEvent.bind(this, rowData, rowID)}>
-        <Text style = {styles.text}> {rowData} </Text>
+        <Text style = {styles.text} 
+          numberOfLines={1}> 
+          {rowData} 
+        </Text>
       </TouchableHighlight>
     )
   }
   
   render() {
     return (
-      <Image source={require('../img/menu.jpg')} style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.container1}>
           <TextInput
             style={styles.textinput}
@@ -108,7 +110,7 @@ export default class SearchEvent extends Component {
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false} />
         </View>
-      </Image>
+      </View>
     );
   }
 }
@@ -137,14 +139,15 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 360,
-    backgroundColor: 'purple'
+    backgroundColor: '#C5CAE9',
+    paddingHorizontal: 5
   },
   button: {
     fontSize: 15,
     fontWeight: '600',
     width: 200,
     color: '#fffff0',
-    backgroundColor: '#008080',
+    backgroundColor: '#303F9F',
     textAlign: 'center',
     paddingVertical:10
   },
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
     color: '#fffff0',
     fontSize: 40,
     fontWeight: '600',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   }
 });
 

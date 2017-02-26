@@ -15,6 +15,7 @@ import {
 
 var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
 numbers.shift()
+const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
 export default class CreateEvent extends Component {
   constructor(props) {
@@ -26,9 +27,12 @@ export default class CreateEvent extends Component {
       description : '',
       location : '',
       date: date,
+      vote: true,
+      type: 'Restaurants',
       unlimited: true,
       limited: 1,
       datePickerVisible: false,
+      typePickerVisible: false,
       numberPickerVisible: false,
     }
   }
@@ -91,15 +95,23 @@ export default class CreateEvent extends Component {
     this.setState({datePickerVisible: !this.state.datePickerVisible});
   }
     
+  _onTypePress() {
+    this.setState({typePickerVisible: !this.state.typePickerVisible});
+  }
+  
   _onNumberPress() {
     this.setState({numberPickerVisible: !this.state.numberPickerVisible});
   }
   
-  _onSwitch(value) {
+  _onSwitchVote(value) {
+    this.setState({vote: value})
+  }
+  
+  _onSwitchCap(value) {
     this.setState({unlimited: value})
-      if (value) {
-        this.setState({numberPickerVisible: false})
-      }
+    if (value) {
+      this.setState({numberPickerVisible: false})
+    }
   }
   
   render() {
@@ -134,20 +146,51 @@ export default class CreateEvent extends Component {
             placeholder="Type event location"
             onChangeText={(text) => this.setState({location : text})}
           />
-        </View>  
+        </View>
+
+        <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+        <TouchableHighlight 
+          style={styles.typeandnumber}
+          onPress={this._onTypePress.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.text1}> {this.state.type} </Text>           
+        </TouchableHighlight>
+
+        {this.state.typePickerVisible && <PickerIOS
+          selectedValue = {this.state.type}
+          onValueChange={(value) => this.setState({type : value})}>
+          {eventTypes.map((e) => (
+            <PickerIOS.Item
+              key= 'key'
+              value= {e}
+              label= {e}
+            />
+          ))}
+        </PickerIOS>}
+        
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Vote allowed
+          </Text>
+          <Switch
+            onValueChange={this._onSwitchVote.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.vote} />
+        </View>
+        
         <View style={styles.unlimited}>
           <Text style={styles.title}>
             Unlimited number of people
           </Text>
           <Switch
-            onValueChange={this._onSwitch.bind(this)}
+            onValueChange={this._onSwitchCap.bind(this)}
             style={{marginTop: 5}}
             value={this.state.unlimited} />
         </View>
         
         {!this.state.unlimited && 
           <TouchableHighlight 
-            style={styles.emptyview}
+            style={styles.typeandnumber}
             onPress={this._onNumberPress.bind(this)}
             underlayColor = 'lightgray'>
             <Text style={styles.text1}> {'Number of people: ' + this.state.limited} </Text>           
@@ -165,11 +208,11 @@ export default class CreateEvent extends Component {
               label= {n.toString()}
             />
           ))}
-        </PickerIOS>
-        }
+        </PickerIOS>}
+        
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
-          style={styles.textinput1}
+          style={styles.description}
           placeholder="Type event description!"
           onChangeText={(text) => this.setState({description : text})}
           multiline={true}
@@ -208,12 +251,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   textinput: {
-    height: 30,
+    height: 40,
     fontSize: 20,
     padding: 5
   },
-  textinput1: {
-    height: 180,
+  description: {
+    height: 120,
     borderColor: 'grey',
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
@@ -230,7 +273,14 @@ const styles = StyleSheet.create({
   text: {
     color: 'grey',
     fontSize: 25,
-    padding: 10
+    padding: 5
+  },
+  typeandnumber: {
+    height: 40,
+    borderColor: 'grey',
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    backgroundColor: 'white'
   },
   text1: {
     fontSize: 20,

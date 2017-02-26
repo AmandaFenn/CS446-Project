@@ -18,7 +18,7 @@ export default class GuestList extends Component {
       guestsDataSource: this._createListdataSource([]),
       partsRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId + '/Participants'),
       guests: [],
-      guestIds : []
+      guestIds : [],
     }
     if (!this.props.guest) {
       this._loadfbInfo(-1, this.props.fbId)
@@ -159,11 +159,11 @@ export default class GuestList extends Component {
           numberOfLines={1}> 
           {rowData.Name} 
         </Text>
-        <TouchableHighlight
+        {this.props.host && <TouchableHighlight
           style={styles.button}
           onPress = {this._deleteOrInvite.bind(this, rowID)}>
           <Text style = {styles.buttontext}> {this.props.guest ? 'Delete' : 'Invite'} </Text>
-        </TouchableHighlight>
+        </TouchableHighlight>}
       </View>
     )
   }

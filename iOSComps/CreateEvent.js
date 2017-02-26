@@ -9,8 +9,12 @@ import {
   TextInput,
   DatePickerIOS,
   PickerIOS,
+  Switch,
   ScrollView,
 } from 'react-native';
+
+var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
+numbers.shift()
 
 export default class CreateEvent extends Component {
   constructor(props) {
@@ -22,7 +26,10 @@ export default class CreateEvent extends Component {
       description : '',
       location : '',
       date: date,
-      datePickerVisible: false
+      unlimited: true,
+      limited: 1,
+      datePickerVisible: false,
+      numberPickerVisible: false,
     }
   }
 
@@ -83,6 +90,17 @@ export default class CreateEvent extends Component {
   _onDatePress() {
     this.setState({datePickerVisible: !this.state.datePickerVisible});
   }
+    
+  _onNumberPress() {
+    this.setState({numberPickerVisible: !this.state.numberPickerVisible});
+  }
+  
+  _onSwitch(value) {
+    this.setState({unlimited: value})
+      if (value) {
+        this.setState({numberPickerVisible: false})
+      }
+  }
   
   render() {
     return (
@@ -117,6 +135,38 @@ export default class CreateEvent extends Component {
             onChangeText={(text) => this.setState({location : text})}
           />
         </View>  
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Unlimited number of people
+          </Text>
+          <Switch
+            onValueChange={this._onSwitch.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.unlimited} />
+        </View>
+        
+        {!this.state.unlimited && 
+          <TouchableHighlight 
+            style={styles.emptyview}
+            onPress={this._onNumberPress.bind(this)}
+            underlayColor = 'lightgray'>
+            <Text style={styles.text1}> {'Number of people: ' + this.state.limited} </Text>           
+          </TouchableHighlight>
+        }
+        
+        {this.state.numberPickerVisible && !this.state.unlimited &&
+        <PickerIOS
+          selectedValue = {this.state.limited}
+          onValueChange={(value) => this.setState({limited : value})}>
+          {numbers.map((n) => (
+            <PickerIOS.Item
+              key= 'key'
+              value= {n}
+              label= {n.toString()}
+            />
+          ))}
+        </PickerIOS>
+        }
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.textinput1}
@@ -181,6 +231,15 @@ const styles = StyleSheet.create({
     color: 'grey',
     fontSize: 25,
     padding: 10
+  },
+  text1: {
+    fontSize: 20,
+    paddingTop: 10
+  },
+  unlimited: {
+    height: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-between', 
   },
   button: {
     alignItems: 'center',  

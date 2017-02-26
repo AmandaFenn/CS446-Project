@@ -9,6 +9,7 @@ import {
   TextInput,
   DatePickerIOS,
   PickerIOS,
+  Switch,
   ScrollView,
   ListView
 } from 'react-native';
@@ -24,7 +25,10 @@ export default class EvengPage extends Component {
       description : 'None',
       location : 'Waterloo',
       date: new Date(),
+      unlimited: true,
+      limited: 1,
       datePickerVisible: false,
+      numberPickerVisible: false,
       guests: 0,
       eventRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId),
       comments: this._createListdataSource(['User1: comment1','User2: comment2','User3: comment3']),
@@ -32,6 +36,8 @@ export default class EvengPage extends Component {
       locationModified: false,
       dateModified: false,
       timeModified: false,
+      host: true,
+      numbers : Array.apply(null, {length: 1000}).map(Number.call, Number)
     }
     this._initData()
   }
@@ -55,9 +61,19 @@ export default class EvengPage extends Component {
   }
   
   _loadEventCallBack(snapshot) {
+    var parts = snapshot.child('Participants').numChildren()
+    var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
+    for (i = 0; i < parts; i++) {
+      numbers.shift()
+    }
     this.setState({
-      guests: snapshot.child('Participants').numChildren()
+      guests: parts,
+      limited: parts,
+      numbers: numbers
     });
+    if(!snapshot.child('Participants/' + this.props.fbId + '/Host').val()) {
+      this.setState({host: false})
+    }    
   }
 
   _loadEvent() {
@@ -88,7 +104,6 @@ export default class EvengPage extends Component {
       description:snapshotdata.Description,
       location:snapshotdata.Location,
       date: date,
-
     })
   }
 
@@ -185,6 +200,17 @@ export default class EvengPage extends Component {
     this.setState({datePickerVisible: !this.state.datePickerVisible});
   }
   
+  _onNumberPress() {
+    this.setState({numberPickerVisible: !this.state.numberPickerVisible});
+  }
+  
+  _onSwitch(value) {
+    this.setState({unlimited: value})
+      if (value) {
+        this.setState({numberPickerVisible: false})
+      }
+  }
+  
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -195,6 +221,7 @@ export default class EvengPage extends Component {
           defaultValue={this.state.description}
           onChangeText={(text) => this.setState({description : text, descriptionModified:true})}
           multiline={true}
+          editable={this.state.host}
         />
         
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
@@ -206,7 +233,8 @@ export default class EvengPage extends Component {
             underlayColor = 'lightgray'>
             <Text style={styles.text}> {this.state.date.toLocaleString()} </Text>
           </TouchableHighlight>
-          {this.state.datePickerVisible && <DatePickerIOS style={styles.date}
+          {this.state.datePickerVisible && this.state.host &&
+          <DatePickerIOS style={styles.date}
             date={this.state.date}
             mode="datetime"
             minimumDate = {new Date()}
@@ -228,6 +256,7 @@ export default class EvengPage extends Component {
           placeholder="Type event location"
           defaultValue={this.state.location}
           onChangeText={(text) => this.setState({location : text, locationModified: true})}
+          editable={this.state.host}
         />
         
         <View style={styles.location}>
@@ -235,14 +264,48 @@ export default class EvengPage extends Component {
           <TouchableHighlight
             style={styles.button1}
             onPress={this._guest.bind(this)}>
-            <Text style={styles.buttontext1}> Manage </Text>
+            <Text style={styles.buttontext1}> {this.state.host? 'Manage': 'View'} </Text>
           </TouchableHighlight>
           <TouchableHighlight
             style={styles.button1}
             onPress={this._friend.bind(this)}>
-            <Text style={styles.buttontext1}> Invite </Text>
+            <Text style={styles.buttontext1}> {this.state.host? 'Invite' : 'Join/Leave'} </Text>
           </TouchableHighlight>
         </View>
+        
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Unlimited number of people
+          </Text>
+          <Switch
+            onValueChange={this._onSwitch.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.unlimited} 
+            disabled={!this.state.host} />
+        </View>
+        
+        {!this.state.unlimited && 
+          <TouchableHighlight 
+            style={styles.emptyview}
+            onPress={this._onNumberPress.bind(this)}
+            underlayColor = 'lightgray'>
+            <Text style={styles.guest}> {'Number of people: ' + this.state.limited} </Text>           
+          </TouchableHighlight>
+        }
+        
+        {this.state.numberPickerVisible && !this.state.unlimited &&
+        <PickerIOS
+          selectedValue = {this.state.limited}
+          onValueChange={(value) => this.setState({limited : value})}>
+          {this.state.numbers.map((n) => (
+            <PickerIOS.Item
+              key= 'key'
+              value= {n}
+              label= {n.toString()}
+            />
+          ))}
+        </PickerIOS>
+        }
         
         <View style={styles.emptyview}><Text style={styles.title}>Comments:</Text></View>
 
@@ -256,7 +319,7 @@ export default class EvengPage extends Component {
         
         <View style={styles.emptyview} />
 
-        <View style={styles.buttonlayout}>
+        {this.state.host && <View style={styles.buttonlayout}>
           <TouchableHighlight
             style={styles.button2}
             onPress={this._submit.bind(this)}>
@@ -267,7 +330,7 @@ export default class EvengPage extends Component {
             onPress={this._deleteEvent.bind(this)}>
             <Text style={styles.buttontext2}> Delete </Text>
           </TouchableHighlight>
-        </View>
+        </View>}
       </ScrollView>
     )
   }
@@ -375,6 +438,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical:10,
     paddingHorizontal:5
+  },
+  unlimited: {
+    height: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-between', 
   },
 });
 

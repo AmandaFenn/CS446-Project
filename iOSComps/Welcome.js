@@ -12,6 +12,10 @@ import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
 import MainMenu from '../iOSComps/MainMenu';
 
 export default class Welcome extends Component {
+  constructor(props){
+    super(props)
+  }
+  
   _onForward() {
     this.props.navigator.push({
       component: MainMenu,
@@ -19,8 +23,13 @@ export default class Welcome extends Component {
       passProps: { firebaseApp : this.props.firebaseApp }
     });
   }
-
+  
+  _getStarted() {
+    this._onForward()
+  }
+  
   _onLogOut() {
+    this.setState({signIn: false})
     alert("User logged out")
   }
 
@@ -47,7 +56,7 @@ export default class Welcome extends Component {
         <Text style={styles.instructions}>
           in the blink of an eye.
         </Text>
-        <TouchableHighlight onPress={this._onForward.bind(this)}>
+        <TouchableHighlight onPress={this._getStarted.bind(this)}>
           <Text style={styles.button}> Get Started! </Text>
         </TouchableHighlight>
         <View style={styles.space}/>

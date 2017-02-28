@@ -22,6 +22,7 @@ import CreateEvent from './AndroidComps/CreateEvent';
 import EventPage from './AndroidComps/EventPage';
 import GuestList from './AndroidComps/GuestList';
 import SearchEvent from './AndroidComps/SearchEvent';
+import SuggestMap from './AndroidComps/SuggestMap';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA8G1jarjew06jjORJf7nA3DBvb0ks56LE",
@@ -55,6 +56,8 @@ export default class Blink extends Component {
         return (<GuestList route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
       case 5:
         return (<SearchEvent route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+      case 6:
+        return (<SuggestMap route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
     }
   }
 

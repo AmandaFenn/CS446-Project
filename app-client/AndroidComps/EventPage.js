@@ -93,6 +93,16 @@ export default class EvengPage extends Component {
     eventRef.once('value').then(this._initDataRead.bind(this))
   }
 
+  _onSuggest() {
+    this.props.navigator.push({
+      title: 'Map',
+      index: 6,
+      fbId : this.props.route.fbId,
+      eventId : this.props.route.eventId,
+      guest: true
+    });
+  }
+
   _guest() {
     this.props.navigator.push({
       title : 'Guests',
@@ -212,7 +222,7 @@ export default class EvengPage extends Component {
           <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
           <TouchableHighlight
             style={styles.button}
-            onPress={this._onBack.bind(this)}>
+            onPress={this._onSuggest.bind(this)}>
             <Text style={styles.buttontext}> Sugeest Location</Text>
           </TouchableHighlight>
         </View>

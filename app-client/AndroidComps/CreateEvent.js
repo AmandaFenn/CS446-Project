@@ -10,8 +10,13 @@ import {
   DatePickerAndroid,
   TimePickerAndroid,
   Picker,
+  Switch,
   ScrollView
 } from 'react-native';
+
+var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
+numbers.shift()
+const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
 export default class CreateEvent extends Component {
   constructor(props) {
@@ -23,6 +28,12 @@ export default class CreateEvent extends Component {
       description : '',
       location : '',
       date: date,
+      vote: true,
+      type: 'Restaurants',
+      unlimited: true,
+      limited: 1,
+      typePickerVisible: false,
+      numberPickerVisible: false,
     }
     console.log('fbid---------------------------------' + this.props.route.fbId)
   }
@@ -115,6 +126,25 @@ export default class CreateEvent extends Component {
     }
   };
 
+  _onTypePress() {
+    this.setState({typePickerVisible: !this.state.typePickerVisible});
+  }
+
+  _onNumberPress() {
+    this.setState({numberPickerVisible: !this.state.numberPickerVisible});
+  }
+
+  _onSwitchVote(value) {
+    this.setState({vote: value})
+  }
+
+  _onSwitchCap(value) {
+    this.setState({unlimited: value})
+    if (value) {
+      this.setState({numberPickerVisible: false})
+    }
+  }
+
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -147,6 +177,39 @@ export default class CreateEvent extends Component {
             placeholder="Type event location"
             onChangeText={(text) => this.setState({location : text})}
             />
+        </View>
+
+        <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+        <Picker
+          selectedValue = {this.state.type}
+          onValueChange={(value) => this.setState({type : value})}>
+          {eventTypes.map((e) => (
+            <Picker.Item
+              key= 'key'
+              value= {e}
+              label= {e}
+            />
+          ))}
+        </Picker>
+
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Vote allowed
+          </Text>
+          <Switch
+            onValueChange={this._onSwitchVote.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.vote} />
+        </View>
+
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Unlimited number of people
+          </Text>
+          <Switch
+            onValueChange={this._onSwitchCap.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.unlimited} />
         </View>
 
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
@@ -208,6 +271,11 @@ const styles = StyleSheet.create({
     color: 'grey',
     fontSize: 25,
     padding: 10
+  },
+  unlimited: {
+    height: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
     alignItems: 'center',

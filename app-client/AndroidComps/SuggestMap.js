@@ -89,20 +89,12 @@ export default class SuggestMap extends Component {
 }
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    ...StyleSheet.absoluteFillObject,
+   justifyContent: 'flex-end',
   },
   map: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
+    height: 400,
   },
   emptyview: {
     height: 40,

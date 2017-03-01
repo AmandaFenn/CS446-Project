@@ -224,7 +224,7 @@ export default class CreateEvent extends Component {
           </View>
         }
 
-        <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
+        <View style={styles.emptyview}><Text style={styles.title1}>Description:</Text></View>
 
         <TextInput
           style = {styles.description}
@@ -259,6 +259,10 @@ const styles = StyleSheet.create({
     fontSize:20,
     color:'#455A64',
     paddingTop: 10
+  },
+  title1: {
+    fontSize:20,
+    color:'#455A64',
   },
   textinputview: {
     backgroundColor: 'white',

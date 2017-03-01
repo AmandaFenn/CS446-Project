@@ -129,7 +129,8 @@ export default class EvengPage extends Component {
       index : 4,
       fbId : this.props.route.fbId,
       eventId : this.props.route.eventId,
-      guest: true
+      guest: true,
+      host: this.state.host
     });
   }
 
@@ -139,7 +140,8 @@ export default class EvengPage extends Component {
       index : 4,
       fbId : this.props.route.fbId,
       eventId : this.props.route.eventId,
-      guest: false
+      guest: false,
+      host: this.state.host
     });
   }
 
@@ -178,6 +180,16 @@ export default class EvengPage extends Component {
     this._onBack()
   }
 
+  _onJoin() {
+    var newPart = {}
+    newPart[this.props.route.fbId] = {'Host': false, 'Name': this.props.route.name, 'Status':2}
+    this.state.eventRef.child('Participants/').update(newPart)
+  }
+
+  _onLeave() {
+    this.state.eventRef.child('Participants/' + this.props.route.fbId).remove()
+  }
+  
   onDateChange = (date) => {
     this.setState({date: date});
   };
@@ -277,7 +289,8 @@ export default class EvengPage extends Component {
           <Picker
             style={styles.emptyview, {width: 350}}
             selectedValue = {this.state.type}
-            onValueChange={(value) => this.setState({type : value})}>
+            onValueChange={(value) => this.setState({type : value})}
+            enabled = {this.state.host}>
             {eventTypes.map((e) => (
               <Picker.Item
                 key= 'key'
@@ -288,20 +301,21 @@ export default class EvengPage extends Component {
           </Picker>
         </View>
 
-        <View style={styles.emptyview}><Text style={styles.title}>View Guest List:</Text></View>
+        <View style={styles.emptyview}><Text style={styles.title1}>View Guest List:</Text></View>
 
         <View style={styles.location}>
           <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
           <TouchableHighlight
             style={styles.button1}
             onPress={this._guest.bind(this)}>
-            <Text style={styles.buttontext1}> Manage </Text>
+            <Text style={styles.buttontext1}> {this.state.host? 'Manage': 'View'} </Text>
           </TouchableHighlight>
+          {this.state.host && 
           <TouchableHighlight
             style={styles.button1}
             onPress={this._friend.bind(this)}>
             <Text style={styles.buttontext1}> Invite </Text>
-          </TouchableHighlight>
+          </TouchableHighlight>}
         </View>
 
         <View style={styles.unlimited}>
@@ -311,7 +325,8 @@ export default class EvengPage extends Component {
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote} />
+            value={this.state.vote}
+            disabled={!this.state.host}/>
         </View>
 
         <View style={styles.unlimited}>
@@ -321,7 +336,8 @@ export default class EvengPage extends Component {
           <Switch
             onValueChange={this._onSwitchCap.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.unlimited} />
+            value={this.state.unlimited} 
+            disabled={!this.state.host}/>
         </View>
 
         {!this.state.unlimited &&
@@ -329,8 +345,9 @@ export default class EvengPage extends Component {
             <View style={styles.emptyview}><Text style={styles.title}>Number of people: </Text></View>
             <Picker
               style={styles.emptyview, {width: 60}}
-              selectedValue = {this.state.limited}
-              onValueChange={(value) => this.setState({limited : value})}>
+              selectedValue={this.state.limited}
+              onValueChange={(value) => this.setState({limited : value})}
+              enabled={this.state.host} >
               {this.state.numbers.map((n) => (
                 <Picker.Item
                   key= 'key'
@@ -342,7 +359,7 @@ export default class EvengPage extends Component {
           </View>
         }
 
-        <View style={styles.emptyview}><Text style={styles.title}>Comments:</Text></View>
+        <View style={styles.emptyview}><Text style={styles.title1}>Comments:</Text></View>
 
         <View style={styles.container2}>
           <ListView
@@ -357,13 +374,13 @@ export default class EvengPage extends Component {
         <View style={styles.buttonlayout} elevation={3}>
           <TouchableHighlight
             style={styles.button2}
-            onPress={this._submit.bind(this)}>
-            <Text style={styles.buttontext2}> Save </Text>
+            onPress={this.state.host ? this._submit.bind(this) : this._onJoin.bind(this)}>
+            <Text style={styles.buttontext2}> {this.state.host ? 'Save' : 'Join'} </Text>
             </TouchableHighlight>
           <TouchableHighlight
             style={styles.button2}
-            onPress={this._deleteEvent.bind(this)}>
-            <Text style={styles.buttontext2}> Delete </Text>
+            onPress={this.state.host ? this._deleteEvent.bind(this) : this._onLeave.bind(this)}>
+            <Text style={styles.buttontext2}> {this.state.host ? 'Delete' : 'Leave'} </Text>
           </TouchableHighlight>
         </View>
       </ScrollView>
@@ -374,8 +391,8 @@ export default class EvengPage extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
+    paddingTop: 60,
     paddingHorizontal: 5,
-    paddingTop: 80,
   },
   container2: {
     flex: 3,
@@ -383,11 +400,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#C5CAE9'
   },
   emptyview: {
-    height: 40
+    height: 40,
   },
   title: {
     fontSize: 20,
     paddingTop: 10,
+    color:'#455A64'
+  },
+  title1: {
+    fontSize: 20,
     color:'#455A64'
   },
   guest: {
@@ -417,11 +438,11 @@ const styles = StyleSheet.create({
     color: 'grey',
     fontSize: 25,
     paddingHorizontal:10,
-    paddingTop: 10
+    paddingTop: 3
   },
   text1: {
     color: '#fffff0',
-    fontSize: 40,
+    fontSize: 30,
     fontWeight: '300',
     backgroundColor: 'transparent'
   },
@@ -441,7 +462,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    marginHorizontal: 100,
+    marginHorizontal: 110,
     backgroundColor: 'lightgray',
   },
   button1: {
@@ -455,11 +476,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 50,
   },
   buttontext: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: '300',
     color: 'black',
     textAlign: 'center',
-    paddingVertical:6,
+    paddingHorizontal: 5,
+    paddingTop:5,
   },
   buttontext1: {
     fontSize: 15,

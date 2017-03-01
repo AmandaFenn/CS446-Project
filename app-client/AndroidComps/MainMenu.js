@@ -201,7 +201,10 @@ export default class MainMenu extends Component {
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight onPress = {this._onMyEvent.bind(this, rowData, rowID)}>
-        <Text style = {styles.text1}> {rowData} </Text>
+        <Text style = {styles.text1}
+          numberOfLines={1}>
+          {rowData}
+        </Text>
       </TouchableHighlight>
     )
   }

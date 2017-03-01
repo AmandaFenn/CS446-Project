@@ -10,9 +10,12 @@ import {
   DatePickerAndroid,
   TimePickerAndroid,
   Picker,
+  Switch,
   ScrollView,
   ListView
 } from 'react-native';
+
+const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
 export default class EvengPage extends Component {
   constructor(props) {
@@ -20,7 +23,12 @@ export default class EvengPage extends Component {
     this.state = {
       description : '',
       location : '',
+      type: 'Restaurants',
       date: new Date(),
+      vote: true,
+      unlimited: true,
+      limited: 1,
+      numberPickerVisible: false,
       guests: 0,
       eventRef : this.props.firebaseApp.database().ref('Events/'+ this.props.route.eventId),
       comments: this._createListdataSource(['User1: comment1','User2: comment2','User3: comment3']),
@@ -28,6 +36,8 @@ export default class EvengPage extends Component {
       locationModified: false,
       dateModified: false,
       timeModified: false,
+      host: true,
+      numbers : Array.apply(null, {length: 1000}).map(Number.call, Number)
     }
     this._initData()
   }
@@ -51,9 +61,19 @@ export default class EvengPage extends Component {
   }
 
   _loadEventCallBack(snapshot) {
+    var parts = snapshot.child('Participants').numChildren()
+    var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
+    for (i = 0; i < parts; i++) {
+      numbers.shift()
+    }
     this.setState({
-      guests: snapshot.child('Participants').numChildren()
+      guests: parts,
+      limited: parts,
+      numbers: numbers
     });
+    if(!snapshot.child('Participants/' + this.props.route.fbId + '/Host').val()) {
+      this.setState({host: false})
+    }
   }
 
   _loadEvent() {
@@ -162,6 +182,21 @@ export default class EvengPage extends Component {
     this.setState({date: date});
   };
 
+  _onSwitchVote(value) {
+    this.setState({vote: value})
+  }
+
+  _onSwitchCap(value) {
+    this.setState({unlimited: value})
+    if (value) {
+      this.setState({numberPickerVisible: false})
+    }
+  }
+
+  _doNothing() {
+    console.log('do nothing')
+  }
+
   async _showDatePicker() {
     try {
       const {action, year, month, day} = await DatePickerAndroid.open({date: this.state.date, minDate: new Date(), mode: 'default'});
@@ -197,22 +232,23 @@ export default class EvengPage extends Component {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
-          style={styles.textinput1}
+          style={styles.description}
           placeholder="Type event description!"
           defaultValue={this.state.description}
           onChangeText={(text) => this.setState({description : text, descriptionModified:true})}
           multiline={true}
+          editable={this.state.host}
         />
 
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View style={styles.datetime}>
           <TouchableHighlight
-            onPress={this._showDatePicker.bind(this)}>
+            onPress={this.state.host ? this._showDatePicker.bind(this) : this._doNothing.bind(this)}>
             <Text style={styles.text}>{this.state.date.toLocaleDateString()}</Text>
           </TouchableHighlight>
           <TouchableHighlight
-            onPress={this._showTimePicker.bind(this)}>
+            onPress={this.state.host ? this._showTimePicker.bind(this) : this._doNothing.bind(this) }>
             <Text style={styles.text}>{this.state.date.toLocaleTimeString()}</Text>
           </TouchableHighlight>
         </View>
@@ -233,7 +269,24 @@ export default class EvengPage extends Component {
           defaultValue={this.state.location}
           onChangeText={(text) => this.setState({location : text, locationModified: true})}
           underlineColorAndroid = 'transparent'
+          editable={this.state.host}
         />
+
+        <View style={styles.datetime}>
+          <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+          <Picker
+            style={styles.emptyview, {width: 350}}
+            selectedValue = {this.state.type}
+            onValueChange={(value) => this.setState({type : value})}>
+            {eventTypes.map((e) => (
+              <Picker.Item
+                key= 'key'
+                value= {e}
+                label= {e}
+              />
+            ))}
+          </Picker>
+        </View>
 
         <View style={styles.emptyview}><Text style={styles.title}>View Guest List:</Text></View>
 
@@ -250,6 +303,44 @@ export default class EvengPage extends Component {
             <Text style={styles.buttontext1}> Invite </Text>
           </TouchableHighlight>
         </View>
+
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Vote allowed
+          </Text>
+          <Switch
+            onValueChange={this._onSwitchVote.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.vote} />
+        </View>
+
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Unlimited number of people
+          </Text>
+          <Switch
+            onValueChange={this._onSwitchCap.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.unlimited} />
+        </View>
+
+        {!this.state.unlimited &&
+          <View style={styles.datetime}>
+            <View style={styles.emptyview}><Text style={styles.title}>Number of people: </Text></View>
+            <Picker
+              style={styles.emptyview, {width: 60}}
+              selectedValue = {this.state.limited}
+              onValueChange={(value) => this.setState({limited : value})}>
+              {this.state.numbers.map((n) => (
+                <Picker.Item
+                  key= 'key'
+                  value= {n}
+                  label= {n.toString()}
+                />
+              ))}
+            </Picker>
+          </View>
+        }
 
         <View style={styles.emptyview}><Text style={styles.title}>Comments:</Text></View>
 
@@ -283,6 +374,7 @@ export default class EvengPage extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
+    paddingHorizontal: 5,
     paddingTop: 80,
   },
   container2: {
@@ -294,11 +386,13 @@ const styles = StyleSheet.create({
     height: 40
   },
   title: {
-    fontSize:20,
+    fontSize: 20,
+    paddingTop: 10,
     color:'#455A64'
   },
   guest: {
-    fontSize:20,
+    fontSize: 20,
+    paddingTop: 10,
     color: 'black'
   },
   textinput: {
@@ -306,8 +400,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     padding: 5
   },
-  textinput1: {
-    height: 150,
+  description: {
+    height: 120,
     borderColor: 'grey',
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
@@ -321,14 +415,20 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'grey',
-    fontSize: 30,
-    padding: 5
+    fontSize: 25,
+    paddingHorizontal:10,
+    paddingTop: 10
   },
   text1: {
     color: '#fffff0',
     fontSize: 40,
     fontWeight: '300',
     backgroundColor: 'transparent'
+  },
+  unlimited: {
+    height: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   location: {
     flex : 1,

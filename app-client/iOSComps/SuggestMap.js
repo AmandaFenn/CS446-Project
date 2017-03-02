@@ -9,6 +9,7 @@ import {
   ListView,
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
+import MapView from 'react-native-maps';
 
 export default class SuggestMap extends Component {
   constructor(props){

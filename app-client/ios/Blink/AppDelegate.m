@@ -6,6 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
+@import GoogleMaps;
 
 #import "AppDelegate.h"
 
@@ -30,6 +31,8 @@
   
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
+  
+  [GMSServices provideAPIKey:@"AIzaSyBNgglmSwizyouMQoTNQ560XwKWHjiALwE"];
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [UIViewController new];

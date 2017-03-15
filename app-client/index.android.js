@@ -86,19 +86,28 @@ class CustomNavigationBar extends Navigator.NavigationBar {
 }
 
 var routeMapper = {
- LeftButton(route, navigator, index, navState)
-  { return (
-    <TouchableHighlight onPress={() => {
-     navigator.pop();}}
-     underlayColor = 'white'>
-      <Text style={styles.text}> Back </Text>
-    </TouchableHighlight>);
- },
- RightButton(route, navigator, index, navState)
-   { return null; },
- Title(route, navigator, index, navState)
-   { return (<Text style={styles.text}> {route.title} </Text>); },
- };
+  LeftButton(route, navigator, index, navState) {
+    return (
+      <TouchableHighlight
+        onPress={() => {navigator.pop();}}
+        underlayColor = 'white'>
+        <Text style={styles.text}> Back </Text>
+      </TouchableHighlight>
+    );
+  },
+  RightButton(route, navigator, index, navState) {
+    return (
+      <TouchableHighlight
+         onPress={route.RightButtonPress}
+         underlayColor = 'white'>
+         <Text style={styles.text}> {route.RightButtonTitle} </Text>
+      </TouchableHighlight>
+    );
+  },
+  Title(route, navigator, index, navState) {
+    return (<Text style={styles.text}> {route.title} </Text>);
+  },
+};
 
 
  const styles = StyleSheet.create({

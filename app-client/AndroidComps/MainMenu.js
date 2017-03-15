@@ -78,7 +78,8 @@ export default class MainMenu extends Component {
       title : 'New Event',
       index : 2,
       name : this.state.name,
-      fbId : this.state.fbId
+      fbId : this.state.fbId,
+      RightButtonTitle: 'Done'
     });
   }
 

@@ -34,6 +34,8 @@ export default class CreateEvent extends Component {
       limited: 1,
       numberPickerVisible: false,
     }
+    this.props.route.RightButtonTitle = 'Create'
+    this.props.route.RightButtonPress = this._submit.bind(this)
     console.log('fbid---------------------------------' + this.props.route.fbId)
   }
 
@@ -234,13 +236,6 @@ export default class CreateEvent extends Component {
           underlineColorAndroid = 'transparent'
         />
 
-        <View style={styles.emptyview} />
-
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this._submit.bind(this)}>
-          <Text style={styles.buttontext}> Create </Text>
-        </TouchableHighlight>
       </ScrollView>
     )
   }

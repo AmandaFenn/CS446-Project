@@ -39,6 +39,8 @@ export default class EvengPage extends Component {
       host: true,
       numbers : Array.apply(null, {length: 1000}).map(Number.call, Number)
     }
+    this.props.route.RightButtonTitle = 'Done'
+    this.props.route.RightButtonPress = this._submit.bind(this)
     this._initData()
   }
 
@@ -73,6 +75,8 @@ export default class EvengPage extends Component {
     });
     if(!snapshot.child('Participants/' + this.props.route.fbId + '/Host').val()) {
       this.setState({host: false})
+      this.props.route.RightButtonTitle = ''
+      this.props.route.RightButtonPress = null
     }
   }
 
@@ -189,7 +193,7 @@ export default class EvengPage extends Component {
   _onLeave() {
     this.state.eventRef.child('Participants/' + this.props.route.fbId).remove()
   }
-  
+
   onDateChange = (date) => {
     this.setState({date: date});
   };
@@ -252,6 +256,39 @@ export default class EvengPage extends Component {
           editable={this.state.host}
         />
 
+        <View style={styles.location}>
+          {!this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onJoin.bind(this)}>
+            <Text style={styles.buttontext1}> Join </Text>
+          </TouchableHighlight>}
+
+          {!this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onLeave.bind(this)}>
+            <Text style={styles.buttontext1}> Leave </Text>
+          </TouchableHighlight>}
+
+          {this.state.host &&
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._friend.bind(this)}>
+            <Text style={styles.buttontext1}> Invite </Text>
+          </TouchableHighlight>}
+
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onSuggest.bind(this)}>
+            <Text style={styles.buttontext1}> Vote </Text>
+          </TouchableHighlight>
+
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onSuggest.bind(this)}>
+            <Text style={styles.buttontext1}> Suggest </Text>
+          </TouchableHighlight>
+        </View>
+
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View style={styles.datetime}>
@@ -265,15 +302,7 @@ export default class EvengPage extends Component {
           </TouchableHighlight>
         </View>
 
-
-        <View style={styles.location} >
-          <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
-          <TouchableHighlight
-            style={styles.button}
-            onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext}> Sugeest Location</Text>
-          </TouchableHighlight>
-        </View>
+        <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
 
         <TextInput
           style={styles.textinput}
@@ -303,20 +332,12 @@ export default class EvengPage extends Component {
 
         <View style={styles.emptyview}><Text style={styles.title1}>View Guest List:</Text></View>
 
-        <View style={styles.location}>
-          <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
-          <TouchableHighlight
-            style={styles.button1}
-            onPress={this._guest.bind(this)}>
-            <Text style={styles.buttontext1}> {this.state.host? 'Manage': 'View'} </Text>
-          </TouchableHighlight>
-          {this.state.host && 
-          <TouchableHighlight
-            style={styles.button1}
-            onPress={this._friend.bind(this)}>
-            <Text style={styles.buttontext1}> Invite </Text>
-          </TouchableHighlight>}
-        </View>
+        <TouchableHighlight
+          style={styles.datetime}
+          onPress={this._guest.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.guest}> Guests: {this.state.guests} </Text>
+        </TouchableHighlight>
 
         <View style={styles.unlimited}>
           <Text style={styles.title}>
@@ -336,7 +357,7 @@ export default class EvengPage extends Component {
           <Switch
             onValueChange={this._onSwitchCap.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.unlimited} 
+            value={this.state.unlimited}
             disabled={!this.state.host}/>
         </View>
 
@@ -371,18 +392,12 @@ export default class EvengPage extends Component {
 
         <View style={styles.emptyview} />
 
-        <View style={styles.buttonlayout} elevation={3}>
-          <TouchableHighlight
-            style={styles.button2}
-            onPress={this.state.host ? this._submit.bind(this) : this._onJoin.bind(this)}>
-            <Text style={styles.buttontext2}> {this.state.host ? 'Save' : 'Join'} </Text>
-            </TouchableHighlight>
-          <TouchableHighlight
-            style={styles.button2}
-            onPress={this.state.host ? this._deleteEvent.bind(this) : this._onLeave.bind(this)}>
-            <Text style={styles.buttontext2}> {this.state.host ? 'Delete' : 'Leave'} </Text>
-          </TouchableHighlight>
-        </View>
+        {this.state.host && <TouchableHighlight
+          style={styles.button2}
+          onPress={this._deleteEvent.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.buttontext2}> Delete </Text>
+        </TouchableHighlight>}
       </ScrollView>
     )
   }
@@ -413,7 +428,6 @@ const styles = StyleSheet.create({
   },
   guest: {
     fontSize: 20,
-    paddingTop: 10,
     color: 'black'
   },
   textinput: {
@@ -454,6 +468,7 @@ const styles = StyleSheet.create({
   location: {
     flex : 1,
     flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   buttonlayout: {
     flex : 1,
@@ -468,7 +483,6 @@ const styles = StyleSheet.create({
   button1: {
     alignItems: 'center',
     backgroundColor: 'lightgray',
-    marginHorizontal: 25,
   },
   button2: {
     alignItems: 'center',
@@ -486,7 +500,7 @@ const styles = StyleSheet.create({
   buttontext1: {
     fontSize: 15,
     fontWeight: '300',
-    width:100,
+    width:80,
     color: 'black',
     textAlign: 'center',
     paddingVertical:10,

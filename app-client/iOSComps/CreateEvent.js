@@ -36,6 +36,20 @@ export default class CreateEvent extends Component {
       numberPickerVisible: false,
     }
   }
+  
+  componentWillMount() {
+    this.props.navigator.replace({
+      component: CreateEvent,
+      title: 'New Event',
+      rightButtonTitle: 'Create',
+      onRightButtonPress: this._submit.bind(this),
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        name : this.props.name,
+        fbId : this.props.fbId
+      }
+    });
+  }
 
   _onBack() {
     this.props.navigator.pop();
@@ -217,13 +231,6 @@ export default class CreateEvent extends Component {
           onChangeText={(text) => this.setState({description : text})}
           multiline={true}
         />
-        <View style={styles.emptyview} />
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this._submit.bind(this)}>
-          <Text style={styles.buttontext}> Create </Text>
-        </TouchableHighlight>
-        <View style={styles.emptyview} />
         <View style={styles.emptyview} />
       </ScrollView>
     )

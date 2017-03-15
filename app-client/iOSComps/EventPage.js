@@ -19,7 +19,7 @@ import SuggestMap from '../iOSComps/SuggestMap';
 
 const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
-export default class EvengPage extends Component {
+export default class EventPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -48,6 +48,7 @@ export default class EvengPage extends Component {
   }
 
   componentWillMount() {
+    this._updateNav(this.state.host)
     this._loadEventCallBack = this._loadEventCallBack.bind(this)
     this._loadEvent()
   }
@@ -56,6 +57,22 @@ export default class EvengPage extends Component {
     this.state.eventRef.off('value', this._loadEventCallBack);
   }
 
+  _updateNav(host) {
+    this.props.navigator.replace({
+      component: EventPage,
+      title: this.props.title,
+      rightButtonTitle: host ? 'Done' : '',
+      onRightButtonPress: host ? this._submit.bind(this) : null,
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        name : this.props.name,
+        title: this.props.title,
+        fbId : this.props.fbId,
+        eventId : this.props.eventId
+      }
+    });
+  }
+  
   _onBack() {
     this.props.navigator.pop();
   }
@@ -78,6 +95,7 @@ export default class EvengPage extends Component {
     });
     if(!snapshot.child('Participants/' + this.props.fbId + '/Host').val()) {
       this.setState({host: false})
+      this._updateNav(false)
     }
   }
 
@@ -248,6 +266,39 @@ export default class EvengPage extends Component {
           multiline={true}
           editable={this.state.host}
         />
+        
+        <View style={styles.location}>
+          {!this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onJoin.bind(this)}>
+            <Text style={styles.buttontext1}> Join </Text>
+          </TouchableHighlight>}
+          
+          {!this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onLeave.bind(this)}>
+            <Text style={styles.buttontext1}> Leave </Text>
+          </TouchableHighlight>}
+          
+          {this.state.host &&
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._friend.bind(this)}>
+            <Text style={styles.buttontext1}> Invite </Text>
+          </TouchableHighlight>}
+          
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onSuggest.bind(this)}>
+            <Text style={styles.buttontext1}> Vote </Text>
+          </TouchableHighlight>
+          
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onSuggest.bind(this)}>
+            <Text style={styles.buttontext1}> Suggest </Text>
+          </TouchableHighlight>
+        </View>
 
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
@@ -267,14 +318,7 @@ export default class EvengPage extends Component {
           />}
         </View>
 
-        <View style={styles.location} >
-          <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
-          <TouchableHighlight
-            style={styles.button}
-            onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext}> Sugeest Location</Text>
-          </TouchableHighlight>
-        </View>
+        <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
 
         <TextInput
           style={styles.typeandnumber}
@@ -315,21 +359,13 @@ export default class EvengPage extends Component {
             value={this.state.vote}
             disabled={!this.state.host} />
         </View>
-
-        <View style={styles.location}>
-          <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
-          <TouchableHighlight
-            style={styles.button1}
-            onPress={this._guest.bind(this)}>
-            <Text style={styles.buttontext1}> {this.state.host? 'Manage': 'View'} </Text>
-          </TouchableHighlight>
-          {this.state.host &&
-          <TouchableHighlight
-            style={styles.button1}
-            onPress={this._friend.bind(this)}>
-            <Text style={styles.buttontext1}> Invite </Text>
-          </TouchableHighlight>}
-        </View>
+        
+        <TouchableHighlight
+          style={styles.typeandnumber}
+          onPress={this._guest.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.guest}> Guests: {this.state.guests} </Text>
+        </TouchableHighlight>
 
         <View style={styles.unlimited}>
           <Text style={styles.title}>
@@ -377,18 +413,12 @@ export default class EvengPage extends Component {
 
         <View style={styles.emptyview} />
 
-        <View style={styles.buttonlayout}>
-          <TouchableHighlight
-            style={styles.button2}
-            onPress={this.state.host ? this._submit.bind(this) : this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> {this.state.host ? 'Save' : 'Join'} </Text>
-            </TouchableHighlight>
-          <TouchableHighlight
-            style={styles.button2}
-            onPress={this.state.host ? this._deleteEvent.bind(this) : this._onLeave.bind(this)}>
-            <Text style={styles.buttontext2}> {this.state.host ? 'Delete' : 'Leave'} </Text>
-          </TouchableHighlight>
-        </View>
+        {this.state.host && <TouchableHighlight
+          style={styles.typeandnumber}
+          onPress={this._deleteEvent.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.buttontext2}> Delete </Text>
+        </TouchableHighlight>}
       </ScrollView>
     )
   }
@@ -453,16 +483,14 @@ const styles = StyleSheet.create({
   button1: {
     alignItems: 'center',
     backgroundColor: 'lightgray',
-    marginHorizontal: 12
   },
   buttontext1: {
     fontSize: 15,
     fontWeight: '300',
-    width:100,
+    width:80,
     color: 'black',
     textAlign: 'center',
-    paddingVertical:10,
-    paddingHorizontal:5
+    paddingVertical:5,
   },
   textinput: {
     height: 40,
@@ -491,14 +519,12 @@ const styles = StyleSheet.create({
   },
   button2: {
     alignItems: 'center',
-    backgroundColor: 'lightgray',
     marginHorizontal: 40,
   },
   buttontext2: {
     fontSize: 15,
     fontWeight: '300',
-    width:100,
-    color: 'black',
+    color: 'red',
     textAlign: 'center',
     paddingVertical:10,
     paddingHorizontal:5
@@ -510,4 +536,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent('EvengPage', () => EvengPage);
+AppRegistry.registerComponent('EventPage', () => EvengPage);

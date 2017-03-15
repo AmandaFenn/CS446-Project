@@ -57,7 +57,6 @@ export default class MainMenu extends Component {
       myevents: this._createListdataSource(events),
       myeventIds: eventIds
     });
-    //console.log("set new state")
   }
 
   _updateEvents() {
@@ -80,7 +79,7 @@ export default class MainMenu extends Component {
     this.props.navigator.push({
       component: CreateEvent,
       title: 'New Event',
-      backButtonTitle: 'Back',
+      rightButtonTitle: 'Create',
       passProps: { 
         firebaseApp : this.props.firebaseApp,
         name : this.state.name,
@@ -202,6 +201,7 @@ export default class MainMenu extends Component {
       passProps: { 
         firebaseApp : this.props.firebaseApp,
         name : this.state.name,
+        title : rowData,
         fbId : this.state.fbId,
         eventId : this.state.myeventIds[rowID]
       }

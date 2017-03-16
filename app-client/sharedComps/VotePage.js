@@ -19,7 +19,8 @@ export default class VotePage extends Component {
       votesDataSource: createListdataSource([]),
       votesRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId + '/Votes'),
       votes: [],
-      voteIds : []
+      voteIds : [],
+      guestVote: true,
     }
     console.log(this.props.eventId)
   }
@@ -51,13 +52,20 @@ export default class VotePage extends Component {
       votesDataSource: createListdataSource(votes),
     });
   }
-
+  
   _loadVotes() {
     this.state.votesRef.on('value', this._loadVotesCallBack, function(error) {
       console.error(error);
     });
   }
 
+  _newVote() {
+    var votelistRef = this.state.votesRef.push()
+    votelistRef.set({
+      'Name': 'Vote test',
+    })
+  }
+  
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <View style = {styles.profile}>

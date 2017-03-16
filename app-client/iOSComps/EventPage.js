@@ -16,6 +16,8 @@ import {
 
 import GuestList from '../iOSComps/GuestList';
 import SuggestMap from '../iOSComps/SuggestMap';
+import VotePage from '../iOSComps/VotePage';
+
 
 const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
@@ -42,7 +44,8 @@ export default class EventPage extends Component {
       dateModified: false,
       timeModified: false,
       host: true,
-      numbers : Array.apply(null, {length: 1000}).map(Number.call, Number)
+      numbers : Array.apply(null, {length: 1000}).map(Number.call, Number),
+      navUpdated: false,
     }
     this._initData()
   }
@@ -55,6 +58,7 @@ export default class EventPage extends Component {
 
   componentWillUnmount() {
     this.state.eventRef.off('value', this._loadEventCallBack);
+    console.log('---------------------------')
   }
 
   _updateNav(host) {
@@ -95,7 +99,10 @@ export default class EventPage extends Component {
     });
     if(!snapshot.child('Participants/' + this.props.fbId + '/Host').val()) {
       this.setState({host: false})
-      this._updateNav(false)
+      if (!this.state.navUpdated) {
+        this._updateNav(false)
+        this.setState({navUpdated: true})
+      }
     }
   }
 
@@ -149,7 +156,20 @@ export default class EventPage extends Component {
       }
     });
   }
-
+  
+  _onVote() {
+    this.props.navigator.push({
+      component: VotePage,
+      title: 'Votes',
+      passProps: {
+        firebaseApp : this.props.firebaseApp,
+        fbId : this.props.fbId,
+        host: this.state.host,
+        eventId : this.props.eventId,
+      }
+    });
+  }
+  
   _guest() {
     this.props.navigator.push({
       component: GuestList,
@@ -290,13 +310,13 @@ export default class EventPage extends Component {
           <TouchableHighlight
             style={styles.button1}
             onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext1}> Vote </Text>
+            <Text style={styles.buttontext1}> Suggest </Text>
           </TouchableHighlight>
           
           <TouchableHighlight
             style={styles.button1}
-            onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext1}> Suggest </Text>
+            onPress={this._onVote.bind(this)}>
+            <Text style={styles.buttontext1}> Vote </Text>
           </TouchableHighlight>
         </View>
 

@@ -127,6 +127,17 @@ export default class EvengPage extends Component {
     });
   }
 
+  _onVote() {
+    this.props.navigator.push({
+      title: 'Votes',
+      index: 7,
+      passProps: {
+        fbId : this.props.route.fbId,
+        eventId : this.props.route.eventId,
+      }
+    });
+  }
+
   _guest() {
     this.props.navigator.push({
       title : 'Guests',
@@ -279,13 +290,13 @@ export default class EvengPage extends Component {
           <TouchableHighlight
             style={styles.button1}
             onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext1}> Vote </Text>
+            <Text style={styles.buttontext1}> Suggest </Text>
           </TouchableHighlight>
 
           <TouchableHighlight
             style={styles.button1}
-            onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext1}> Suggest </Text>
+            onPress={this._onVote.bind(this)}>
+            <Text style={styles.buttontext1}> Vote </Text>
           </TouchableHighlight>
         </View>
 

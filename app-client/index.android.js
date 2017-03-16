@@ -23,6 +23,7 @@ import EventPage from './AndroidComps/EventPage';
 import GuestList from './AndroidComps/GuestList';
 import SearchEvent from './AndroidComps/SearchEvent';
 import SuggestMap from './AndroidComps/SuggestMap';
+import VotePage from './AndroidComps/VotePage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA8G1jarjew06jjORJf7nA3DBvb0ks56LE",
@@ -58,6 +59,8 @@ export default class Blink extends Component {
         return (<SearchEvent route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
       case 6:
         return (<SuggestMap route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+      case 7:
+        return (<VotePage route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
     }
   }
 

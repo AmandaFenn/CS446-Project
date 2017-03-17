@@ -32,9 +32,10 @@ export default class CreateEvent extends Component {
       type: 'Restaurants',
       unlimited: true,
       limited: 1,
-      typePickerVisible: false,
       numberPickerVisible: false,
     }
+    this.props.route.RightButtonTitle = 'Create'
+    this.props.route.RightButtonPress = this._submit.bind(this)
     console.log('fbid---------------------------------' + this.props.route.fbId)
   }
 
@@ -126,14 +127,6 @@ export default class CreateEvent extends Component {
     }
   };
 
-  _onTypePress() {
-    this.setState({typePickerVisible: !this.state.typePickerVisible});
-  }
-
-  _onNumberPress() {
-    this.setState({numberPickerVisible: !this.state.numberPickerVisible});
-  }
-
   _onSwitchVote(value) {
     this.setState({vote: value})
   }
@@ -179,18 +172,21 @@ export default class CreateEvent extends Component {
             />
         </View>
 
-        <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
-        <Picker
-          selectedValue = {this.state.type}
-          onValueChange={(value) => this.setState({type : value})}>
-          {eventTypes.map((e) => (
-            <Picker.Item
-              key= 'key'
-              value= {e}
-              label= {e}
-            />
-          ))}
-        </Picker>
+        <View style={styles.datetime}>
+          <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+          <Picker
+            style={styles.emptyview, {width: 350}}
+            selectedValue = {this.state.type}
+            onValueChange={(value) => this.setState({type : value})}>
+            {eventTypes.map((e) => (
+              <Picker.Item
+                key= 'key'
+                value= {e}
+                label= {e}
+              />
+            ))}
+          </Picker>
+        </View>
 
         <View style={styles.unlimited}>
           <Text style={styles.title}>
@@ -212,23 +208,34 @@ export default class CreateEvent extends Component {
             value={this.state.unlimited} />
         </View>
 
-        <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
+        {!this.state.unlimited &&
+          <View style={styles.datetime}>
+            <View style={styles.emptyview}><Text style={styles.title}>Number of people: </Text></View>
+            <Picker
+              style={styles.emptyview, {width: 60}}
+              selectedValue = {this.state.limited}
+              onValueChange={(value) => this.setState({limited : value})}>
+              {numbers.map((n) => (
+                <Picker.Item
+                  key= 'key'
+                  value= {n}
+                  label= {n.toString()}
+                />
+              ))}
+            </Picker>
+          </View>
+        }
+
+        <View style={styles.emptyview}><Text style={styles.title1}>Description:</Text></View>
 
         <TextInput
-          style = {styles.textinput1}
+          style = {styles.description}
           placeholder = "Type event description"
           onChangeText = {(text) => this.setState({description : text})}
           multiline={true}
           underlineColorAndroid = 'transparent'
         />
 
-        <View style={styles.emptyview} />
-
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this._submit.bind(this)}>
-          <Text style={styles.buttontext}> Create </Text>
-        </TouchableHighlight>
       </ScrollView>
     )
   }
@@ -237,7 +244,7 @@ export default class CreateEvent extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
-    paddingTop: 80,
+    paddingTop: 60,
     paddingHorizontal: 5
   },
   emptyview: {
@@ -245,7 +252,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize:20,
-    color:'#455A64'
+    color:'#455A64',
+    paddingTop: 10
+  },
+  title1: {
+    fontSize:20,
+    color:'#455A64',
   },
   textinputview: {
     backgroundColor: 'white',
@@ -255,8 +267,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     padding: 5
   },
-  textinput1: {
-    height: 150,
+  description: {
+    height: 120,
     borderColor: 'grey',
     borderWidth: 1,
     backgroundColor: 'white',
@@ -270,7 +282,8 @@ const styles = StyleSheet.create({
   text: {
     color: 'grey',
     fontSize: 25,
-    padding: 10
+    paddingHorizontal:10,
+    paddingTop: 10
   },
   unlimited: {
     height: 40,

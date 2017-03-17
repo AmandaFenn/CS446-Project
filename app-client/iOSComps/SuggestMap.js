@@ -7,9 +7,9 @@ import {
   Image,
   TouchableHighlight,
   ListView,
-  MapView,
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
+import MapView from 'react-native-maps';
 
 export default class SuggestMap extends Component {
   constructor(props){
@@ -57,9 +57,14 @@ export default class SuggestMap extends Component {
     return (
       <View style={styles.container}>
         <MapView
-          style={{height: 370}}
-          showsUserLocation={true}
-          followUserLocation = {true}
+          style={styles.map}
+          region={{
+           latitude: 37.78825,
+           longitude: -122.4324,
+           latitudeDelta: 0.015,
+           longitudeDelta: 0.0121,
+          }}
+          provider='google'
         />
         <View style={styles.emptyview}><Text style={styles.title}>Suggested locations:</Text></View>
         
@@ -84,7 +89,13 @@ export default class SuggestMap extends Component {
 
 }
 const styles = StyleSheet.create({
-  container: { 
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+    height: 400,
   },
   emptyview: {
     height: 40,

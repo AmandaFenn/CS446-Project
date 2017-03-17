@@ -23,6 +23,7 @@ import EventPage from './AndroidComps/EventPage';
 import GuestList from './AndroidComps/GuestList';
 import SearchEvent from './AndroidComps/SearchEvent';
 import SuggestMap from './AndroidComps/SuggestMap';
+import VotePage from './AndroidComps/VotePage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA8G1jarjew06jjORJf7nA3DBvb0ks56LE",
@@ -58,6 +59,8 @@ export default class Blink extends Component {
         return (<SearchEvent route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
       case 6:
         return (<SuggestMap route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+      case 7:
+        return (<VotePage route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
     }
   }
 
@@ -86,19 +89,28 @@ class CustomNavigationBar extends Navigator.NavigationBar {
 }
 
 var routeMapper = {
- LeftButton(route, navigator, index, navState)
-  { return (
-    <TouchableHighlight onPress={() => {
-     navigator.pop();}}
-     underlayColor = 'white'>
-      <Text style={styles.text}> Back </Text>
-    </TouchableHighlight>);
- },
- RightButton(route, navigator, index, navState)
-   { return null; },
- Title(route, navigator, index, navState)
-   { return (<Text style={styles.text}> {route.title} </Text>); },
- };
+  LeftButton(route, navigator, index, navState) {
+    return (
+      <TouchableHighlight
+        onPress={() => {navigator.pop();}}
+        underlayColor = 'white'>
+        <Text style={styles.text}> Back </Text>
+      </TouchableHighlight>
+    );
+  },
+  RightButton(route, navigator, index, navState) {
+    return (
+      <TouchableHighlight
+         onPress={route.RightButtonPress}
+         underlayColor = 'white'>
+         <Text style={styles.text}> {route.RightButtonTitle} </Text>
+      </TouchableHighlight>
+    );
+  },
+  Title(route, navigator, index, navState) {
+    return (<Text style={styles.text}> {route.title} </Text>);
+  },
+};
 
 
  const styles = StyleSheet.create({

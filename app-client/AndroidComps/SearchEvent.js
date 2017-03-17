@@ -77,7 +77,7 @@ export default class SearchEvent extends Component {
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight onPress = {this._onEvent.bind(this, rowData, rowID)}>
-        <Text style = {styles.text}> {rowData} </Text>
+        <Text style = {styles.text} numberOfLines={1}> {rowData} </Text>
       </TouchableHighlight>
     )
   }

@@ -16,10 +16,12 @@ import {
 
 import GuestList from '../iOSComps/GuestList';
 import SuggestMap from '../iOSComps/SuggestMap';
+import VotePage from '../iOSComps/VotePage';
+
 
 const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
-export default class EvengPage extends Component {
+export default class EventPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -42,20 +44,39 @@ export default class EvengPage extends Component {
       dateModified: false,
       timeModified: false,
       host: true,
-      numbers : Array.apply(null, {length: 1000}).map(Number.call, Number)
+      numbers : Array.apply(null, {length: 1000}).map(Number.call, Number),
+      navUpdated: false,
     }
     this._initData()
   }
-  
+
   componentWillMount() {
+    this._updateNav(this.state.host)
     this._loadEventCallBack = this._loadEventCallBack.bind(this)
     this._loadEvent()
   }
 
   componentWillUnmount() {
     this.state.eventRef.off('value', this._loadEventCallBack);
+    console.log('---------------------------')
   }
 
+  _updateNav(host) {
+    this.props.navigator.replace({
+      component: EventPage,
+      title: this.props.title,
+      rightButtonTitle: host ? 'Done' : '',
+      onRightButtonPress: host ? this._submit.bind(this) : null,
+      passProps: { 
+        firebaseApp : this.props.firebaseApp,
+        name : this.props.name,
+        title: this.props.title,
+        fbId : this.props.fbId,
+        eventId : this.props.eventId
+      }
+    });
+  }
+  
   _onBack() {
     this.props.navigator.pop();
   }
@@ -64,7 +85,7 @@ export default class EvengPage extends Component {
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return ds.cloneWithRows(array)
   }
-  
+
   _loadEventCallBack(snapshot) {
     var parts = snapshot.child('Participants').numChildren()
     var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
@@ -78,7 +99,11 @@ export default class EvengPage extends Component {
     });
     if(!snapshot.child('Participants/' + this.props.fbId + '/Host').val()) {
       this.setState({host: false})
-    }    
+      if (!this.state.navUpdated) {
+        this._updateNav(false)
+        this.setState({navUpdated: true})
+      }
+    }
   }
 
   _loadEvent() {
@@ -86,7 +111,7 @@ export default class EvengPage extends Component {
       console.error(error);
     });
   }
-  
+
   _checkInfo() {
     var check = false
     var checkInfo = ''
@@ -116,18 +141,31 @@ export default class EvengPage extends Component {
     var eventRef = this.props.firebaseApp.database().ref('Events/'+ this.props.eventId)
     eventRef.once('value').then(this._initDataRead.bind(this))
   }
-  
+
   _onSuggest() {
     this.props.navigator.push({
       component: SuggestMap,
       title: 'Map',
       leftButtonTitle: 'Back',
       onLeftButtonPress: ()=>{this.props.navigator.pop()},
-      passProps: { 
+      passProps: {
         firebaseApp : this.props.firebaseApp,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: true
+      }
+    });
+  }
+  
+  _onVote() {
+    this.props.navigator.push({
+      component: VotePage,
+      title: 'Votes',
+      passProps: {
+        firebaseApp : this.props.firebaseApp,
+        fbId : this.props.fbId,
+        host: this.state.host,
+        eventId : this.props.eventId,
       }
     });
   }
@@ -138,7 +176,7 @@ export default class EvengPage extends Component {
       title: 'Guests',
       leftButtonTitle: 'Back',
       onLeftButtonPress: ()=>{this.props.navigator.pop()},
-      passProps: { 
+      passProps: {
         firebaseApp : this.props.firebaseApp,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
@@ -147,22 +185,23 @@ export default class EvengPage extends Component {
       }
     });
   }
-  
+
   _friend() {
     this.props.navigator.push({
       component: GuestList,
       title : 'Friends',
       leftButtonTitle: 'Back',
       onLeftButtonPress: ()=>{this.props.navigator.pop()},
-      passProps: { 
+      passProps: {
         firebaseApp : this.props.firebaseApp,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
-        guest: false
+        guest: false,
+        host: this.state.host
       }
     });
   }
-  
+
   _updateEvent() {
     var eventRef = this.props.firebaseApp.database().ref('Events/'+ this.props.eventId)
     var newData = {}
@@ -192,7 +231,7 @@ export default class EvengPage extends Component {
         this._onBack()
     }
   }
-  
+
   _deleteEvent() {
     this.props.firebaseApp.database().ref('Events/'+ this.props.eventId).remove()
     this._onBack()
@@ -203,11 +242,11 @@ export default class EvengPage extends Component {
     newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2}
     this.state.eventRef.child('Participants/').update(newPart)
   }
-  
+
   _onLeave() {
     this.state.eventRef.child('Participants/' + this.props.fbId).remove()
   }
-  
+
   onDateChange = (date) => {
     this.setState({date: date});
   };
@@ -215,26 +254,26 @@ export default class EvengPage extends Component {
   _onDatePress() {
     this.setState({datePickerVisible: !this.state.datePickerVisible});
   }
-  
+
   _onTypePress() {
     this.setState({typePickerVisible: !this.state.typePickerVisible});
   }
-  
+
   _onNumberPress() {
     this.setState({numberPickerVisible: !this.state.numberPickerVisible});
   }
-  
+
   _onSwitchVote(value) {
     this.setState({vote: value})
   }
-  
+
   _onSwitchCap(value) {
     this.setState({unlimited: value})
     if (value) {
       this.setState({numberPickerVisible: false})
     }
   }
-  
+
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -248,10 +287,43 @@ export default class EvengPage extends Component {
           editable={this.state.host}
         />
         
+        <View style={styles.location}>
+          {!this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onJoin.bind(this)}>
+            <Text style={styles.buttontext1}> Join </Text>
+          </TouchableHighlight>}
+          
+          {!this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onLeave.bind(this)}>
+            <Text style={styles.buttontext1}> Leave </Text>
+          </TouchableHighlight>}
+          
+          {this.state.host &&
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._friend.bind(this)}>
+            <Text style={styles.buttontext1}> Invite </Text>
+          </TouchableHighlight>}
+          
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onSuggest.bind(this)}>
+            <Text style={styles.buttontext1}> Suggest </Text>
+          </TouchableHighlight>
+          
+          <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onVote.bind(this)}>
+            <Text style={styles.buttontext1}> Vote </Text>
+          </TouchableHighlight>
+        </View>
+
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
-        
+
         <View>
-          <TouchableHighlight 
+          <TouchableHighlight
             style={styles.datetime}
             onPress={this._onDatePress.bind(this)}
             underlayColor = 'lightgray'>
@@ -264,17 +336,10 @@ export default class EvengPage extends Component {
             minimumDate = {new Date()}
             onDateChange={this.onDateChange}
           />}
-        </View>  
-        
-        <View style={styles.location} >
-          <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
-          <TouchableHighlight
-            style={styles.button}
-            onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext}> Sugeest Location</Text>
-          </TouchableHighlight>
         </View>
-        
+
+        <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
+
         <TextInput
           style={styles.typeandnumber}
           placeholder="Type event location"
@@ -282,13 +347,13 @@ export default class EvengPage extends Component {
           onChangeText={(text) => this.setState({location : text, locationModified: true})}
           editable={this.state.host}
         />
-        
+
         <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
-        <TouchableHighlight 
+        <TouchableHighlight
           style={styles.typeandnumber}
           onPress={this._onTypePress.bind(this)}
           underlayColor = 'lightgray'>
-          <Text style={styles.guest}> {this.state.type} </Text>           
+          <Text style={styles.guest}> {this.state.type} </Text>
         </TouchableHighlight>
 
         {this.state.typePickerVisible && this.state.host &&
@@ -303,7 +368,7 @@ export default class EvengPage extends Component {
             />
           ))}
         </PickerIOS>}
-        
+
         <View style={styles.unlimited}>
           <Text style={styles.title}>
             Vote allowed
@@ -311,25 +376,17 @@ export default class EvengPage extends Component {
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote} 
+            value={this.state.vote}
             disabled={!this.state.host} />
         </View>
         
-        <View style={styles.location}>
-          <View style={styles.emptyview}><Text style={styles.guest}>Guests: {this.state.guests}</Text></View>
-          <TouchableHighlight
-            style={styles.button1}
-            onPress={this._guest.bind(this)}>
-            <Text style={styles.buttontext1}> {this.state.host? 'Manage': 'View'} </Text>
-          </TouchableHighlight>
-          {this.state.host && 
-          <TouchableHighlight
-            style={styles.button1}
-            onPress={this._friend.bind(this)}>
-            <Text style={styles.buttontext1}> Invite </Text>
-          </TouchableHighlight>}
-        </View>
-        
+        <TouchableHighlight
+          style={styles.typeandnumber}
+          onPress={this._guest.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.guest}> Guests: {this.state.guests} </Text>
+        </TouchableHighlight>
+
         <View style={styles.unlimited}>
           <Text style={styles.title}>
             Unlimited number of people
@@ -337,19 +394,19 @@ export default class EvengPage extends Component {
           <Switch
             onValueChange={this._onSwitchCap.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.unlimited} 
+            value={this.state.unlimited}
             disabled={!this.state.host} />
         </View>
-        
-        {!this.state.unlimited && 
-          <TouchableHighlight 
+
+        {!this.state.unlimited &&
+          <TouchableHighlight
             style={styles.emptyview}
             onPress={this._onNumberPress.bind(this)}
             underlayColor = 'lightgray'>
-            <Text style={styles.guest}> {'Number of people: ' + this.state.limited} </Text>           
+            <Text style={styles.guest}> {'Number of people: ' + this.state.limited} </Text>
           </TouchableHighlight>
         }
-        
+
         {this.state.numberPickerVisible && !this.state.unlimited &&
         <PickerIOS
           selectedValue = {this.state.limited}
@@ -363,31 +420,25 @@ export default class EvengPage extends Component {
           ))}
         </PickerIOS>
         }
-        
+
         <View style={styles.emptyview}><Text style={styles.title}>Comments:</Text></View>
 
         <View style={styles.comments}>
-          <ListView 
+          <ListView
             dataSource={this.state.comments}
             renderRow={(rowData) => <Text style = {styles.commenttext}>{rowData}</Text>}
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false} />
         </View>
-        
+
         <View style={styles.emptyview} />
 
-        <View style={styles.buttonlayout}>
-          <TouchableHighlight
-            style={styles.button2}
-            onPress={this.state.host ? this._submit.bind(this) : this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> {this.state.host ? 'Save' : 'Join'} </Text>
-            </TouchableHighlight>
-          <TouchableHighlight
-            style={styles.button2}
-            onPress={this.state.host ? this._deleteEvent.bind(this) : this._onLeave.bind(this)}>
-            <Text style={styles.buttontext2}> {this.state.host ? 'Delete' : 'Leave'} </Text>
-          </TouchableHighlight>
-        </View>
+        {this.state.host && <TouchableHighlight
+          style={styles.typeandnumber}
+          onPress={this._deleteEvent.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.buttontext2}> Delete </Text>
+        </TouchableHighlight>}
       </ScrollView>
     )
   }
@@ -452,16 +503,14 @@ const styles = StyleSheet.create({
   button1: {
     alignItems: 'center',
     backgroundColor: 'lightgray',
-    marginHorizontal: 12
   },
   buttontext1: {
     fontSize: 15,
     fontWeight: '300',
-    width:100,
+    width:80,
     color: 'black',
     textAlign: 'center',
-    paddingVertical:10,
-    paddingHorizontal:5
+    paddingVertical:5,
   },
   textinput: {
     height: 40,
@@ -490,14 +539,12 @@ const styles = StyleSheet.create({
   },
   button2: {
     alignItems: 'center',
-    backgroundColor: 'lightgray',
     marginHorizontal: 40,
   },
   buttontext2: {
     fontSize: 15,
     fontWeight: '300',
-    width:100,
-    color: 'black',
+    color: 'red',
     textAlign: 'center',
     paddingVertical:10,
     paddingHorizontal:5
@@ -505,8 +552,8 @@ const styles = StyleSheet.create({
   unlimited: {
     height: 40,
     flexDirection: 'row',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
   },
 });
 
-AppRegistry.registerComponent('EvengPage', () => EvengPage);
+AppRegistry.registerComponent('EventPage', () => EvengPage);

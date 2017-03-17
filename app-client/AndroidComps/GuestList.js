@@ -8,145 +8,11 @@ import {
   TouchableHighlight,
   ListView,
 } from 'react-native';
-import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
-import * as firebase from 'firebase';
+import SharedGuestList from '../sharedComps/GuestList';
 
-export default class GuestList extends Component {
+export default class GuestList extends SharedGuestList {
   constructor(props){
     super(props)
-    this.state = {
-      guestsDataSource: this._createListdataSource([]),
-      partsRef : this.props.firebaseApp.database().ref('Events/'+ this.props.route.eventId + '/Participants'),
-      guests: [],
-      guestIds : []
-    }
-    if (!this.props.route.guest) {
-      this._loadfbInfo(-1, this.props.route.fbId)
-    }
-  }
-
-  componentWillMount() {
-    if (this.props.route.guest) {
-      this._loadGuestsCallBack = this._loadGuestsCallBack.bind(this)
-      this._loadGuests()
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.route.guest) {
-      this.state.partsRef.off('value', this._loadGuestsCallBack);
-    }
-  }
-
-  _onBack() {
-    this.props.navigator.pop();
-  }
-
-  _createListdataSource(array) {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return ds.cloneWithRows(array)
-  }
-
-  _loadGuestsCallBack(snapshot) {
-    var guestsName = []
-    var guestIds = []
-    snapshot.forEach(function(data) {
-      guestsName.push({'Name' : data.val().Name})
-      guestIds.push(data.key)
-    });
-    for (i=0; i<guestIds.length;i++) {
-      this._loadfbInfo(i, guestIds[i])
-    }
-    this.setState({
-      guestIds: guestIds
-    });
-  }
-
-  _loadGuests() {
-    this.state.partsRef.on('value', this._loadGuestsCallBack, function(error) {
-      console.error(error);
-    });
-  }
-
-  _deleteOrInvite(rowID) {
-    var id = this.state.guestIds[rowID]
-    if (this.props.route.guest) {
-      if (id != this.props.route.fbId) {
-        this.setState({
-          guests: [],
-          guestIds: []
-        })
-        this.state.partsRef.child(id).remove()
-
-      }
-    } else {
-      var newPart = {}
-      newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
-      this.state.partsRef.update(newPart)
-    }
-  }
-
-  _addGuest(i, data) {
-    var guests = this.state.guests
-    guests[i] = {'Name': data.name, 'pic' : data.picture.data.url}
-    this.setState({
-      guestsDataSource: this._createListdataSource(guests),
-      guests: guests
-    });
-  }
-
-  _addFriends(data) {
-    var friends = []
-    var friendIds = []
-    for (k = 0; k < data.length; k++) {
-      friends[k] = {'Name': data[k].name, 'pic' : data[k].picture.data.url}
-      friendIds[k] = data[k].id
-    }
-    this.setState({
-      guestsDataSource: this._createListdataSource(friends),
-      guests: friends,
-      guestIds: friendIds
-    });
-  }
-
-  _loadfbInfo(i, fbId) {
-    AccessToken.getCurrentAccessToken().then(
-      (data) => {
-        let accessToken = data.accessToken
-        const responseInfoCallback = (error, result) => {
-          if (error) {
-            console.log(error)
-            alert('Fail to fetch facebook information: ' + error.toString());
-          } else {
-            if (i >= 0) {
-              this._addGuest(i, result)
-            } else {
-              this._addFriends(result.friends.data)
-            }
-          }
-        }
-
-        var requestID = this.props.route.guest ? fbId : 'me'
-        var requestStr = 'name, picture'
-        if (!this.props.route.guest) {
-          requestStr = requestStr + ', friends{name, picture}'
-        }
-        const infoRequest = new GraphRequest(
-          '/' + requestID,
-          {
-            accessToken: accessToken,
-            parameters: {
-              fields: {
-                string: requestStr
-              }
-            }
-          },
-          responseInfoCallback
-        );
-        // Start the graph request.
-        new GraphRequestManager().addRequest(infoRequest).start()
-      }
-    )
   }
 
   _renderRow(rowData, sectionID, rowID, highlightRow) {
@@ -155,10 +21,10 @@ export default class GuestList extends Component {
         <Image source={{uri: rowData.pic}}
               style={{width:50, height: 50}} />
         <Text style = {styles.text1}> {rowData.Name} </Text>
-        {this.props.route.host && <TouchableHighlight
+        {this.props.host && <TouchableHighlight
           style={styles.button}
           onPress = {this._deleteOrInvite.bind(this, rowID)}>
-          <Text style = {styles.buttontext}> {this.props.route.guest ? 'Delete' : 'Invite'} </Text>
+          <Text style = {styles.buttontext}> {this.props.guest ? 'Delete' : 'Invite'} </Text>
         </TouchableHighlight>}
       </View>
     )

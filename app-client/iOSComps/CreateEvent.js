@@ -36,14 +36,14 @@ export default class CreateEvent extends Component {
       numberPickerVisible: false,
     }
   }
-  
+
   componentWillMount() {
     this.props.navigator.replace({
       component: CreateEvent,
       title: 'New Event',
       rightButtonTitle: 'Create',
       onRightButtonPress: this._submit.bind(this),
-      passProps: { 
+      passProps: {
         firebaseApp : this.props.firebaseApp,
         name : this.props.name,
         fbId : this.props.fbId
@@ -108,26 +108,26 @@ export default class CreateEvent extends Component {
   _onDatePress() {
     this.setState({datePickerVisible: !this.state.datePickerVisible});
   }
-    
+
   _onTypePress() {
     this.setState({typePickerVisible: !this.state.typePickerVisible});
   }
-  
+
   _onNumberPress() {
     this.setState({numberPickerVisible: !this.state.numberPickerVisible});
   }
-  
+
   _onSwitchVote(value) {
     this.setState({vote: value})
   }
-  
+
   _onSwitchCap(value) {
     this.setState({unlimited: value})
     if (value) {
       this.setState({numberPickerVisible: false})
     }
   }
-  
+
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -137,10 +137,10 @@ export default class CreateEvent extends Component {
             placeholder="Type event name."
             onChangeText={(text) => this.setState({name : text})}
           />
-        </View>  
+        </View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
         <View>
-          <TouchableHighlight 
+          <TouchableHighlight
             style={styles.datetime}
             onPress={this._onDatePress.bind(this)}
             underlayColor = 'lightgray'>
@@ -152,7 +152,7 @@ export default class CreateEvent extends Component {
             minimumDate = {new Date()}
             onDateChange={this.onDateChange}
           />}
-        </View>  
+        </View>
         <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
         <View style={styles.textinputview}>
           <TextInput
@@ -163,11 +163,11 @@ export default class CreateEvent extends Component {
         </View>
 
         <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
-        <TouchableHighlight 
+        <TouchableHighlight
           style={styles.typeandnumber}
           onPress={this._onTypePress.bind(this)}
           underlayColor = 'lightgray'>
-          <Text style={styles.text1}> {this.state.type} </Text>           
+          <Text style={styles.text1}> {this.state.type} </Text>
         </TouchableHighlight>
 
         {this.state.typePickerVisible && <PickerIOS
@@ -181,7 +181,7 @@ export default class CreateEvent extends Component {
             />
           ))}
         </PickerIOS>}
-        
+
         <View style={styles.unlimited}>
           <Text style={styles.title}>
             Vote allowed
@@ -191,7 +191,7 @@ export default class CreateEvent extends Component {
             style={{marginTop: 5}}
             value={this.state.vote} />
         </View>
-        
+
         <View style={styles.unlimited}>
           <Text style={styles.title}>
             Unlimited number of people
@@ -201,16 +201,16 @@ export default class CreateEvent extends Component {
             style={{marginTop: 5}}
             value={this.state.unlimited} />
         </View>
-        
-        {!this.state.unlimited && 
-          <TouchableHighlight 
+
+        {!this.state.unlimited &&
+          <TouchableHighlight
             style={styles.typeandnumber}
             onPress={this._onNumberPress.bind(this)}
             underlayColor = 'lightgray'>
-            <Text style={styles.text1}> {'Number of people: ' + this.state.limited} </Text>           
+            <Text style={styles.text1}> {'Number of people: ' + this.state.limited} </Text>
           </TouchableHighlight>
         }
-        
+
         {this.state.numberPickerVisible && !this.state.unlimited &&
         <PickerIOS
           selectedValue = {this.state.limited}
@@ -223,7 +223,7 @@ export default class CreateEvent extends Component {
             />
           ))}
         </PickerIOS>}
-        
+
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}
@@ -296,10 +296,10 @@ const styles = StyleSheet.create({
   unlimited: {
     height: 40,
     flexDirection: 'row',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
   },
   button: {
-    alignItems: 'center',  
+    alignItems: 'center',
     marginHorizontal: 100,
     backgroundColor: '#303F9F',
   },

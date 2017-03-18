@@ -12,32 +12,18 @@ import {
   Switch,
   ScrollView,
 } from 'react-native';
+import SharedCreateEvent from '../sharedComps/CreateEvent';
 
 var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
 numbers.shift()
 const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
-export default class CreateEvent extends Component {
+export default class CreateEvent extends SharedCreateEvent {
   constructor(props) {
     super(props)
-    var date = new Date()
-    date.setSeconds(0)
-    this.state = {
-      name : '',
-      description : '',
-      location : '',
-      date: date,
-      vote: true,
-      type: 'Restaurants',
-      unlimited: true,
-      limited: 1,
-      datePickerVisible: false,
-      typePickerVisible: false,
-      numberPickerVisible: false,
-    }
   }
 
-  componentWillMount() {
+  _updateNav() {
     this.props.navigator.replace({
       component: CreateEvent,
       title: 'New Event',
@@ -49,83 +35,6 @@ export default class CreateEvent extends Component {
         fbId : this.props.fbId
       }
     });
-  }
-
-  _onBack() {
-    this.props.navigator.pop();
-  }
-
-  _checkInfo() {
-    var check = false
-    var checkInfo = ''
-    if (this.state.name == '') {
-      check = true
-      checkInfo += 'Please enter the event name!\n'
-    }
-
-    if (this.state.location == '') {
-      check = true
-      checkInfo += 'Please enter the event location!\n'
-    }
-
-    if (check) {
-      alert(checkInfo)
-    }
-    return check
-  }
-
-  _createEvent() {
-    var eventlistRef = this.props.firebaseApp.database().ref('Events/').push()
-    eventlistRef.set({
-      'Name': this.state.name,
-      'Date': this.state.date.toLocaleDateString(),
-      'Time': this.state.date.toLocaleTimeString(),
-      'Location': this.state.location,
-      'Description': this.state.description,
-    })
-    var addHost = {};
-    var hostData = {
-       'Name': this.props.name,
-       'Host': true,
-       'Status': 0
-    }
-    var newPostKey = eventlistRef.key
-    addHost['/Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
-    this.props.firebaseApp.database().ref().update(addHost)
-  }
-
-  _submit() {
-    if (!this._checkInfo()) {
-      this._createEvent()
-      this._onBack()
-    }
-  }
-
-  onDateChange = (date) => {
-    this.setState({date: date});
-  };
-
-  _onDatePress() {
-    this.setState({datePickerVisible: !this.state.datePickerVisible});
-  }
-
-  _onTypePress() {
-    this.setState({typePickerVisible: !this.state.typePickerVisible});
-  }
-
-  _onNumberPress() {
-    this.setState({numberPickerVisible: !this.state.numberPickerVisible});
-  }
-
-  _onSwitchVote(value) {
-    this.setState({vote: value})
-  }
-
-  _onSwitchCap(value) {
-    this.setState({unlimited: value})
-    if (value) {
-      this.setState({numberPickerVisible: false})
-    }
   }
 
   render() {

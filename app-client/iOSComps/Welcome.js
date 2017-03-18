@@ -9,9 +9,10 @@ import {
   StatusBar,
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
+import SharedWelcome from '../sharedComps/Welcome';
 import MainMenu from '../iOSComps/MainMenu';
 
-export default class Welcome extends Component {
+export default class Welcome extends SharedWelcome {
   constructor(props){
     super(props)
   }
@@ -22,15 +23,6 @@ export default class Welcome extends Component {
       title: 'Main Menu',
       passProps: { firebaseApp : this.props.firebaseApp }
     });
-  }
-  
-  _getStarted() {
-    this._onForward()
-  }
-  
-  _onLogOut() {
-    this.setState({signIn: false})
-    alert("User logged out")
   }
 
   render() {

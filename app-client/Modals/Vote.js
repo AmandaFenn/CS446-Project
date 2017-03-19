@@ -1,13 +1,6 @@
 import React, { Component } from 'react';
 import {
   AppRegistry,
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  Image,
-  TouchableHighlight,
-  ListView,
 } from 'react-native';
 import {createListdataSource} from '../utils/HelpFuncs'
 import ButtonWithIcon from '../Buttons/ButtonWithIcon'
@@ -25,7 +18,7 @@ export default class Vote extends Component {
       voteItemsDataSource: createListdataSource([]),
     }
   }
-  
+
   componentWillMount() {
     if (!this.props.createMode) {
       this._loadVoteItemsCallBack = this._loadVoteItemsCallBack.bind(this)
@@ -38,7 +31,7 @@ export default class Vote extends Component {
       this.state.voteItemsRef.off('value', this._loadVoteItemsCallBack);
     }
   }
-  
+
   _loadVoteItemsCallBack(snapshot) {
     var voteItems = []
     var voteItemScores = []
@@ -55,13 +48,13 @@ export default class Vote extends Component {
       voteItemsDataSource: createListdataSource(voteItems),
     });
   }
-  
+
   _loadVoteItems() {
     this.state.voteItemsRef.on('value', this._loadVoteItemsCallBack, function(error) {
       console.error(error);
     });
   }
-  
+
   _createVote() {
     var votelistRef = this.props.votesRef.push()
     votelistRef.set({
@@ -85,12 +78,12 @@ export default class Vote extends Component {
       this.props.modalParent._setModalVisible(false)
     }
   }
-  
+
   _leaveModal() {
     this._cleanInfo()
     this.props.modalParent._setModalVisible(false)
   }
-  
+
   _addItem() {
     if (!this._checkItemInfo()) {
       voteItems = this.state.voteItems
@@ -107,11 +100,15 @@ export default class Vote extends Component {
       }
     }
   }
-  
+
   _deleteItem(rowID) {
     if (this.props.createMode) {
-      voteItems = this.state.voteItems
-      delete voteItems[rowID]
+      voteItems = []
+      for (i = 0; i< this.state.voteItems.length; i++) {
+        if (i != rowID) {
+          voteItems.push(this.state.voteItems[i])
+        }
+      }
       this.setState({
         voteItems: voteItems,
         voteItemsDataSource: createListdataSource(voteItems),
@@ -121,15 +118,15 @@ export default class Vote extends Component {
       this.setState({
         toDelete: rowID
       })
-    }  
+    }
   }
-  
+
   _updateVoteCount(id, i) {
     var updateScore = {}
     updateScore['Score'] = this.state.voteItemScores[id] + i
     this.state.voteItemsRef.child(this.state.voteItems[id]).update(updateScore)
   }
-  
+
   _hasVote() {
     for (j=0; j<this.state.voters.length; j++) {
       if (this._hasVoteItem(j)) {
@@ -138,7 +135,7 @@ export default class Vote extends Component {
     }
     return false
   }
-  
+
   _hasVoteItem(rowID) {
     if (this.state.voters[rowID] == undefined) {
       return false
@@ -151,18 +148,18 @@ export default class Vote extends Component {
     }
     return false
   }
-  
+
   _vote(rowID) {
     if (this._hasVoteItem(rowID)) {
       alert('You have voted for: ' + this.state.voteItems[rowID])
     } else {
       var updateVoter = {}
-      updateVoter[this.props.fbId] = 1   
+      updateVoter[this.props.fbId] = 1
       this.state.voteItemsRef.child(this.state.voteItems[rowID] + '/Voters').update(updateVoter)
       this._updateVoteCount(rowID, 1)
     }
   }
-  
+
   _undoVote(rowID) {
     if (!this._hasVoteItem(rowID)) {
       alert('You have not voted for: ' + this.state.voteItems[rowID])
@@ -171,7 +168,7 @@ export default class Vote extends Component {
       this._updateVoteCount(rowID, -1)
     }
   }
-   
+
   _checkItemInfo() {
     var check = false
     var checkInfo = ''
@@ -192,7 +189,7 @@ export default class Vote extends Component {
     }
     return check
   }
-  
+
   _checkInfo() {
     var check = false
     var checkInfo = ''
@@ -206,7 +203,7 @@ export default class Vote extends Component {
     }
     return check
   }
-  
+
   _cleanInfo() {
     this.setState({
       voteTopicTmp: '',

@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 
 import SharedVotePage from '../sharedComps/VotePage'
-import Vote from '../Modals/Vote'
-import ButtonWithIcon from '../Buttons/ButtonWithIcon'
+import Vote from './Vote'
 
 export default class VotePage extends SharedVotePage {
   constructor(props) {
@@ -22,21 +21,6 @@ export default class VotePage extends SharedVotePage {
   _updateNav() {
     this.props.route.RightButtonIcon = (this.props.host || this.state.guestVote) ? require('../img/android_plus.png') : null
     this.props.route.RightButtonPress = (this.props.host || this.state.guestVote) ? this._newVote.bind(this) : null
-  }
-
-  _renderItem(rowData, sectionID, rowID, highlightRow) {
-    return (
-      <View style = {styles.profile}>
-        <Text style = {styles.text1}> {rowData} </Text>
-        <TouchableHighlight
-          style={{width: 30, height: 30}}
-          onPress={this._deleteVote.bind(this, rowID)}>
-          <Image
-            style={{width: 30, height: 30}}
-            source={require('../img/android_minus.png')} />
-        </TouchableHighlight>
-      </View>
-    )
   }
 
   _renderVote(rowData, sectionID, rowID, highlightRow) {
@@ -65,18 +49,16 @@ export default class VotePage extends SharedVotePage {
           transparent={false}
           visible={this.state.modalVisible}
           onRequestClose={() => {alert("Modal has been closed.")}}
-          >
+        >
           <View style={{backgroundColor: 'red'}}>
             <Vote
               stylePlusButtonImage={{width:30, height: 30}}
-              dataSource={this.state.voteItemsDataSourceTmp}
-              renderVoteItem={this._renderItem.bind(this)}
               createMode={this.state.createMode}
-              onChangeTopic = {(text) => this.setState({topicTmp : text})}
-              onChangeItem = {(text) => this.setState({voteItemTmp : text})}
-              add={this._addItem.bind(this)}
-              cancel={this._leaveModal.bind(this)}
-              create={this._submit.bind(this)}
+              fbId = {this.props.fbId}
+              votesRef = {this.state.votesRef}
+              voteId = {this.state.selectedVoteId}
+              topic = {this.state.seletedVoteTopic}
+              modalParent = {this}
             />
           </View>
         </Modal>

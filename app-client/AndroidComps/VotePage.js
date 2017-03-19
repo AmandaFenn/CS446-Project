@@ -7,9 +7,12 @@ import {
   Image,
   TouchableHighlight,
   ListView,
+  Modal
 } from 'react-native';
 
-import SharedVotePage from '../sharedComps/VotePage';
+import SharedVotePage from '../sharedComps/VotePage'
+import Vote from '../Modals/Vote'
+import ButtonWithIcon from '../Buttons/ButtonWithIcon'
 
 export default class VotePage extends SharedVotePage {
   constructor(props) {
@@ -21,10 +24,36 @@ export default class VotePage extends SharedVotePage {
     this.props.route.RightButtonPress = (this.props.host || this.state.guestVote) ? this._newVote.bind(this) : null
   }
 
-  _renderRow(rowData, sectionID, rowID, highlightRow) {
+  _renderItem(rowData, sectionID, rowID, highlightRow) {
     return (
       <View style = {styles.profile}>
-        <Text style = {styles.text1}> {rowData.Name} </Text>
+        <Text style = {styles.text1}> {rowData} </Text>
+        <TouchableHighlight
+          style={{width: 30, height: 30}}
+          onPress={this._deleteVote.bind(this, rowID)}>
+          <Image
+            style={{width: 30, height: 30}}
+            source={require('../img/android_minus.png')} />
+        </TouchableHighlight>
+      </View>
+    )
+  }
+
+  _renderVote(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <View style = {styles.profile}>
+        <TouchableHighlight
+          style = {{flex: 5}}
+          onPress={this._onVote.bind(this, rowID)}>
+          <Text style = {styles.text1}> {rowData.Name} </Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={{width: 30, height: 30}}
+          onPress={this._deleteVote.bind(this, rowID)}>
+          <Image
+            style={{width: 30, height: 30}}
+            source={require('../img/android_minus.png')} />
+        </TouchableHighlight>
       </View>
     )
   }
@@ -32,10 +61,29 @@ export default class VotePage extends SharedVotePage {
   render() {
     return (
       <View style={styles.container}>
+        <Modal
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {alert("Modal has been closed.")}}
+          >
+          <View style={{backgroundColor: 'red'}}>
+            <Vote
+              stylePlusButtonImage={{width:30, height: 30}}
+              dataSource={this.state.voteItemsDataSourceTmp}
+              renderVoteItem={this._renderItem.bind(this)}
+              createMode={this.state.createMode}
+              onChangeTopic = {(text) => this.setState({topicTmp : text})}
+              onChangeItem = {(text) => this.setState({voteItemTmp : text})}
+              add={this._addItem.bind(this)}
+              cancel={this._leaveModal.bind(this)}
+              create={this._submit.bind(this)}
+            />
+          </View>
+        </Modal>
         <View style={styles.container2}>
           <ListView
             dataSource={this.state.votesDataSource}
-            renderRow={this._renderRow.bind(this)}
+            renderRow={this._renderVote.bind(this)}
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false} />
           </View>

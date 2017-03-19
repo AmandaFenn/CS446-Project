@@ -9,8 +9,12 @@ import {
   StatusBar,
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
+import SharedWelcome from '../sharedComps/Welcome';
 
-export default class Welcome extends Component {
+export default class Welcome extends SharedWelcome {
+  constructor(props){
+    super(props)
+  }
 
   _onForward() {
     this.props.navigator.push({
@@ -19,14 +23,8 @@ export default class Welcome extends Component {
     });
   }
 
-  _onLogOut() {
-    // Do not call Firebase signout here.
-    alert("User logged out")
-  }
-
   render() {
     return (
-//      <Image source={require('../img/blink.jpg')} style={styles.background}>
       <View style={styles.container} >
         <StatusBar
           backgroundColor="#303F9F"
@@ -72,7 +70,6 @@ export default class Welcome extends Component {
             onLogoutFinished={this._onLogOut.bind(this)}/>
         </View>
       </View>
-      //     </Image>
     );
   }
 }

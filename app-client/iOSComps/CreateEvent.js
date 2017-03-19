@@ -12,38 +12,24 @@ import {
   Switch,
   ScrollView,
 } from 'react-native';
+import SharedCreateEvent from '../sharedComps/CreateEvent';
 
 var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
 numbers.shift()
 const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
-export default class CreateEvent extends Component {
+export default class CreateEvent extends SharedCreateEvent {
   constructor(props) {
     super(props)
-    var date = new Date()
-    date.setSeconds(0)
-    this.state = {
-      name : '',
-      description : '',
-      location : '',
-      date: date,
-      vote: true,
-      type: 'Restaurants',
-      unlimited: true,
-      limited: 1,
-      datePickerVisible: false,
-      typePickerVisible: false,
-      numberPickerVisible: false,
-    }
   }
-  
-  componentWillMount() {
+
+  _updateNav() {
     this.props.navigator.replace({
       component: CreateEvent,
       title: 'New Event',
       rightButtonTitle: 'Create',
       onRightButtonPress: this._submit.bind(this),
-      passProps: { 
+      passProps: {
         firebaseApp : this.props.firebaseApp,
         name : this.props.name,
         fbId : this.props.fbId
@@ -51,83 +37,6 @@ export default class CreateEvent extends Component {
     });
   }
 
-  _onBack() {
-    this.props.navigator.pop();
-  }
-
-  _checkInfo() {
-    var check = false
-    var checkInfo = ''
-    if (this.state.name == '') {
-      check = true
-      checkInfo += 'Please enter the event name!\n'
-    }
-
-    if (this.state.location == '') {
-      check = true
-      checkInfo += 'Please enter the event location!\n'
-    }
-
-    if (check) {
-      alert(checkInfo)
-    }
-    return check
-  }
-
-  _createEvent() {
-    var eventlistRef = this.props.firebaseApp.database().ref('Events/').push()
-    eventlistRef.set({
-      'Name': this.state.name,
-      'Date': this.state.date.toLocaleDateString(),
-      'Time': this.state.date.toLocaleTimeString(),
-      'Location': this.state.location,
-      'Description': this.state.description,
-    })
-    var addHost = {};
-    var hostData = {
-       'Name': this.props.name,
-       'Host': true,
-       'Status': 0
-    }
-    var newPostKey = eventlistRef.key
-    addHost['/Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
-    this.props.firebaseApp.database().ref().update(addHost)
-  }
-
-  _submit() {
-    if (!this._checkInfo()) {
-      this._createEvent()
-      this._onBack()
-    }
-  }
-
-  onDateChange = (date) => {
-    this.setState({date: date});
-  };
-
-  _onDatePress() {
-    this.setState({datePickerVisible: !this.state.datePickerVisible});
-  }
-    
-  _onTypePress() {
-    this.setState({typePickerVisible: !this.state.typePickerVisible});
-  }
-  
-  _onNumberPress() {
-    this.setState({numberPickerVisible: !this.state.numberPickerVisible});
-  }
-  
-  _onSwitchVote(value) {
-    this.setState({vote: value})
-  }
-  
-  _onSwitchCap(value) {
-    this.setState({unlimited: value})
-    if (value) {
-      this.setState({numberPickerVisible: false})
-    }
-  }
-  
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -137,10 +46,10 @@ export default class CreateEvent extends Component {
             placeholder="Type event name."
             onChangeText={(text) => this.setState({name : text})}
           />
-        </View>  
+        </View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
         <View>
-          <TouchableHighlight 
+          <TouchableHighlight
             style={styles.datetime}
             onPress={this._onDatePress.bind(this)}
             underlayColor = 'lightgray'>
@@ -152,7 +61,7 @@ export default class CreateEvent extends Component {
             minimumDate = {new Date()}
             onDateChange={this.onDateChange}
           />}
-        </View>  
+        </View>
         <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
         <View style={styles.textinputview}>
           <TextInput
@@ -163,11 +72,11 @@ export default class CreateEvent extends Component {
         </View>
 
         <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
-        <TouchableHighlight 
+        <TouchableHighlight
           style={styles.typeandnumber}
           onPress={this._onTypePress.bind(this)}
           underlayColor = 'lightgray'>
-          <Text style={styles.text1}> {this.state.type} </Text>           
+          <Text style={styles.text1}> {this.state.type} </Text>
         </TouchableHighlight>
 
         {this.state.typePickerVisible && <PickerIOS
@@ -181,7 +90,7 @@ export default class CreateEvent extends Component {
             />
           ))}
         </PickerIOS>}
-        
+
         <View style={styles.unlimited}>
           <Text style={styles.title}>
             Vote allowed
@@ -191,7 +100,7 @@ export default class CreateEvent extends Component {
             style={{marginTop: 5}}
             value={this.state.vote} />
         </View>
-        
+
         <View style={styles.unlimited}>
           <Text style={styles.title}>
             Unlimited number of people
@@ -201,16 +110,16 @@ export default class CreateEvent extends Component {
             style={{marginTop: 5}}
             value={this.state.unlimited} />
         </View>
-        
-        {!this.state.unlimited && 
-          <TouchableHighlight 
+
+        {!this.state.unlimited &&
+          <TouchableHighlight
             style={styles.typeandnumber}
             onPress={this._onNumberPress.bind(this)}
             underlayColor = 'lightgray'>
-            <Text style={styles.text1}> {'Number of people: ' + this.state.limited} </Text>           
+            <Text style={styles.text1}> {'Number of people: ' + this.state.limited} </Text>
           </TouchableHighlight>
         }
-        
+
         {this.state.numberPickerVisible && !this.state.unlimited &&
         <PickerIOS
           selectedValue = {this.state.limited}
@@ -223,7 +132,7 @@ export default class CreateEvent extends Component {
             />
           ))}
         </PickerIOS>}
-        
+
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}
@@ -296,10 +205,10 @@ const styles = StyleSheet.create({
   unlimited: {
     height: 40,
     flexDirection: 'row',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
   },
   button: {
-    alignItems: 'center',  
+    alignItems: 'center',
     marginHorizontal: 100,
     backgroundColor: '#303F9F',
   },

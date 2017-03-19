@@ -10,26 +10,11 @@ import {
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
 import MapView from 'react-native-maps';
+import SharedSuggestMap from '../sharedComps/SuggestMap';
 
-export default class SuggestMap extends Component {
+export default class SuggestMap extends SharedSuggestMap {
   constructor(props){
     super(props)
-    this.state = {
-      suggestions: this._createListdataSource(['Location 1','Location 2','Location 3', 'Location 4', 'Location 5']),
-    }
-  }
-
-  _onBack() {
-    this.props.navigator.pop();
-  }
-
-  _createListdataSource(array) {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return ds.cloneWithRows(array)
-  }
-
-  _doNothing() {
-
   }
 
   _renderRow(rowData, sectionID, rowID, highlightRow) {

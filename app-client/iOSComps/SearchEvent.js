@@ -9,63 +9,14 @@ import {
   TextInput,
   ListView
 } from 'react-native';
-import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
-import * as firebase from 'firebase';
-
+import SharedSearchEvent from '../sharedComps/SearchEvent';
 import EventPage from '../iOSComps/EventPage';
 
-export default class SearchEvent extends Component {
+export default class SearchEvent extends SharedSearchEvent {
   constructor(props){
     super(props)
-    this.state = {
-      name : '',
-      searchEvents: this._createListdataSource([]),
-      searchEventIds: [],
-      eventsRef : this.props.firebaseApp.database().ref('Events/'),
-    }
   }
-  
-  componentWillMount() {
-    this._searchEventsCallBack = this._searchEventsCallBack.bind(this)
-    this.state.eventsRef.on('value', this._searchEventsCallBack, function(error) {
-      console.error(error);
-    });
-  }
-  
-  componentWillUnmount() {
-    this.state.eventsRef.off('value', this._searchEventsCallBack);
-  }
-  
-  _onBack() {
-    this.props.navigator.pop();
-  }
-  
-  _createListdataSource(array) {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return ds.cloneWithRows(array)
-  }
-  
-  _searchEventsCallBack(snapshot) {
-    var events = []
-    var eventIds = []
-    var searchName = this.state.name
-    snapshot.forEach(function(data) {
-      var dataVal = data.val()
-      if (searchName != '' && dataVal.Name.includes(searchName)) {
-        events.push(dataVal.Name)
-        eventIds.push(data.key)
-      }
-    });
-    this.setState({ 
-      searchEvents: this._createListdataSource(events),
-      myeventIds: eventIds
-    });
-  }
-  
-  _onSearch() {
-    this.state.eventsRef.once('value').then(this._searchEventsCallBack.bind(this))
-  }
-  
+
   _onEvent(rowData, rowID) {
     this.props.navigator.push({
       component: EventPage,

@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
   Navigator,
   BackAndroid,
   TouchableHighlight
@@ -46,19 +47,19 @@ export default class Blink extends Component {
   renderScene(route, navigator) {
     switch (route.index) {
       case 0:
-        return (<Welcome navigator = {navigator} firebaseApp = {firebaseApp}/>)
+        return (<Welcome navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 1:
-        return (<MainMenu route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+        return (<MainMenu route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 2:
-        return (<CreateEvent route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+        return (<CreateEvent route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 3:
-        return (<EventPage route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+        return (<EventPage route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 4:
-        return (<GuestList route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+        return (<GuestList route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 5:
-        return (<SearchEvent route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+        return (<SearchEvent route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 6:
-        return (<SuggestMap route = {route} navigator = {navigator} firebaseApp = {firebaseApp}/>)
+        return (<SuggestMap route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 7:
         return (<VotePage route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
     }
@@ -92,6 +93,7 @@ var routeMapper = {
   LeftButton(route, navigator, index, navState) {
     return (
       <TouchableHighlight
+        style={{padding: 5}}
         onPress={() => {navigator.pop();}}
         underlayColor = 'white'>
         <Text style={styles.text}> Back </Text>
@@ -101,9 +103,11 @@ var routeMapper = {
   RightButton(route, navigator, index, navState) {
     return (
       <TouchableHighlight
+         style={{padding: 5}}
          onPress={route.RightButtonPress}
          underlayColor = 'white'>
-         <Text style={styles.text}> {route.RightButtonTitle} </Text>
+         {route.RightButtonTitle != null ? <Text style={styles.text}> {route.RightButtonTitle} </Text> :
+         <Image source={route.RightButtonIcon} style={{width: 30, height: 30}} />}
       </TouchableHighlight>
     );
   },

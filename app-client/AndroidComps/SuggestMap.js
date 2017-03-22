@@ -43,12 +43,8 @@ export default class SuggestMap extends SharedSuggestMap {
       <View style={styles.container}>
         <MapView
           style={styles.map}
-          region={{
-           latitude: 37.78825,
-           longitude: -122.4324,
-           latitudeDelta: 0.015,
-           longitudeDelta: 0.0121,
-         }}
+          initialRegion={this.state.region}
+          onPress={this._onPress.bind(this)}
         />
         <View style={styles.emptyview}><Text style={styles.title}>Suggested locations:</Text></View>
 

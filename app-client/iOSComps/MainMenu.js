@@ -107,6 +107,7 @@ export default class MainMenu extends SharedMainMenu {
             dataSource={this.state.myevents}
             renderRow={this._renderRow.bind(this)}
             enableEmptySections={true}
+            automaticallyAdjustContentInsets={false}
             renderSeparator={this._renderSeparator} />
         </View>
       </View>
@@ -133,7 +134,6 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 360,
-    backgroundColor: 'white'
   },
   profile: {
     justifyContent: 'space-around',

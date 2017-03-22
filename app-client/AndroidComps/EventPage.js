@@ -33,6 +33,7 @@ export default class EvengPage extends SharedEventPage {
       title: 'Map',
       index: 6,
       passProps: {
+        eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: true

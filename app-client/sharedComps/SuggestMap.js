@@ -9,6 +9,7 @@ export default class SuggestMap extends Component {
     super(props)
     this.state = {
       suggestions: createListdataSource(['Location 1','Location 2','Location 3', 'Location 4', 'Location 5']),
+      locationRef: this.props.eventRef.child('Participants/' + this.props.fbId + '/Location'),
       region: {
         latitude: 43.464258,
         longitude: -80.520410,
@@ -19,7 +20,6 @@ export default class SuggestMap extends Component {
         latitude: 43.464258,
         longitude: -80.520410,
       },
-      test:0
     }
   }
 
@@ -27,15 +27,36 @@ export default class SuggestMap extends Component {
     this.props.navigator.pop();
   }
 
-  _onPress(data) {
-    this.setState({
-      markerCoordinate: data.nativeEvent.coordinate
-    })
-    console.log(this.state.markerCoordinate)
+  _onMapPress(data) {
+    if (data.nativeEvent.coordinate) {
+      this.setState({
+        markerCoordinate: data.nativeEvent.coordinate
+      })
+      console.log(data.nativeEvent)
+      console.log(this.state.markerCoordinate.latitude)
+    }
+  }
+  
+  _onDragMarkerEnd(data) {
+    if (data.nativeEvent.coordinate) {
+      this.setState({
+        markerCoordinate: data.nativeEvent.coordinate
+      })
+      console.log(data.nativeEvent)
+      console.log(this.state.markerCoordinate.latitude)
+    }
+  }
+  
+  _onMarkerPress(data) {
+    console.log("marker")
+  }
+  
+  _updateLocation() {
+    this.state.locationRef.update(this.state.markerCoordinate)
   }
 
   _doNothing() {
-
+    console.log('do nothing')
   }
 }
 

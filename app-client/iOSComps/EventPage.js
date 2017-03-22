@@ -50,6 +50,7 @@ export default class EventPage extends SharedEventPage {
       onLeftButtonPress: ()=>{this.props.navigator.pop()},
       passProps: {
         firebaseApp : this.props.firebaseApp,
+        eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: true

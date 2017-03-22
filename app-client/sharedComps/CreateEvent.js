@@ -20,6 +20,11 @@ export default class CreateEvent extends Component {
       datePickerVisible: false,
       typePickerVisible: false,
       numberPickerVisible: false,
+      modalVisible: false,
+      GeoCoordinate: {
+        latitude: 43.464258,
+        longitude: -80.520410,
+      },
     }
   }
 
@@ -66,7 +71,8 @@ export default class CreateEvent extends Component {
     var hostData = {
        'Name': this.props.name,
        'Host': true,
-       'Status': 0
+       'Status': 0,
+       'Location': this.state.GeoCoordinate,
     }
     var newPostKey = eventlistRef.key
     addHost['/Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
@@ -105,6 +111,21 @@ export default class CreateEvent extends Component {
     if (value) {
       this.setState({numberPickerVisible: false})
     }
+  }
+  
+  _setModalVisible(visible) {
+    this.setState({modalVisible: visible});
+  }
+  
+  _onGeoMap() {
+    this._setModalVisible(true)
+  }
+  
+  _updateGeoCoordinate(newGeoCoordinate) {
+    this.setState({
+      GeoCoordinate: newGeoCoordinate
+    })
+    this._setModalVisible(false)
   }
 }
 

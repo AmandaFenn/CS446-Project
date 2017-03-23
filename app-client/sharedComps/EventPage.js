@@ -30,8 +30,13 @@ export default class EventPage extends Component {
       voteModified: false,
       capModified: false,
       host: true,
+      member: true,
       numbers : Array.apply(null, {length: 1000}).map(Number.call, Number),
       navUpdated: false,
+      GeoCoordinate: {
+        latitude: 43.464258,
+        longitude: -80.520410,
+      },
     }
     this._initData()
   }
@@ -69,7 +74,8 @@ export default class EventPage extends Component {
     });
 
     if (!this.state.host) {
-      this._readCap()
+      this._readCap(snapshot)
+      this._member(snapshot)
     }
 
     if(!snapshot.child('Participants/' + this.props.fbId + '/Host').val()) {
@@ -116,17 +122,27 @@ export default class EventPage extends Component {
     }
   }
 
+  _member(snapshot) {
+    var parts = snapshot.child('Participants').val()
+    this.setState({
+      member: parts[this.props.fbId] ? true : false
+    })
+  }
+
   _initDataRead(snapshot) {
     this._readCap(snapshot)
+    this._member(snapshot)
     var snapshotdata = snapshot.val()
     var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
-
+    var GeoCoordinate = snapshotdata.Participants[this.props.fbId].Location
+    
     this.setState({
       private: snapshotdata.Private,
-      description:snapshotdata.Description,
-      location:snapshotdata.Location,
+      description: snapshotdata.Description,
+      location: snapshotdata.Location,
       date: date,
-      guestVote:snapshotdata.GuestCanCreateVotes
+      guestVote: snapshotdata.GuestCanCreateVotes,
+      GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate
     })
   }
 

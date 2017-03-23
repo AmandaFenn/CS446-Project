@@ -47,7 +47,7 @@ export default class Welcome extends SharedWelcome {
           in the blink of an eye.
         </Text>
         <View elevation={3} backgroundColor="black">
-          <TouchableHighlight onPress={this._onForward.bind(this)}>
+          <TouchableHighlight onPress={this._getStarted.bind(this)}>
             <Text style={styles.button}> Get Started! </Text>
           </TouchableHighlight>
         </View>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   AppRegistry,
 } from 'react-native';
+import {AccessToken} from 'react-native-fbsdk'
 
 export default class Welcome extends Component {
   constructor(props){
@@ -12,7 +13,15 @@ export default class Welcome extends Component {
   }
 
   _getStarted() {
-    this._onForward()
+    AccessToken.getCurrentAccessToken().then(
+      (data) => {
+        if (data) {
+          this._onForward()
+        } else {
+          alert('Please log in!')
+        }
+      }
+    )
   }
 
   _onLogOut() {

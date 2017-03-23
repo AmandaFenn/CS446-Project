@@ -15,8 +15,7 @@ import {
   ListView
 } from 'react-native';
 import SharedEventPage from '../sharedComps/EventPage';
-
-const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
+import Constants from '../utils/Constants'
 
 export default class EvengPage extends SharedEventPage {
   constructor(props) {
@@ -189,7 +188,7 @@ export default class EvengPage extends SharedEventPage {
             selectedValue = {this.state.type}
             onValueChange={(value) => this.setState({type : value})}
             enabled = {this.state.host}>
-            {eventTypes.map((e) => (
+            {Constants.eventTypes.map((e) => (
               <Picker.Item
                 key= 'key'
                 value= {e}
@@ -215,7 +214,7 @@ export default class EvengPage extends SharedEventPage {
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote}
+            value={this.state.guestVote}
             disabled={!this.state.host}/>
         </View>
 
@@ -236,7 +235,7 @@ export default class EvengPage extends SharedEventPage {
             <Picker
               style={styles.emptyview, {width: 60}}
               selectedValue={this.state.limited}
-              onValueChange={(value) => this.setState({limited : value})}
+              onValueChange={(value) => this.setState({limited:value, capModified:true})}
               enabled={this.state.host} >
               {this.state.numbers.map((n) => (
                 <Picker.Item

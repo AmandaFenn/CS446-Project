@@ -15,10 +15,10 @@ import {
 } from 'react-native';
 import SharedCreateEvent from '../sharedComps/CreateEvent';
 import GeoLocation from './GeoLocation'
+import Constants from '../utils/Constants'
 
 var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
 numbers.shift()
-const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
 export default class CreateEvent extends SharedCreateEvent {
   constructor(props) {
@@ -46,7 +46,7 @@ export default class CreateEvent extends SharedCreateEvent {
           transparent={false}
           visible={this.state.modalVisible}
           onRequestClose={() => {alert("Modal has been closed.")}}>
-          <GeoLocation 
+          <GeoLocation
             region = {this.state.region}
             markerCoordinate = {this.state.GeoCoordinate}
             modalParent = {this}
@@ -102,7 +102,7 @@ export default class CreateEvent extends SharedCreateEvent {
         {this.state.typePickerVisible && <PickerIOS
           selectedValue = {this.state.type}
           onValueChange={(value) => this.setState({type : value})}>
-          {eventTypes.map((e) => (
+          {Constants.eventTypes.map((e) => (
             <PickerIOS.Item
               key= 'key'
               value= {e}
@@ -118,7 +118,7 @@ export default class CreateEvent extends SharedCreateEvent {
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote} />
+            value={this.state.guestVote} />
         </View>
 
         <View style={styles.unlimited}>

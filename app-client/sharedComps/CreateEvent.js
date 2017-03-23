@@ -13,7 +13,7 @@ export default class CreateEvent extends Component {
       description : '',
       location : '',
       date: date,
-      vote: true,
+      guestVote: true,
       type: 'Restaurants',
       unlimited: true,
       limited: 1,
@@ -66,6 +66,9 @@ export default class CreateEvent extends Component {
       'Time': this.state.date.toLocaleTimeString(),
       'Location': this.state.location,
       'Description': this.state.description,
+      'Type': this.state.type,
+      'Cap': this.state.unlimited ? -1 : this.state.limited,
+      'GuestCanCreateVotes': this.state.guestVote,
     })
     var addHost = {};
     var hostData = {
@@ -103,7 +106,7 @@ export default class CreateEvent extends Component {
   }
 
   _onSwitchVote(value) {
-    this.setState({vote: value})
+    this.setState({guestVote: value})
   }
 
   _onSwitchCap(value) {
@@ -112,15 +115,15 @@ export default class CreateEvent extends Component {
       this.setState({numberPickerVisible: false})
     }
   }
-  
+
   _setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
-  
+
   _onGeoMap() {
     this._setModalVisible(true)
   }
-  
+
   _updateGeoCoordinate(newGeoCoordinate) {
     this.setState({
       GeoCoordinate: newGeoCoordinate

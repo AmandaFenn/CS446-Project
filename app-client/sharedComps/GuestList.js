@@ -11,8 +11,12 @@ export default class GuestList extends Component {
     this.state = {
       guestsDataSource: createListdataSource([]),
       partsRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId + '/Participants'),
+      capRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId + '/Cap'),
+      unlimited: true,
+      limited: -1,
       guests: [],
       guestIds : [],
+      guestNum: 1
     }
     if (!this.props.guest) {
       this._loadfbInfo(-1, this.props.fbId)
@@ -23,22 +27,25 @@ export default class GuestList extends Component {
     if (this.props.guest) {
       this._loadGuestsCallBack = this._loadGuestsCallBack.bind(this)
       this._loadGuests()
+    } else {
+      this._loadCapCallBack = this._loadCapCallBack.bind(this)
+      this._loadCap()
+      this._loadGuestNumCallBack = this._loadGuestNumCallBack.bind(this)
+      this._loadGuestNum()
     }
   }
 
   componentWillUnmount() {
     if (this.props.guest) {
       this.state.partsRef.off('value', this._loadGuestsCallBack);
+    } else {
+      this.state.capRef.off('value', this._loadCapCallBack);
+      this.state.partsRef.off('value', this._loadGuestNumCallBack);
     }
   }
 
   _onBack() {
     this.props.navigator.pop();
-  }
-
-  _createListdataSource(array) {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return ds.cloneWithRows(array)
   }
 
   _loadGuestsCallBack(snapshot) {
@@ -62,6 +69,34 @@ export default class GuestList extends Component {
     });
   }
 
+  _loadCapCallBack(snapshot) {
+    cap = snapshot.val()
+    this.setState({
+      unlimited: cap > 0 ? false : true,
+      limited: cap > 0 ? cap : -1
+    });
+    console.log('should print ' + cap)
+  }
+
+  _loadCap() {
+    this.state.capRef.on('value', this._loadCapCallBack, function(error) {
+      console.error(error);
+    });
+  }
+
+  _loadGuestNumCallBack(snapshot) {
+    guestNum = snapshot.numChildren()
+    this.setState({
+      guestNum: guestNum
+    });
+  }
+
+  _loadGuestNum() {
+    this.state.partsRef.on('value', this._loadGuestNumCallBack, function(error) {
+      console.error(error);
+    });
+  }
+
   _deleteOrInvite(rowID) {
     var id = this.state.guestIds[rowID]
     if (this.props.guest) {
@@ -73,9 +108,14 @@ export default class GuestList extends Component {
         this.state.partsRef.child(id).remove()
       }
     } else {
-      var newPart = {}
-      newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
-      this.state.partsRef.update(newPart)
+      if (this.state.unlimited || this.state.guestNum < this.state.limited) {
+        var newPart = {}
+        newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
+        this.state.partsRef.update(newPart)
+        console.log('should print ' + this.state.limited)
+      } else {
+        alert('This event is full!')
+      }
     }
   }
 
@@ -114,7 +154,6 @@ export default class GuestList extends Component {
             if (i >= 0) {
               this._addGuest(i, result)
             } else {
-              console.log(result)
               this._addFriends(result.friends.data)
             }
           }

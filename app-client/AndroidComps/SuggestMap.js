@@ -44,8 +44,14 @@ export default class SuggestMap extends SharedSuggestMap {
         <MapView
           style={styles.map}
           initialRegion={this.state.region}
-          onPress={this._onPress.bind(this)}
-        />
+          onPress={this._onMapPress.bind(this)}
+          onMarkerPress={this._onMarkerPress.bind(this)}
+          provider='google'>
+          <MapView.Marker draggable
+            coordinate={this.state.markerCoordinate}
+            onDragEnd={this._onDragMarkerEnd.bind(this)}>
+          </MapView.Marker>
+        </MapView>
         <View style={styles.emptyview}><Text style={styles.title}>Suggested locations:</Text></View>
 
         <View style={styles.suggestions}>
@@ -60,7 +66,7 @@ export default class SuggestMap extends SharedSuggestMap {
 
         <TouchableHighlight
           style={styles.button}
-          onPress={this._doNothing.bind(this)}>
+          onPress={this._updateLocation.bind(this)}>
           <Text style={styles.buttontext}> Suggest </Text>
         </TouchableHighlight>
       </View>

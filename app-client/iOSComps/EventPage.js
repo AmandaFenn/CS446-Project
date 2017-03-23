@@ -17,9 +17,7 @@ import SharedEventPage from '../sharedComps/EventPage';
 import GuestList from '../iOSComps/GuestList';
 import SuggestMap from '../iOSComps/SuggestMap';
 import VotePage from '../iOSComps/VotePage';
-
-
-const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
+import Constants from '../utils/Constants'
 
 export default class EventPage extends SharedEventPage {
   constructor(props) {
@@ -32,7 +30,7 @@ export default class EventPage extends SharedEventPage {
       title: this.props.title,
       rightButtonTitle: host ? 'Done' : '',
       onRightButtonPress: host ? this._submit.bind(this) : null,
-      passProps: { 
+      passProps: {
         firebaseApp : this.props.firebaseApp,
         name : this.props.name,
         title: this.props.title,
@@ -41,7 +39,7 @@ export default class EventPage extends SharedEventPage {
       }
     });
   }
-  
+
   _onSuggest() {
     this.props.navigator.push({
       component: SuggestMap,
@@ -57,7 +55,7 @@ export default class EventPage extends SharedEventPage {
       }
     });
   }
-  
+
   _onVote() {
     this.props.navigator.push({
       component: VotePage,
@@ -70,7 +68,7 @@ export default class EventPage extends SharedEventPage {
       }
     });
   }
-  
+
   _guest() {
     this.props.navigator.push({
       component: GuestList,
@@ -115,33 +113,33 @@ export default class EventPage extends SharedEventPage {
           multiline={true}
           editable={this.state.host}
         />
-        
+
         <View style={styles.location}>
           {!this.state.host && <TouchableHighlight
             style={styles.button1}
             onPress={this._onJoin.bind(this)}>
             <Text style={styles.buttontext1}> Join </Text>
           </TouchableHighlight>}
-          
+
           {!this.state.host && <TouchableHighlight
             style={styles.button1}
             onPress={this._onLeave.bind(this)}>
             <Text style={styles.buttontext1}> Leave </Text>
           </TouchableHighlight>}
-          
+
           {this.state.host &&
           <TouchableHighlight
             style={styles.button1}
             onPress={this._friend.bind(this)}>
             <Text style={styles.buttontext1}> Invite </Text>
           </TouchableHighlight>}
-          
+
           <TouchableHighlight
             style={styles.button1}
             onPress={this._onSuggest.bind(this)}>
             <Text style={styles.buttontext1}> Suggest </Text>
           </TouchableHighlight>
-          
+
           <TouchableHighlight
             style={styles.button1}
             onPress={this._onVote.bind(this)}>
@@ -189,7 +187,7 @@ export default class EventPage extends SharedEventPage {
         <PickerIOS
           selectedValue = {this.state.type}
           onValueChange={(value) => this.setState({type : value})}>
-          {eventTypes.map((e) => (
+          {Constants.eventTypes.map((e) => (
             <PickerIOS.Item
               key= 'key'
               value= {e}
@@ -205,10 +203,10 @@ export default class EventPage extends SharedEventPage {
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote}
+            value={this.state.guestVote}
             disabled={!this.state.host} />
         </View>
-        
+
         <TouchableHighlight
           style={styles.typeandnumber}
           onPress={this._guest.bind(this)}
@@ -239,7 +237,7 @@ export default class EventPage extends SharedEventPage {
         {this.state.numberPickerVisible && !this.state.unlimited &&
         <PickerIOS
           selectedValue = {this.state.limited}
-          onValueChange={(value) => this.setState({limited : value})}>
+          onValueChange={(value) => this.setState({limited: value, capModified:true})}>
           {this.state.numbers.map((n) => (
             <PickerIOS.Item
               key= 'key'

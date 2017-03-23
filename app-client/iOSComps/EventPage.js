@@ -30,7 +30,17 @@ export default class EventPage extends SharedEventPage {
       title: this.props.title,
       rightButtonTitle: host ? 'Done' : '',
       onRightButtonPress: host ? this._submit.bind(this) : null,
+<<<<<<< HEAD
       passProps: this.props
+=======
+      passProps: {
+        firebaseApp : this.props.firebaseApp,
+        name : this.props.name,
+        title: this.props.title,
+        fbId : this.props.fbId,
+        eventId : this.props.eventId,
+      }
+>>>>>>> af58a9c1a10b298a356c0e94b69addc3e6ff850f
     });
   }
 
@@ -45,7 +55,7 @@ export default class EventPage extends SharedEventPage {
         eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
-        guest: true
+        GeoCoordinate: this.state.GeoCoordinate
       }
     });
   }
@@ -112,14 +122,8 @@ export default class EventPage extends SharedEventPage {
         <View style={styles.location}>
           {!this.state.host && <TouchableHighlight
             style={styles.button1}
-            onPress={this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> Join </Text>
-          </TouchableHighlight>}
-
-          {!this.state.host && <TouchableHighlight
-            style={styles.button1}
-            onPress={this._onLeave.bind(this)}>
-            <Text style={styles.buttontext1}> Leave </Text>
+            onPress={this.state.member ? this._onLeave.bind(this) : this._onJoin.bind(this)}>
+            <Text style={styles.buttontext1}> {this.state.member ? 'Leave' : 'Join'} </Text>
           </TouchableHighlight>}
 
           {this.state.host &&

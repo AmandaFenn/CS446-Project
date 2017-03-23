@@ -35,7 +35,7 @@ export default class EvengPage extends SharedEventPage {
         eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
-        guest: true
+        GeoCoordinate: this.state.GeoCoordinate
       }
     });
   }
@@ -129,14 +129,8 @@ export default class EvengPage extends SharedEventPage {
         <View style={styles.location}>
           {!this.state.host && <TouchableHighlight
             style={styles.button1}
-            onPress={this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> Join </Text>
-          </TouchableHighlight>}
-
-          {!this.state.host && <TouchableHighlight
-            style={styles.button1}
-            onPress={this._onLeave.bind(this)}>
-            <Text style={styles.buttontext1}> Leave </Text>
+            onPress={this.state.member ? this._onLeave.bind(this) : this._onJoin.bind(this)}>
+            <Text style={styles.buttontext1}> {this.state.member ? 'Leave' : 'Join'} </Text>
           </TouchableHighlight>}
 
           {this.state.host &&

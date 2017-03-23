@@ -46,7 +46,9 @@ export default class EvengPage extends SharedEventPage {
       index: 7,
       passProps: {
         fbId : this.props.fbId,
+        host: this.state.host,
         eventId : this.props.eventId,
+        guestVote: this.state.guestVote
       }
     });
   }
@@ -156,7 +158,7 @@ export default class EvengPage extends SharedEventPage {
             <Text style={styles.buttontext1}> Vote </Text>
           </TouchableHighlight>
         </View>
-
+        <View style={styles.emptyview}><Text style={styles.title1}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View style={styles.datetime}>
@@ -182,7 +184,7 @@ export default class EvengPage extends SharedEventPage {
         />
 
         <View style={styles.datetime}>
-          <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+          <View style={styles.emptyview}><Text style={styles.title}>Category:</Text></View>
           <Picker
             style={styles.emptyview, {width: 350}}
             selectedValue = {this.state.type}

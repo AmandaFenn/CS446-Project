@@ -113,6 +113,16 @@ export default class CreateEvent extends SharedCreateEvent {
 
         <View style={styles.unlimited}>
           <Text style={styles.title}>
+            Private
+          </Text>
+          <Switch
+            onValueChange={this._onSwitchPrivate.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.private} />
+        </View>
+
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
             Vote allowed
           </Text>
           <Switch

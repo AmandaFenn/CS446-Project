@@ -11,7 +11,8 @@ export default class EventPage extends Component {
     this.state = {
       description : '',
       location : '',
-      type: 'Restaurants',
+      private: false,
+      type: 'Eatings',
       date: new Date(),
       guestVote: true,
       unlimited: true,
@@ -50,19 +51,6 @@ export default class EventPage extends Component {
   }
 
   _updateNav(host) {
-    this.props.navigator.replace({
-      component: EventPage,
-      title: this.props.title,
-      rightButtonTitle: host ? 'Done' : '',
-      onRightButtonPress: host ? this._submit.bind(this) : null,
-      passProps: {
-        firebaseApp : this.props.firebaseApp,
-        name : this.props.name,
-        title: this.props.title,
-        fbId : this.props.fbId,
-        eventId : this.props.eventId
-      }
-    });
   }
 
   _loadEventCallBack(snapshot) {
@@ -72,10 +60,14 @@ export default class EventPage extends Component {
       numbers.shift()
     }
 
+    guestVote = snapshot.child('GuestCanCreateVotes').val()
+
     this.setState({
       guests: parts,
       numbers: numbers,
+      guestVote: guestVote != undefined ? guestVote : true
     });
+
     if (!this.state.host) {
       this._readCap()
     }
@@ -111,7 +103,7 @@ export default class EventPage extends Component {
   }
 
   _readCap(snapshot) {
-    var cap = snapshot.child('Cap').val()
+    var cap = snapshot != undefined ? snapshot.child('Cap').val() : -1
     if (cap > 0) {
       this.setState({
         unlimited: false
@@ -130,6 +122,7 @@ export default class EventPage extends Component {
     var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
 
     this.setState({
+      private: snapshotdata.Private,
       description:snapshotdata.Description,
       location:snapshotdata.Location,
       date: date,

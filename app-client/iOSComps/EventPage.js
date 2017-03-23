@@ -35,7 +35,9 @@ export default class EventPage extends SharedEventPage {
         name : this.props.name,
         title: this.props.title,
         fbId : this.props.fbId,
-        eventId : this.props.eventId
+        host : this.props.host,
+        eventId : this.props.eventId,
+        guestVote: this.props.guestVote
       }
     });
   }
@@ -65,6 +67,7 @@ export default class EventPage extends SharedEventPage {
         fbId : this.props.fbId,
         host: this.state.host,
         eventId : this.props.eventId,
+        guestVote: this.props.guestVote
       }
     });
   }
@@ -147,6 +150,7 @@ export default class EventPage extends SharedEventPage {
           </TouchableHighlight>
         </View>
 
+        <View style={styles.emptyview}><Text style={styles.title1}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View>
@@ -175,7 +179,7 @@ export default class EventPage extends SharedEventPage {
           editable={this.state.host}
         />
 
-        <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+        <View style={styles.emptyview}><Text style={styles.title}>Category:</Text></View>
         <TouchableHighlight
           style={styles.typeandnumber}
           onPress={this._onTypePress.bind(this)}

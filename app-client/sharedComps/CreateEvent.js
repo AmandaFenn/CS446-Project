@@ -17,6 +17,7 @@ export default class CreateEvent extends Component {
       type: 'Restaurants',
       unlimited: true,
       limited: 1,
+      private: false,
       datePickerVisible: false,
       typePickerVisible: false,
       numberPickerVisible: false,
@@ -67,6 +68,7 @@ export default class CreateEvent extends Component {
       'Location': this.state.location,
       'Description': this.state.description,
       'Type': this.state.type,
+      'Private': this.state.private,
       'Cap': this.state.unlimited ? -1 : this.state.limited,
       'GuestCanCreateVotes': this.state.guestVote,
     })
@@ -78,7 +80,7 @@ export default class CreateEvent extends Component {
        'Location': this.state.GeoCoordinate,
     }
     var newPostKey = eventlistRef.key
-    addHost['/Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
+    addHost['Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
     this.props.firebaseApp.database().ref().update(addHost)
   }
 
@@ -103,6 +105,10 @@ export default class CreateEvent extends Component {
 
   _onNumberPress() {
     this.setState({numberPickerVisible: !this.state.numberPickerVisible});
+  }
+
+  _onSwitchPrivate(value) {
+    this.setState({private: value})
   }
 
   _onSwitchVote(value) {

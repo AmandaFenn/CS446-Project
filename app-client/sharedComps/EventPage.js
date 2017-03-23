@@ -33,6 +33,7 @@ export default class EventPage extends Component {
       member: true,
       numbers : Array.apply(null, {length: 1000}).map(Number.call, Number),
       navUpdated: false,
+      modalVisible: false,
       GeoCoordinate: {
         latitude: 43.464258,
         longitude: -80.520410,
@@ -60,17 +61,20 @@ export default class EventPage extends Component {
 
   _loadEventCallBack(snapshot) {
     var parts = snapshot.child('Participants').numChildren()
+    
     var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
     for (i = 0; i < parts; i++) {
       numbers.shift()
     }
-
-    guestVote = snapshot.child('GuestCanCreateVotes').val()
+    var GeoCoordinate = snapshot.child('Participants/' + this.props.fbId + '/Location').val()
+    var guestVote = snapshot.child('GuestCanCreateVotes').val()
 
     this.setState({
       guests: parts,
       numbers: numbers,
+      GeoCoordinate: GeoCoordinate,
       guestVote: guestVote != undefined ? guestVote : true
+      
     });
 
     if (!this.state.host) {
@@ -209,9 +213,7 @@ export default class EventPage extends Component {
 
   _onJoin() {
     if (this.state.unlimited || this.state.guests < this.state.limited) {
-      var newPart = {}
-      newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2}
-      this.state.eventRef.child('Participants/').update(newPart)
+      this._onGeoMap()
     } else {
       alert('This event is full!')
     }
@@ -252,6 +254,24 @@ export default class EventPage extends Component {
     if (value) {
       this.setState({numberPickerVisible: false})
     }
+  }
+  
+  _setModalVisible(visible) {
+    this.setState({modalVisible: visible});
+  }
+
+  _onGeoMap() {
+    this._setModalVisible(true)
+  }
+
+  _updateGeoCoordinate(newGeoCoordinate) {
+    var newPart = {}
+    newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2, 'Location': newGeoCoordinate}
+    this.state.eventRef.child('Participants/').update(newPart)
+    this.setState({
+      GeoCoordinate: newGeoCoordinate
+    })
+    this._setModalVisible(false)
   }
 }
 

@@ -11,12 +11,14 @@ import {
   PickerIOS,
   Switch,
   ScrollView,
-  ListView
+  ListView,
+  Modal
 } from 'react-native';
 import SharedEventPage from '../sharedComps/EventPage';
 import GuestList from '../iOSComps/GuestList';
 import SuggestMap from '../iOSComps/SuggestMap';
 import VotePage from '../iOSComps/VotePage';
+import GeoLocation from './GeoLocation'
 import Constants from '../utils/Constants'
 
 export default class EventPage extends SharedEventPage {
@@ -99,6 +101,16 @@ export default class EventPage extends SharedEventPage {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Modal
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {alert("Modal has been closed.")}}>
+          <GeoLocation
+            region = {this.state.region}
+            markerCoordinate = {this.state.GeoCoordinate}
+            modalParent = {this}
+          />
+        </Modal>
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}

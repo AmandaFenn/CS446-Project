@@ -30,15 +30,7 @@ export default class EventPage extends SharedEventPage {
       title: this.props.title,
       rightButtonTitle: host ? 'Done' : '',
       onRightButtonPress: host ? this._submit.bind(this) : null,
-      passProps: {
-        firebaseApp : this.props.firebaseApp,
-        name : this.props.name,
-        title: this.props.title,
-        fbId : this.props.fbId,
-        host : this.props.host,
-        eventId : this.props.eventId,
-        guestVote: this.props.guestVote
-      }
+      passProps: this.props
     });
   }
 
@@ -67,7 +59,7 @@ export default class EventPage extends SharedEventPage {
         fbId : this.props.fbId,
         host: this.state.host,
         eventId : this.props.eventId,
-        guestVote: this.props.guestVote
+        guestVote: this.state.guestVote
       }
     });
   }

@@ -31,11 +31,7 @@ export default class CreateEvent extends SharedCreateEvent {
       title: 'New Event',
       rightButtonTitle: 'Create',
       onRightButtonPress: this._submit.bind(this),
-      passProps: {
-        firebaseApp : this.props.firebaseApp,
-        name : this.props.name,
-        fbId : this.props.fbId
-      }
+      passProps: this.props
     });
   }
 

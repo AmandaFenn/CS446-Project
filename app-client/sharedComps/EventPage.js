@@ -106,7 +106,8 @@ export default class EventPage extends Component {
     var cap = snapshot != undefined ? snapshot.child('Cap').val() : -1
     if (cap > 0) {
       this.setState({
-        unlimited: false
+        unlimited: false,
+        limited: cap
       })
     } else {
       this.setState({

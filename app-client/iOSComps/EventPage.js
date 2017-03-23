@@ -30,17 +30,7 @@ export default class EventPage extends SharedEventPage {
       title: this.props.title,
       rightButtonTitle: host ? 'Done' : '',
       onRightButtonPress: host ? this._submit.bind(this) : null,
-<<<<<<< HEAD
       passProps: this.props
-=======
-      passProps: {
-        firebaseApp : this.props.firebaseApp,
-        name : this.props.name,
-        title: this.props.title,
-        fbId : this.props.fbId,
-        eventId : this.props.eventId,
-      }
->>>>>>> af58a9c1a10b298a356c0e94b69addc3e6ff850f
     });
   }
 

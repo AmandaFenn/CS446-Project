@@ -31,6 +31,7 @@ export default class EventPage extends Component {
       capModified: false,
       host: true,
       member: true,
+      status: 0,
       numbers : Array.apply(null, {length: 1000}).map(Number.call, Number),
       navUpdated: false,
       modalVisible: false,
@@ -61,20 +62,23 @@ export default class EventPage extends Component {
 
   _loadEventCallBack(snapshot) {
     var parts = snapshot.child('Participants').numChildren()
-    
+
     var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
     for (i = 0; i < parts; i++) {
       numbers.shift()
     }
+
+    var part = snapshot.child('Participants/' + this.props.fbId).val()
+    var status = snapshot.child('Participants/' + this.props.fbId + '/Status').val()
     var GeoCoordinate = snapshot.child('Participants/' + this.props.fbId + '/Location').val()
     var guestVote = snapshot.child('GuestCanCreateVotes').val()
 
     this.setState({
       guests: parts,
       numbers: numbers,
-      GeoCoordinate: GeoCoordinate,
+      status: status!=null ? status : -1,
+      GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate,
       guestVote: guestVote != undefined ? guestVote : true
-      
     });
 
     if (!this.state.host) {
@@ -139,13 +143,15 @@ export default class EventPage extends Component {
     this._member(snapshot)
     var snapshotdata = snapshot.val()
     var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
-    var GeoCoordinate = snapshotdata.Participants[this.props.fbId].Location
-    
+    var status = snapshot.child('Participants/' + this.props.fbId + '/Status').val()
+    var GeoCoordinate = snapshot.child('Participants' + this.props.fbId + '/Location').val()
+
     this.setState({
       private: snapshotdata.Private,
       description: snapshotdata.Description,
       location: snapshotdata.Location,
       date: date,
+      status: status!=null ? status : -1,
       guestVote: snapshotdata.GuestCanCreateVotes,
       GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate
     })
@@ -255,7 +261,7 @@ export default class EventPage extends Component {
       this.setState({numberPickerVisible: false})
     }
   }
-  
+
   _setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
@@ -266,8 +272,14 @@ export default class EventPage extends Component {
 
   _updateGeoCoordinate(newGeoCoordinate) {
     var newPart = {}
-    newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2, 'Location': newGeoCoordinate}
-    this.state.eventRef.child('Participants/').update(newPart)
+    if (this.state.status > 0) {
+      newPart['Status'] = 0
+      newPart['Location'] = newGeoCoordinate
+      this.state.eventRef.child('Participants/' + this.props.fbId).update(newPart)
+    } else {
+      newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2, 'Location': newGeoCoordinate}
+      this.state.eventRef.child('Participants/').update(newPart)
+    }
     this.setState({
       GeoCoordinate: newGeoCoordinate
     })

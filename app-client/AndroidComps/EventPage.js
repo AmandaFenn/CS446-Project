@@ -12,9 +12,11 @@ import {
   Picker,
   Switch,
   ScrollView,
-  ListView
+  ListView,
+  Modal
 } from 'react-native';
 import SharedEventPage from '../sharedComps/EventPage';
+import GeoLocation from './GeoLocation'
 import Constants from '../utils/Constants'
 
 export default class EvengPage extends SharedEventPage {
@@ -116,6 +118,16 @@ export default class EvengPage extends SharedEventPage {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Modal
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {alert("Modal has been closed.")}}>
+          <GeoLocation
+            region = {this.state.region}
+            markerCoordinate = {this.state.GeoCoordinate}
+            modalParent = {this}
+          />
+        </Modal>
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}
@@ -127,10 +139,16 @@ export default class EvengPage extends SharedEventPage {
         />
 
         <View style={styles.location}>
-          {!this.state.host && <TouchableHighlight
+          {(this.state.status == -1 || this.state.status == 1) && <TouchableHighlight
             style={styles.button1}
-            onPress={this.state.member ? this._onLeave.bind(this) : this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> {this.state.member ? 'Leave' : 'Join'} </Text>
+            onPress={this._onJoin.bind(this)}>
+            <Text style={styles.buttontext1}> {this.state.status > 0 ? 'Accept' : 'Join'} </Text>
+          </TouchableHighlight>}
+
+          {!this.state.host && this.state.status >= 0 && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._onLeave.bind(this)}>
+            <Text style={styles.buttontext1}> Leave </Text>
           </TouchableHighlight>}
 
           {this.state.host &&
@@ -140,17 +158,17 @@ export default class EvengPage extends SharedEventPage {
             <Text style={styles.buttontext1}> Invite </Text>
           </TouchableHighlight>}
 
-          <TouchableHighlight
+          {this.state.status >= 0 && this.state.status < 2 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onSuggest.bind(this)}>
             <Text style={styles.buttontext1}> Suggest </Text>
-          </TouchableHighlight>
+          </TouchableHighlight>}
 
-          <TouchableHighlight
+          {this.state.status == 0 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onVote.bind(this)}>
             <Text style={styles.buttontext1}> Vote </Text>
-          </TouchableHighlight>
+          </TouchableHighlight>}
         </View>
         <View style={styles.emptyview}><Text style={styles.title1}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>

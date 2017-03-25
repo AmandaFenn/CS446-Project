@@ -23,9 +23,9 @@ export default class Blink extends Component {
   renderScene(route, navigator) {
     switch (route.index) {
       case 0:
-        return (<Welcome navigator = {navigator} />)
+        return (<Welcome route = {route} navigator = {navigator} {... route.passProps}/>)
       case 1:
-        return (<Menus navigator = {navigator} />)
+        return (<Menus route = {route} navigator = {navigator} {... route.passProps}/>)
     }
   }
 

@@ -53,7 +53,7 @@ export default class EventNavigation extends Component {
   render() {
     return (
       <Navigator
-        initialRoute={{ title: 'Main Menu', index: 1}}
+        initialRoute={{ title: 'Main Menu', index: 1, passProps: this.props}}
         renderScene={this.renderScene}
         navigationBar={ <Navigator.NavigationBar
           routeMapper={routeMapper}

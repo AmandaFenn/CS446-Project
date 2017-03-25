@@ -63,7 +63,8 @@ export default class EvengPage extends SharedEventPage {
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: true,
-        host: this.state.host
+        host: this.state.host,
+        name: this.state.name,
       }
     });
   }
@@ -76,7 +77,8 @@ export default class EvengPage extends SharedEventPage {
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: false,
-        host: this.state.host
+        host: this.state.host,
+        name: this.state.name,
       }
     });
   }

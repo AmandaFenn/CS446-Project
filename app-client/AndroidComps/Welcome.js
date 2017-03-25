@@ -16,10 +16,11 @@ export default class Welcome extends SharedWelcome {
     super(props)
   }
 
-  _onForward() {
+  _onForward(props) {
     this.props.navigator.replace({
       title: 'Blink',
-      index: 1
+      index: 1,
+      passProps: props
     });
   }
 

@@ -21,10 +21,12 @@ export default class Settings extends Component {
 
   render() {
     return (
-      <View elevation={3}>
-        <LoginButton
-          onLogoutFinished={this.props.getBack}/>
-      </View>
+      <View style = {{flex:1, justifyContent: 'center', alignItems: 'center'}}>
+        <View elevation={3}>
+          <LoginButton
+            onLogoutFinished={this.props.getBack}/>
+        </View>
+      </View> 
     );
   }
 }

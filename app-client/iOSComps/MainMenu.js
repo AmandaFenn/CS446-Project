@@ -24,8 +24,8 @@ export default class MainMenu extends SharedMainMenu {
       title: 'Find Events',
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        name : this.state.name,
-        fbId : this.state.fbId
+        name : this.props.name,
+        fbId : this.props.fbId
       }
     });
   }
@@ -37,8 +37,8 @@ export default class MainMenu extends SharedMainMenu {
       rightButtonTitle: 'Create',
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        name : this.state.name,
-        fbId : this.state.fbId
+        name : this.props.name,
+        fbId : this.props.fbId
       }
     });
   }
@@ -49,9 +49,9 @@ export default class MainMenu extends SharedMainMenu {
       title: rowData,
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        name : this.state.name,
+        name : this.props.name,
         title : rowData,
-        fbId : this.state.fbId,
+        fbId : this.props.fbId,
         eventId : this.state.myeventIds[rowID]
       }
     });
@@ -87,12 +87,12 @@ export default class MainMenu extends SharedMainMenu {
         <View style={styles.container1}>
           <View style={styles.profile}>
             <Image 
-              source={{uri: this.state.pic}}
+              source={{uri: this.props.pic}}
               style={{width: 80, height: 80}}
               boarderWidth="2"
               borderColor="black" />
             <Text style={styles.text}>
-              {this.state.name}
+              {this.props.name}
             </Text>
           </View>
           <TouchableHighlight onPress = {this._onSearchEvent.bind(this)}>

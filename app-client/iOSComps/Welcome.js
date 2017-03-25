@@ -10,18 +10,19 @@ import {
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton} from 'react-native-fbsdk'
 import SharedWelcome from '../sharedComps/Welcome';
-import MainMenu from '../iOSComps/MainMenu';
+import Menus from '../iOSComps/Menus';
 
 export default class Welcome extends SharedWelcome {
   constructor(props){
     super(props)
   }
   
-  _onForward() {
+  _onForward(props) {
     this.props.navigator.push({
-      component: MainMenu,
-      title: 'Main Menu',
-      passProps: { firebaseApp : this.props.firebaseApp }
+      component: Menus,
+      title: 'Blink',
+      navigationBarHidden: true,
+      passProps: props
     });
   }
 
@@ -54,19 +55,7 @@ export default class Welcome extends SharedWelcome {
         <View style={styles.space}/>
         <LoginButton
           readPermissions={["public_profile", "user_friends"]}
-          onLoginFinished={
-            (error, result) => {
-              if (error) {
-                alert("Login failed with error: " + result.error);
-              } else if (result.isCancelled) {
-                alert("Login was cancelled");
-              } else {
-                this._onForward()
-                //alert("Login was successful with permissions: " + result.grantedPermissions)
-              }
-            }
-          }
-          onLogoutFinished={this._onLogOut.bind(this)}/>
+          onLoginFinished={this._onLogin.bind(this)}/>
       </View>
     );
   }

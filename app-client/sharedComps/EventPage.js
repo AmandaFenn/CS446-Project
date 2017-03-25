@@ -2,13 +2,14 @@ import React, { Component, } from 'react'
 import {
   AppRegistry,
 } from 'react-native';
-import {createListdataSource} from '../utils/HelpFuncs';
+import {createListdataSource, sendNotification} from '../utils/HelpFuncs';
 import Constants from '../utils/Constants'
 
 export default class EventPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      name : '',
       description : '',
       location : '',
       private: false,
@@ -32,6 +33,7 @@ export default class EventPage extends Component {
       host: true,
       member: true,
       status: 0,
+      hostId: '',
       numbers : Array.apply(null, {length: 1000}).map(Number.call, Number),
       navUpdated: false,
       modalVisible: false,
@@ -78,7 +80,7 @@ export default class EventPage extends Component {
       numbers: numbers,
       status: status!=null ? status : -1,
       GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate,
-      guestVote: guestVote != undefined ? guestVote : true
+      guestVote: guestVote != undefined ? guestVote : true,
     });
 
     if (!this.state.host) {
@@ -147,6 +149,8 @@ export default class EventPage extends Component {
     var GeoCoordinate = snapshot.child('Participants' + this.props.fbId + '/Location').val()
 
     this.setState({
+      name: snapshotdata.Name,
+      hostId: snapshotdata.HostID,
       private: snapshotdata.Private,
       description: snapshotdata.Description,
       location: snapshotdata.Location,
@@ -227,6 +231,9 @@ export default class EventPage extends Component {
 
   _onLeave() {
     this.state.eventRef.child('Participants/' + this.props.fbId).remove()
+    sendNotification(this.props.firebaseApp.database().ref('Notifications/'+ this.state.hostId),
+                      this.props.eventId,
+                      this.props.name + Constants.messages[2] + this.state.name)
   }
 
   onDateChange = (date) => {
@@ -272,6 +279,7 @@ export default class EventPage extends Component {
 
   _updateGeoCoordinate(newGeoCoordinate) {
     var newPart = {}
+    var m = this.state.status > 0 ? 1 : 0
     if (this.state.status > 0) {
       newPart['Status'] = 0
       newPart['Location'] = newGeoCoordinate
@@ -280,6 +288,9 @@ export default class EventPage extends Component {
       newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2, 'Location': newGeoCoordinate}
       this.state.eventRef.child('Participants/').update(newPart)
     }
+    sendNotification(this.props.firebaseApp.database().ref('Notifications/'+ this.state.hostId),
+                      this.props.eventId,
+                      this.props.name + Constants.messages[m] + this.state.name)
     this.setState({
       GeoCoordinate: newGeoCoordinate
     })

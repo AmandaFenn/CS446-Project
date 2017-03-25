@@ -71,6 +71,8 @@ export default class CreateEvent extends Component {
       'Private': this.state.private,
       'Cap': this.state.unlimited ? -1 : this.state.limited,
       'GuestCanCreateVotes': this.state.guestVote,
+      'HostName' : this.props.name,
+      'HostID' : this.props.fbId
     })
     var addHost = {};
     var hostData = {

@@ -3,7 +3,8 @@ import {
   AppRegistry,
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
-import {createListdataSource} from '../utils/HelpFuncs';
+import {createListdataSource, sendNotification} from '../utils/HelpFuncs';
+import Constants from '../utils/Constants'
 
 export default class GuestList extends Component {
   constructor(props){
@@ -16,6 +17,7 @@ export default class GuestList extends Component {
       limited: -1,
       guests: [],
       guestIds : [],
+      guestsStatus : [],
       guestNum: 1
     }
     if (!this.props.guest) {
@@ -49,17 +51,18 @@ export default class GuestList extends Component {
   }
 
   _loadGuestsCallBack(snapshot) {
-    var guestsName = []
+    var guestsStatus = []
     var guestIds = []
     snapshot.forEach(function(data) {
-      guestsName.push({'Name' : data.val().Name})
+      guestsStatus.push(data.val().Status)
       guestIds.push(data.key)
     });
     for (i=0; i<guestIds.length;i++) {
       this._loadfbInfo(i, guestIds[i])
     }
     this.setState({
-      guestIds: guestIds
+      guestIds: guestIds,
+      guestsStatus: guestsStatus
     });
   }
 
@@ -100,23 +103,58 @@ export default class GuestList extends Component {
   _deleteOrInvite(rowID) {
     var id = this.state.guestIds[rowID]
     if (this.props.guest) {
-      if (id != this.props.fbId) {
-        this.setState({
-          guests: [],
-          guestIds: []
-        })
-        this.state.partsRef.child(id).remove()
-      }
+      this._delete(rowID)
     } else {
       if (this.state.unlimited || this.state.guestNum < this.state.limited) {
-        var newPart = {}
-        newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
-        this.state.partsRef.update(newPart)
-        console.log('should print ' + this.state.limited)
+        this._invite(rowID)
       } else {
         alert('This event is full!')
       }
     }
+  }
+  
+  _delete(rowID) {
+    var id = this.state.guestIds[rowID]
+    if (id != this.props.fbId) {
+      this.setState({
+        guests: [],
+        guestIds: [],
+        guestsStatus: []
+      })
+      message = this.state.guestsStatus[rowID] < 2 ? 
+        Constants.messages[4] + this.props.name : 
+        (Constants.messages[5] + this.props.name + Constants.messages[6])
+      this.state.partsRef.child(id).remove()
+      sendNotification(
+        this.props.firebaseApp.database().ref('Notifications/'+ id),
+        this.props.eventId,
+        message)
+    } else {
+      alert('You can not delete yourself!')
+    }
+  }
+  
+  _invite(rowID) {
+    var id = this.state.guestIds[rowID]
+    var newPart = {}
+    newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
+    this.state.partsRef.update(newPart)
+    sendNotification(
+      this.props.firebaseApp.database().ref('Notifications/'+ id),
+      this.props.eventId,
+      Constants.messages[3] + this.props.name)
+      //console.log('should print ' + this.state.limited)
+  }
+  
+  _accept(rowID) {
+    var id = this.state.guestIds[rowID]
+    var newPart = {}
+    newPart['Status'] = 0
+    this.state.partsRef.child(id).update(newPart)
+    sendNotification(
+      this.props.firebaseApp.database().ref('Notifications/'+ id),
+      this.props.eventId,
+      Constants.messages[7] + this.props.name)
   }
 
   _addGuest(i, data) {

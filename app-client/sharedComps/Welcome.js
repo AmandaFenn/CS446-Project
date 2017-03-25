@@ -24,9 +24,20 @@ export default class Welcome extends Component {
     )
   }
 
+  _onLogin(error, result) {
+    if (error) {
+        alert("Login failed with error: " + result.error);
+    } else if (result.isCancelled) {
+        alert("Login was cancelled");
+    } else {
+      this._onForward();
+      //alert("Login was successful with permissions: " + result.grantedPermissions)
+    }
+  }
+
   _onLogOut() {
+    alert('alert logout----')
     // Do not call Firebase signout here.
-    alert("User logged out")
   }
 }
 

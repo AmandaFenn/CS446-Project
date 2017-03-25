@@ -17,7 +17,7 @@ export default class Welcome extends SharedWelcome {
   }
 
   _onForward() {
-    this.props.navigator.push({
+    this.props.navigator.replace({
       title: 'Blink',
       index: 1
     });
@@ -55,19 +55,8 @@ export default class Welcome extends SharedWelcome {
         <View elevation={3} backgroundColor="black">
           <LoginButton
             readPermissions={["public_profile", "user_friends"]}
-            onLoginFinished={
-            (error, result) => {
-              if (error) {
-                alert("Login failed with error: " + result.error);
-              } else if (result.isCancelled) {
-                alert("Login was cancelled");
-              } else {
-                this._onForward();
-                //alert("Login was successful with permissions: " + result.grantedPermissions)
-              }
-            }
-          }
-            onLogoutFinished={this._onLogOut.bind(this)}/>
+            onLoginFinished={this._onLogin.bind(this)}
+          />
         </View>
       </View>
     );

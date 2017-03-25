@@ -187,6 +187,11 @@ export default class MainMenu extends Component {
 
   _onMyEvent(rowData, rowID) {
   }
+
+  _onLogOut() {
+    // Do not call Firebase signout here.
+    this._onBack()
+  }
 }
 
 AppRegistry.registerComponent('MainMenu', () => MainMenu);

@@ -20,7 +20,17 @@ const Constants = {
     databaseURL: "https://blink-b568e.firebaseio.com",
     storageBucket: "blink-b568e.appspot.com",
     messagingSenderId: "600861396413"
-  })
+  }),
+  ImagePickerOptions : {
+    title: 'Upload a photo',
+    customButtons: [
+      {name: 'fb', title: 'Remove the photo'},
+    ],
+    storageOptions: {
+      skipBackup: true,
+      path: 'images'
+    }
+  }
 }
 
 export default Constants;

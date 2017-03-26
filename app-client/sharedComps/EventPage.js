@@ -11,6 +11,7 @@ export default class EventPage extends Component {
     this.state = {
       name : '',
       description : '',
+      avatarSource : null,
       location : '',
       private: false,
       type: 'Eatings',
@@ -43,6 +44,8 @@ export default class EventPage extends Component {
       },
     }
     this._initData()
+    var avatarRef = this.props.firebaseApp.storage().ref('Avatars/'+ this.props.eventId)
+    avatarRef.getDownloadURL().then(this._loadAvatar.bind(this)).catch(function(error) {})
   }
 
   componentWillMount() {
@@ -218,6 +221,7 @@ export default class EventPage extends Component {
 
   _deleteEvent() {
     this.props.firebaseApp.database().ref('Events/'+ this.props.eventId).remove()
+    this.props.firebaseApp.storage().ref('Avatars/' + this.props.eventId).delete().catch(function(error) {})
     this._onBack()
   }
 
@@ -295,6 +299,14 @@ export default class EventPage extends Component {
       GeoCoordinate: newGeoCoordinate
     })
     this._setModalVisible(false)
+  }
+
+  _loadAvatar(url) {
+    if (url) {
+      this.setState({
+        avatarSource: {uri: url}
+      })
+    }
   }
 }
 

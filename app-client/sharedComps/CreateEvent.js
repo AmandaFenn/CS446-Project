@@ -2,6 +2,9 @@ import React, { Component, } from 'react'
 import {
   AppRegistry,
 } from 'react-native';
+import ImagePicker from 'react-native-image-picker'
+import uploadImage from '../utils/ImageLoad'
+import Constants from '../utils/Constants'
 
 export default class CreateEvent extends Component {
   constructor(props) {
@@ -14,7 +17,7 @@ export default class CreateEvent extends Component {
       location : '',
       date: date,
       guestVote: true,
-      type: 'Restaurants',
+      type: 'Eatings',
       unlimited: true,
       limited: 1,
       private: false,
@@ -26,6 +29,8 @@ export default class CreateEvent extends Component {
         latitude: 43.464258,
         longitude: -80.520410,
       },
+      avatarSource : null,
+      avatarURI : ''
     }
   }
 
@@ -84,6 +89,16 @@ export default class CreateEvent extends Component {
     var newPostKey = eventlistRef.key
     addHost['Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
     this.props.firebaseApp.database().ref().update(addHost)
+
+    // Image
+    if (this.state.avatarURI != '') {
+      uploadImage(newPostKey, this.state.avatarURI)
+    }
+    //var storageRef = this.props.firebaseApp.storage().ref();
+    //var file = new File()
+    //storageRef.child('Avatars').put(file).then(function(snapshot) {
+    //});
+
   }
 
   _submit() {
@@ -137,6 +152,34 @@ export default class CreateEvent extends Component {
       GeoCoordinate: newGeoCoordinate
     })
     this._setModalVisible(false)
+  }
+
+  _onImage() {
+    ImagePicker.showImagePicker(Constants.ImagePickerOptions, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      }
+      else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      }
+      else if (response.customButton) {
+        this.setState({
+          avatarSource: null,
+          avatarURI: ''
+        })
+        //console.log('User tapped custom button: ', response.customButton);
+      }
+      else {
+        let source = { uri: response.uri };
+
+        this.setState({
+          avatarSource: source,
+          avatarURI: response.uri
+        });
+      }
+    });
   }
 }
 

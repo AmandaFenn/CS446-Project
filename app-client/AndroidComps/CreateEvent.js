@@ -84,6 +84,20 @@ export default class CreateEvent extends SharedCreateEvent {
             />
         </View>
 
+        <Image
+          source={this.state.avatarSource}
+          style = {{width:400, height:100}}
+          resizeMode={Image.resizeMode.stretch}/>
+
+        <TouchableHighlight
+          style={{width: 40, height:40}}
+          onPress={this._onImage.bind(this)}
+          underlayColor = 'lightgray'>
+          <Image
+            style={{width: 40, height:40}}
+            source={require('../img/GoogleImages.png')} />
+        </TouchableHighlight>
+
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View style={styles.datetime}>
@@ -144,7 +158,7 @@ export default class CreateEvent extends SharedCreateEvent {
 
         <View style={styles.unlimited}>
           <Text style={styles.title}>
-            Vote allowed
+            Guests can create votes
           </Text>
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}

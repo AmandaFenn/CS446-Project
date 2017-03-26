@@ -130,6 +130,11 @@ export default class EvengPage extends SharedEventPage {
             modalParent = {this}
           />
         </Modal>
+        <Image
+          source={this.state.avatarSource}
+          style = {{width:400, height:100}}
+          resizeMode={Image.resizeMode.stretch}/>
+
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}

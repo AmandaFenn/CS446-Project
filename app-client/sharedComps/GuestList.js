@@ -18,7 +18,7 @@ export default class GuestList extends Component {
       guests: [],
       guestIds : [],
       guestsStatus : [],
-      guestNum: 1
+      guestNum: 1,
     }
     if (!this.props.guest) {
       this._loadfbInfo(-1, this.props.fbId)
@@ -89,7 +89,13 @@ export default class GuestList extends Component {
 
   _loadGuestNumCallBack(snapshot) {
     guestNum = snapshot.numChildren()
+    var guestsStatus = {}
+    snapshot.forEach(function(data) {
+      guestsStatus[data.key] = data.val().Status
+    });
+
     this.setState({
+      guestsStatus: guestsStatus,
       guestNum: guestNum
     });
   }
@@ -112,7 +118,7 @@ export default class GuestList extends Component {
       }
     }
   }
-  
+
   _delete(rowID) {
     var id = this.state.guestIds[rowID]
     if (id != this.props.fbId) {
@@ -121,8 +127,8 @@ export default class GuestList extends Component {
         guestIds: [],
         guestsStatus: []
       })
-      message = this.state.guestsStatus[rowID] < 2 ? 
-        Constants.messages[4] + this.props.name : 
+      message = this.state.guestsStatus[rowID] < 2 ?
+        Constants.messages[4] + this.props.name :
         (Constants.messages[5] + this.props.name + Constants.messages[6])
       this.state.partsRef.child(id).remove()
       sendNotification(
@@ -133,7 +139,7 @@ export default class GuestList extends Component {
       alert('You can not delete yourself!')
     }
   }
-  
+
   _invite(rowID) {
     var id = this.state.guestIds[rowID]
     var newPart = {}
@@ -145,7 +151,7 @@ export default class GuestList extends Component {
       Constants.messages[3] + this.props.name)
       //console.log('should print ' + this.state.limited)
   }
-  
+
   _accept(rowID) {
     var id = this.state.guestIds[rowID]
     var newPart = {}
@@ -155,6 +161,25 @@ export default class GuestList extends Component {
       this.props.firebaseApp.database().ref('Notifications/'+ id),
       this.props.eventId,
       Constants.messages[7] + this.props.name)
+  }
+
+  _pending(rowID) {
+    var status = this.state.guestsStatus[rowID]
+    if (status == 2) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  _isMember(rowID) {
+    var id = this.state.guestIds[rowID]
+    var status = this.state.guestsStatus[id]
+    if (status != undefined) {
+      return true
+    } else {
+      return false
+    }
   }
 
   _addGuest(i, data) {

@@ -13,7 +13,6 @@ import SharedMenus from '../sharedComps/Menus'
 import EventNavigation from './EventNavigation'
 import Notifications from './Notifications'
 import Settings from './Settings'
-import TextWithIcon from '../Buttons/TextWithIcon'
 import Constants from '../utils/Constants'
 
 export default class Menus extends SharedMenus {

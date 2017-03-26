@@ -119,7 +119,7 @@ export default class CreateEvent extends SharedCreateEvent {
 
         <View style={styles.unlimited}>
           <Text style={styles.title}>
-            Vote allowed
+            Guests can create votes
           </Text>
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}

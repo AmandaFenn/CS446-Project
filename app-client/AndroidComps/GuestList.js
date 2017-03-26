@@ -21,7 +21,13 @@ export default class GuestList extends SharedGuestList {
         <Image source={{uri: rowData.pic}}
               style={{width:50, height: 50}} />
         <Text style = {styles.text1}> {rowData.Name} </Text>
-        {this.props.host && <TouchableHighlight
+        {this.props.host && this.props.guest && this._pending(rowID) && <TouchableHighlight
+          style={styles.button}
+          onPress = {this._accept.bind(this, rowID)}>
+          <Text style = {styles.buttontext}> Accept </Text>
+        </TouchableHighlight>}
+
+        {this.props.host && (this.props.guest || !this._isMember(rowID)) && <TouchableHighlight
           style={styles.button}
           onPress = {this._deleteOrInvite.bind(this, rowID)}>
           <Text style = {styles.buttontext}> {this.props.guest ? 'Delete' : 'Invite'} </Text>

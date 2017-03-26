@@ -46,7 +46,19 @@ export default class Welcome extends Component {
     alert('alert logout')
     // Do not call Firebase signout here.
   }
-  
+
+  _initPersonalInfo(result) {
+    var userlistRef = firebaseApp.database().ref('Users/')
+    var addUser = {};
+    addUser[result.id] = {
+      name: result.name,
+      pic: result.picture.data.url,
+      cover: result.cover ? result.cover.source: '',
+      location: result.location ? result.location.name : ''
+    }
+    userlistRef.update(addUser)
+  }
+
   _loadPersonalInfo() {
     AccessToken.getCurrentAccessToken().then(
       (data) => {
@@ -62,13 +74,14 @@ export default class Welcome extends Component {
             //alert('Success fetching data: ' + result.picture.data.url.toString());
             var passProps = {
               firebaseApp: firebaseApp,
-              name: result.name, 
+              name: result.name,
               pic: result.picture.data.url,
               fbId: result.id
             }
             this.setState({
               passProps: passProps
             })
+            this._initPersonalInfo(result)
             this._onForward(passProps)
           }
         }
@@ -79,7 +92,7 @@ export default class Welcome extends Component {
             accessToken: accessToken,
             parameters: {
               fields: {
-                string: 'id, email, name, picture, friends'
+                string: 'id, email, name, picture, friends, cover, location'
               }
             }
           },
@@ -111,7 +124,7 @@ export default class Welcome extends Component {
       }
     )
   }
-  
+
 }
 
 AppRegistry.registerComponent('Welcome', () => Welcome);

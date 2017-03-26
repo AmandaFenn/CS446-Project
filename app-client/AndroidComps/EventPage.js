@@ -117,6 +117,35 @@ export default class EvengPage extends SharedEventPage {
     }
   };
 
+  _renderComments(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <View style = {styles.comment}>
+        <View style = {styles.comment_user}>
+          <Image source = {{uri: this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].pic : Constants.fbIcon}} style = {styles.comment_user_pic}/>
+          <View style = {styles.comment_user_name}>
+            <Text>{this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].name : ''}</Text>
+          </View>
+        </View>
+        <View style = {styles.comment_text}>
+          <Text> {rowData.comment} </Text>
+        </View>
+      </View>
+    )
+  }
+
+  _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
+    return (
+      <View
+        key={`${sectionID}-${rowID}`}
+        style={{
+        height: adjacentRowHighlighted ? 4 : 1,
+        backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
+      }}
+      />
+    );
+  }
+
+
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -175,6 +204,13 @@ export default class EvengPage extends SharedEventPage {
             style={styles.button1}
             onPress={this._onVote.bind(this)}>
             <Text style={styles.buttontext1}> Vote </Text>
+          </TouchableHighlight>}
+
+          {this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._deleteEvent.bind(this)}
+            underlayColor = 'lightgray'>
+            <Text style={styles.buttontext2}> Delete </Text>
           </TouchableHighlight>}
         </View>
         <View style={styles.emptyview}><Text style={styles.title1}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
@@ -269,24 +305,29 @@ export default class EvengPage extends SharedEventPage {
           </View>
         }
 
-        <View style={styles.emptyview}><Text style={styles.title1}>Comments:</Text></View>
+        {this.state.status == 0 && <TextInput
+          style={styles.textinput}
+          placeholder="Comment"
+          defaultValue={this.state.tmpComment}
+          onChangeText={(text) => this.setState({tmpComment : text})}
+          underlineColorAndroid = 'transparent'
+        />}
+
+        {this.state.status == 0 && <TouchableHighlight
+          style={styles.button2}
+          onPress={this._comment.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.buttontext2}> Comment </Text>
+        </TouchableHighlight>}
 
         <View style={styles.container2}>
           <ListView
             dataSource={this.state.comments}
-            renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+            renderRow={this._renderComments.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+            automaticallyAdjustContentInsets={false}
+            renderSeparator={this._renderSeparator}/>
         </View>
-
-        <View style={styles.emptyview} />
-
-        {this.state.host && <TouchableHighlight
-          style={styles.button2}
-          onPress={this._deleteEvent.bind(this)}
-          underlayColor = 'lightgray'>
-          <Text style={styles.buttontext2}> Delete </Text>
-        </TouchableHighlight>}
       </ScrollView>
     )
   }
@@ -301,7 +342,6 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: '#C5CAE9'
   },
   emptyview: {
     height: 40,
@@ -404,6 +444,28 @@ const styles = StyleSheet.create({
     paddingVertical:10,
     paddingHorizontal:5
   },
+  comment: {
+    flexDirection: 'row',
+    width: 400,
+    height: 60
+  },
+  comment_user: {
+    flex: 1,
+    flexDirection: 'column',
+    height: 60
+  },
+  comment_user_pic: {
+    flex: 2,
+    width: 40,
+    height: 40
+  },
+  comment_user_name: {
+    flex: 1
+  },
+  comment_text: {
+    flex: 9
+  }
+
 });
 
 AppRegistry.registerComponent('EvengPage', () => EvengPage);

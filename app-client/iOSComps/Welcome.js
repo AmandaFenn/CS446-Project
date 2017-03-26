@@ -16,7 +16,7 @@ export default class Welcome extends SharedWelcome {
   constructor(props){
     super(props)
   }
-  
+
   _onForward(props) {
     this.props.navigator.push({
       component: Menus,
@@ -32,7 +32,7 @@ export default class Welcome extends SharedWelcome {
         <StatusBar
           backgroundColor="#303F9F"
           barStyle="light-content"/>
-        
+
         <Image source={require('../img/eye.png')} style={styles.icon}/>
         <Text style={styles.welcome}>
           Welcome to Blink!
@@ -54,7 +54,7 @@ export default class Welcome extends SharedWelcome {
         </TouchableHighlight>
         <View style={styles.space}/>
         <LoginButton
-          readPermissions={["public_profile", "user_friends"]}
+          readPermissions={["public_profile", "user_friends, "user_location""]}
           onLoginFinished={this._onLogin.bind(this)}/>
       </View>
     );

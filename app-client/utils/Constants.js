@@ -30,7 +30,8 @@ const Constants = {
       skipBackup: true,
       path: 'images'
     }
-  }
+  },
+  fbIcon : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'
 }
 
 export default Constants;

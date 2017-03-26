@@ -70,8 +70,9 @@ export default class MainMenu extends SharedMainMenu {
       }}
       />
     );
-    }
-   render() {
+  }
+
+  render() {
     return (
       <View style={styles.container}>
         <View style={styles.container1}>

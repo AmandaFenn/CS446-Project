@@ -24,7 +24,9 @@ export default class EventPage extends Component {
       numberPickerVisible: false,
       guests: 0,
       eventRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId),
-      comments: createListdataSource(['User1: comment1','User2: comment2','User3: comment3']),
+      commenters: {},
+      comments: createListdataSource([]),
+      tmpComment: '',
       descriptionModified: false,
       locationModified: false,
       dateModified: false,
@@ -78,12 +80,30 @@ export default class EventPage extends Component {
     var GeoCoordinate = snapshot.child('Participants/' + this.props.fbId + '/Location').val()
     var guestVote = snapshot.child('GuestCanCreateVotes').val()
 
+    var comments = []
+
+    var userlistRef = this.props.firebaseApp.database().ref('Users')
+    var userInfoCallBack = this._userInfoCallBack.bind(this)
+    snapshot.child('Comments').forEach(
+      function(data) {
+        var tmp = {}
+        var id = data.val().id
+        tmp['id'] = id
+        tmp['comment'] = data.val().comment
+        comments.push(tmp)
+        userlistRef.child(id).once('value').then(userInfoCallBack)
+      }
+    )
+
+    comments.reverse()
+
     this.setState({
       guests: parts,
       numbers: numbers,
       status: status!=null ? status : -1,
       GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate,
       guestVote: guestVote != undefined ? guestVote : true,
+      comments: createListdataSource(comments),
     });
 
     if (!this.state.host) {
@@ -98,6 +118,15 @@ export default class EventPage extends Component {
         this.setState({navUpdated: true})
       }
     }
+  }
+
+  _userInfoCallBack(snapshot) {
+    console.log(snapshot.val())
+    var commenters = this.state.commenters
+    commenters[snapshot.key] = snapshot.val()
+    this.setState({
+      commenters: commenters
+    })
   }
 
   _loadEvent() {
@@ -308,6 +337,16 @@ export default class EventPage extends Component {
       })
     }
   }
+
+  _comment() {
+    var commentRef = this.state.eventRef.child('Comments').push()
+    commentRef.set({
+      id: this.props.fbId,
+      comment: this.state.tmpComment,
+    })
+    this.setState({tmpComment: ''})
+  }
+
 }
 
 AppRegistry.registerComponent('EventPage', () => EvengPage);

@@ -20,8 +20,8 @@ export default class MainMenu extends SharedMainMenu {
       title : 'Find Events',
       index : 5,
       passProps: {
-        name : this.state.name,
-        fbId : this.state.fbId
+        name : this.props.name,
+        fbId : this.props.fbId
       }
     });
   }
@@ -31,8 +31,8 @@ export default class MainMenu extends SharedMainMenu {
       title : 'New Event',
       index : 2,
       passProps: {
-        name : this.state.name,
-        fbId : this.state.fbId,
+        name : this.props.name,
+        fbId : this.props.fbId,
       }
     });
   }
@@ -42,8 +42,8 @@ export default class MainMenu extends SharedMainMenu {
       title : rowData,
       index : 3,
       passProps: {
-        name : this.state.name,         // host name
-        fbId : this.state.fbId,
+        name : this.props.name,         // host name
+        fbId : this.props.fbId,
         eventId : this.state.myeventIds[rowID]
       }
     });
@@ -70,18 +70,19 @@ export default class MainMenu extends SharedMainMenu {
       }}
       />
     );
-    }
-   render() {
+  }
+
+  render() {
     return (
       <View style={styles.container}>
         <View style={styles.container1}>
           <View style={styles.profile}>
-            <Image source={{uri: this.state.pic}}
+            <Image source={{uri: this.props.pic}}
               style={{width: 80, height: 80}}
               boarderWidth="2"
               borderColor="black"/>
             <Text style={styles.text}>
-              {this.state.name}
+              {this.props.name}
             </Text>
           </View>
           <TouchableHighlight onPress = {this._onSearchEvent.bind(this)}>

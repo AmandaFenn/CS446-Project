@@ -6,7 +6,8 @@ import {
   View,
   Image,
   TouchableHighlight,
-  ListView
+  ListView,
+  ActivityIndicator
 } from 'react-native';
 import SharedMainMenu from '../sharedComps/MainMenu';
 import SearchEvent from '../iOSComps/SearchEvent';
@@ -24,8 +25,8 @@ export default class MainMenu extends SharedMainMenu {
       title: 'Find Events',
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        name : this.state.name,
-        fbId : this.state.fbId
+        name : this.props.name,
+        fbId : this.props.fbId
       }
     });
   }
@@ -37,8 +38,8 @@ export default class MainMenu extends SharedMainMenu {
       rightButtonTitle: 'Create',
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        name : this.state.name,
-        fbId : this.state.fbId
+        name : this.props.name,
+        fbId : this.props.fbId
       }
     });
   }
@@ -49,9 +50,9 @@ export default class MainMenu extends SharedMainMenu {
       title: rowData,
       passProps: { 
         firebaseApp : this.props.firebaseApp,
-        name : this.state.name,
+        name : this.props.name,
         title : rowData,
-        fbId : this.state.fbId,
+        fbId : this.props.fbId,
         eventId : this.state.myeventIds[rowID]
       }
     });
@@ -87,12 +88,12 @@ export default class MainMenu extends SharedMainMenu {
         <View style={styles.container1}>
           <View style={styles.profile}>
             <Image 
-              source={{uri: this.state.pic}}
+              source={{uri: this.props.pic}}
               style={{width: 80, height: 80}}
               boarderWidth="2"
               borderColor="black" />
             <Text style={styles.text}>
-              {this.state.name}
+              {this.props.name}
             </Text>
           </View>
           <TouchableHighlight onPress = {this._onSearchEvent.bind(this)}>
@@ -103,11 +104,16 @@ export default class MainMenu extends SharedMainMenu {
           </TouchableHighlight>
         </View>
         <View style={styles.container2}>
+          {this.state.loadingEvents ? <ActivityIndicator
+            animating={this.state.loadingEvents}
+            style={[styles.centering, {height: 80}]}
+            size="large"/> :
           <ListView 
             dataSource={this.state.myevents}
             renderRow={this._renderRow.bind(this)}
             enableEmptySections={true}
-            renderSeparator={this._renderSeparator} />
+            automaticallyAdjustContentInsets={false}
+            renderSeparator={this._renderSeparator} />}
         </View>
       </View>
     );
@@ -123,7 +129,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 60,
-    paddingBottom:10,
+    paddingBottom: 60,
   },
   container1: {
     flex: 2,
@@ -131,9 +137,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container2: {
-    flex: 3,
+    //flex: 3,
     width: 360,
-    backgroundColor: 'white'
+    height: 300
   },
   profile: {
     justifyContent: 'space-around',
@@ -160,7 +166,12 @@ const styles = StyleSheet.create({
     //fontFamily: 'sans-serif',
     fontWeight: '300',
     backgroundColor: 'transparent'
-  }
+  },
+  centering: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+  },
 });
 
 AppRegistry.registerComponent('MainMenu', () => MainMenu);

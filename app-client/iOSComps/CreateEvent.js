@@ -11,12 +11,14 @@ import {
   PickerIOS,
   Switch,
   ScrollView,
+  Modal,
 } from 'react-native';
 import SharedCreateEvent from '../sharedComps/CreateEvent';
+import GeoLocation from './GeoLocation'
+import Constants from '../utils/Constants'
 
 var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
 numbers.shift()
-const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
 
 export default class CreateEvent extends SharedCreateEvent {
   constructor(props) {
@@ -29,17 +31,23 @@ export default class CreateEvent extends SharedCreateEvent {
       title: 'New Event',
       rightButtonTitle: 'Create',
       onRightButtonPress: this._submit.bind(this),
-      passProps: {
-        firebaseApp : this.props.firebaseApp,
-        name : this.props.name,
-        fbId : this.props.fbId
-      }
+      passProps: this.props
     });
   }
 
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Modal
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {alert("Modal has been closed.")}}>
+          <GeoLocation
+            region = {this.state.region}
+            markerCoordinate = {this.state.GeoCoordinate}
+            modalParent = {this}
+          />
+        </Modal>
         <View style={styles.emptyview}><Text style={styles.title}>Name:</Text></View>
         <View style={styles.textinputview}>
           <TextInput style={styles.textinput}
@@ -47,6 +55,22 @@ export default class CreateEvent extends SharedCreateEvent {
             onChangeText={(text) => this.setState({name : text})}
           />
         </View>
+        
+        {this.state.avatarSource && <Image
+          source={this.state.avatarSource}
+          style = {{width:400, height:100}}
+          resizeMode={Image.resizeMode.stretch}/>
+        }
+        
+        <TouchableHighlight
+          style={{width: 40, height:40}}
+          onPress={this._onImage.bind(this)}
+          underlayColor = 'lightgray'>
+          <Image
+            style={{width: 40, height:40}}
+            source={require('../img/GoogleImages.png')} />
+        </TouchableHighlight>
+        
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
         <View>
           <TouchableHighlight
@@ -70,6 +94,14 @@ export default class CreateEvent extends SharedCreateEvent {
             onChangeText={(text) => this.setState({location : text})}
           />
         </View>
+        <TouchableHighlight
+          style={{width: 40, height:40}}
+          onPress={this._onGeoMap.bind(this)}
+          underlayColor = 'lightgray'>
+          <Image
+            style={{width: 40, height:40}}
+            source={require('../img/GoogleMap.png')} />
+        </TouchableHighlight>
 
         <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
         <TouchableHighlight
@@ -82,7 +114,7 @@ export default class CreateEvent extends SharedCreateEvent {
         {this.state.typePickerVisible && <PickerIOS
           selectedValue = {this.state.type}
           onValueChange={(value) => this.setState({type : value})}>
-          {eventTypes.map((e) => (
+          {Constants.eventTypes.map((e) => (
             <PickerIOS.Item
               key= 'key'
               value= {e}
@@ -93,12 +125,22 @@ export default class CreateEvent extends SharedCreateEvent {
 
         <View style={styles.unlimited}>
           <Text style={styles.title}>
-            Vote allowed
+            Private
+          </Text>
+          <Switch
+            onValueChange={this._onSwitchPrivate.bind(this)}
+            style={{marginTop: 5}}
+            value={this.state.private} />
+        </View>
+
+        <View style={styles.unlimited}>
+          <Text style={styles.title}>
+            Guests can create votes
           </Text>
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote} />
+            value={this.state.guestVote} />
         </View>
 
         <View style={styles.unlimited}>

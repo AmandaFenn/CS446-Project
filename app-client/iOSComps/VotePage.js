@@ -23,11 +23,7 @@ export default class VotePage extends SharedVotePage {
       title: this.props.title,
       rightButtonIcon: (this.props.host || this.state.guestVote) ? require('../img/NavBarButtonPlus@3x.png') : null,
       onRightButtonPress: (this.props.host || this.state.guestVote) ? this._newVote.bind(this) : null,
-      passProps: { 
-        firebaseApp : this.props.firebaseApp,
-        fbId : this.props.fbId,
-        eventId : this.props.eventId
-      }
+      passProps: this.props
     });
   }
   

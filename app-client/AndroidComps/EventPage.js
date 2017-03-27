@@ -12,11 +12,12 @@ import {
   Picker,
   Switch,
   ScrollView,
-  ListView
+  ListView,
+  Modal
 } from 'react-native';
 import SharedEventPage from '../sharedComps/EventPage';
-
-const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
+import GeoLocation from './GeoLocation'
+import Constants from '../utils/Constants'
 
 export default class EvengPage extends SharedEventPage {
   constructor(props) {
@@ -33,9 +34,10 @@ export default class EvengPage extends SharedEventPage {
       title: 'Map',
       index: 6,
       passProps: {
+        eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
-        guest: true
+        GeoCoordinate: this.state.GeoCoordinate
       }
     });
   }
@@ -46,7 +48,9 @@ export default class EvengPage extends SharedEventPage {
       index: 7,
       passProps: {
         fbId : this.props.fbId,
+        host: this.state.host,
         eventId : this.props.eventId,
+        guestVote: this.state.guestVote
       }
     });
   }
@@ -59,7 +63,8 @@ export default class EvengPage extends SharedEventPage {
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: true,
-        host: this.state.host
+        host: this.state.host,
+        name: this.state.name,
       }
     });
   }
@@ -72,7 +77,8 @@ export default class EvengPage extends SharedEventPage {
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: false,
-        host: this.state.host
+        host: this.state.host,
+        name: this.state.name,
       }
     });
   }
@@ -111,9 +117,53 @@ export default class EvengPage extends SharedEventPage {
     }
   };
 
+  _renderComments(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <View style = {styles.comment}>
+        <View style = {styles.comment_user}>
+          <Image source = {{uri: this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].pic : Constants.fbIcon}} style = {styles.comment_user_pic}/>
+          <View style = {styles.comment_user_name}>
+            <Text>{this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].name : ''}</Text>
+          </View>
+        </View>
+        <View style = {styles.comment_text}>
+          <Text> {rowData.comment} </Text>
+        </View>
+      </View>
+    )
+  }
+
+  _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
+    return (
+      <View
+        key={`${sectionID}-${rowID}`}
+        style={{
+        height: adjacentRowHighlighted ? 4 : 1,
+        backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
+      }}
+      />
+    );
+  }
+
+
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Modal
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {alert("Modal has been closed.")}}>
+          <GeoLocation
+            region = {this.state.region}
+            markerCoordinate = {this.state.GeoCoordinate}
+            modalParent = {this}
+          />
+        </Modal>
+        <Image
+          source={this.state.avatarSource}
+          style = {{width:400, height:100}}
+          resizeMode={Image.resizeMode.stretch}/>
+
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}
@@ -125,13 +175,13 @@ export default class EvengPage extends SharedEventPage {
         />
 
         <View style={styles.location}>
-          {!this.state.host && <TouchableHighlight
+          {(this.state.status == -1 || this.state.status == 1) && <TouchableHighlight
             style={styles.button1}
             onPress={this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> Join </Text>
+            <Text style={styles.buttontext1}> {this.state.status > 0 ? 'Accept' : 'Join'} </Text>
           </TouchableHighlight>}
 
-          {!this.state.host && <TouchableHighlight
+          {!this.state.host && this.state.status >= 0 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onLeave.bind(this)}>
             <Text style={styles.buttontext1}> Leave </Text>
@@ -144,19 +194,26 @@ export default class EvengPage extends SharedEventPage {
             <Text style={styles.buttontext1}> Invite </Text>
           </TouchableHighlight>}
 
-          <TouchableHighlight
+          {this.state.status >= 0 && this.state.status < 2 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onSuggest.bind(this)}>
             <Text style={styles.buttontext1}> Suggest </Text>
-          </TouchableHighlight>
+          </TouchableHighlight>}
 
-          <TouchableHighlight
+          {this.state.status == 0 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onVote.bind(this)}>
             <Text style={styles.buttontext1}> Vote </Text>
-          </TouchableHighlight>
-        </View>
+          </TouchableHighlight>}
 
+          {this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._deleteEvent.bind(this)}
+            underlayColor = 'lightgray'>
+            <Text style={styles.buttontext2}> Delete </Text>
+          </TouchableHighlight>}
+        </View>
+        <View style={styles.emptyview}><Text style={styles.title1}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View style={styles.datetime}>
@@ -182,13 +239,13 @@ export default class EvengPage extends SharedEventPage {
         />
 
         <View style={styles.datetime}>
-          <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+          <View style={styles.emptyview}><Text style={styles.title}>Category:</Text></View>
           <Picker
             style={styles.emptyview, {width: 350}}
             selectedValue = {this.state.type}
             onValueChange={(value) => this.setState({type : value})}
             enabled = {this.state.host}>
-            {eventTypes.map((e) => (
+            {Constants.eventTypes.map((e) => (
               <Picker.Item
                 key= 'key'
                 value= {e}
@@ -214,7 +271,7 @@ export default class EvengPage extends SharedEventPage {
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote}
+            value={this.state.guestVote}
             disabled={!this.state.host}/>
         </View>
 
@@ -235,7 +292,7 @@ export default class EvengPage extends SharedEventPage {
             <Picker
               style={styles.emptyview, {width: 60}}
               selectedValue={this.state.limited}
-              onValueChange={(value) => this.setState({limited : value})}
+              onValueChange={(value) => this.setState({limited:value, capModified:true})}
               enabled={this.state.host} >
               {this.state.numbers.map((n) => (
                 <Picker.Item
@@ -248,24 +305,29 @@ export default class EvengPage extends SharedEventPage {
           </View>
         }
 
-        <View style={styles.emptyview}><Text style={styles.title1}>Comments:</Text></View>
+        {this.state.status == 0 && <TextInput
+          style={styles.textinput}
+          placeholder="Comment"
+          defaultValue={this.state.tmpComment}
+          onChangeText={(text) => this.setState({tmpComment : text})}
+          underlineColorAndroid = 'transparent'
+        />}
+
+        {this.state.status == 0 && <TouchableHighlight
+          style={styles.button2}
+          onPress={this._comment.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.buttontext2}> Comment </Text>
+        </TouchableHighlight>}
 
         <View style={styles.container2}>
           <ListView
             dataSource={this.state.comments}
-            renderRow={(rowData) => <Text style = {styles.text1}>{rowData}</Text>}
+            renderRow={this._renderComments.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+            automaticallyAdjustContentInsets={false}
+            renderSeparator={this._renderSeparator}/>
         </View>
-
-        <View style={styles.emptyview} />
-
-        {this.state.host && <TouchableHighlight
-          style={styles.button2}
-          onPress={this._deleteEvent.bind(this)}
-          underlayColor = 'lightgray'>
-          <Text style={styles.buttontext2}> Delete </Text>
-        </TouchableHighlight>}
       </ScrollView>
     )
   }
@@ -280,7 +342,6 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: '#C5CAE9'
   },
   emptyview: {
     height: 40,
@@ -383,6 +444,28 @@ const styles = StyleSheet.create({
     paddingVertical:10,
     paddingHorizontal:5
   },
+  comment: {
+    flexDirection: 'row',
+    width: 400,
+    height: 60
+  },
+  comment_user: {
+    flex: 1,
+    flexDirection: 'column',
+    height: 60
+  },
+  comment_user_pic: {
+    flex: 2,
+    width: 40,
+    height: 40
+  },
+  comment_user_name: {
+    flex: 1
+  },
+  comment_text: {
+    flex: 9
+  }
+
 });
 
 AppRegistry.registerComponent('EvengPage', () => EvengPage);

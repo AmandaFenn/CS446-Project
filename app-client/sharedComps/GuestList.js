@@ -3,7 +3,8 @@ import {
   AppRegistry,
 } from 'react-native';
 import FBSDK, {LoginManager, LoginButton, AccessToken, GraphRequest, GraphRequestManager} from 'react-native-fbsdk'
-import {createListdataSource} from '../utils/HelpFuncs';
+import {createListdataSource, sendNotification} from '../utils/HelpFuncs';
+import Constants from '../utils/Constants'
 
 export default class GuestList extends Component {
   constructor(props){
@@ -11,8 +12,13 @@ export default class GuestList extends Component {
     this.state = {
       guestsDataSource: createListdataSource([]),
       partsRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId + '/Participants'),
+      capRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId + '/Cap'),
+      unlimited: true,
+      limited: -1,
       guests: [],
       guestIds : [],
+      guestsStatus : [],
+      guestNum: 1,
     }
     if (!this.props.guest) {
       this._loadfbInfo(-1, this.props.fbId)
@@ -23,12 +29,20 @@ export default class GuestList extends Component {
     if (this.props.guest) {
       this._loadGuestsCallBack = this._loadGuestsCallBack.bind(this)
       this._loadGuests()
+    } else {
+      this._loadCapCallBack = this._loadCapCallBack.bind(this)
+      this._loadCap()
+      this._loadGuestNumCallBack = this._loadGuestNumCallBack.bind(this)
+      this._loadGuestNum()
     }
   }
 
   componentWillUnmount() {
     if (this.props.guest) {
       this.state.partsRef.off('value', this._loadGuestsCallBack);
+    } else {
+      this.state.capRef.off('value', this._loadCapCallBack);
+      this.state.partsRef.off('value', this._loadGuestNumCallBack);
     }
   }
 
@@ -36,23 +50,19 @@ export default class GuestList extends Component {
     this.props.navigator.pop();
   }
 
-  _createListdataSource(array) {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return ds.cloneWithRows(array)
-  }
-
   _loadGuestsCallBack(snapshot) {
-    var guestsName = []
+    var guestsStatus = []
     var guestIds = []
     snapshot.forEach(function(data) {
-      guestsName.push({'Name' : data.val().Name})
+      guestsStatus.push(data.val().Status)
       guestIds.push(data.key)
     });
     for (i=0; i<guestIds.length;i++) {
       this._loadfbInfo(i, guestIds[i])
     }
     this.setState({
-      guestIds: guestIds
+      guestIds: guestIds,
+      guestsStatus: guestsStatus
     });
   }
 
@@ -62,20 +72,113 @@ export default class GuestList extends Component {
     });
   }
 
+  _loadCapCallBack(snapshot) {
+    cap = snapshot.val()
+    this.setState({
+      unlimited: cap > 0 ? false : true,
+      limited: cap > 0 ? cap : -1
+    });
+    console.log('should print ' + cap)
+  }
+
+  _loadCap() {
+    this.state.capRef.on('value', this._loadCapCallBack, function(error) {
+      console.error(error);
+    });
+  }
+
+  _loadGuestNumCallBack(snapshot) {
+    guestNum = snapshot.numChildren()
+    var guestsStatus = {}
+    snapshot.forEach(function(data) {
+      guestsStatus[data.key] = data.val().Status
+    });
+
+    this.setState({
+      guestsStatus: guestsStatus,
+      guestNum: guestNum
+    });
+  }
+
+  _loadGuestNum() {
+    this.state.partsRef.on('value', this._loadGuestNumCallBack, function(error) {
+      console.error(error);
+    });
+  }
+
   _deleteOrInvite(rowID) {
     var id = this.state.guestIds[rowID]
     if (this.props.guest) {
-      if (id != this.props.fbId) {
-        this.setState({
-          guests: [],
-          guestIds: []
-        })
-        this.state.partsRef.child(id).remove()
-      }
+      this._delete(rowID)
     } else {
-      var newPart = {}
-      newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
-      this.state.partsRef.update(newPart)
+      if (this.state.unlimited || this.state.guestNum < this.state.limited) {
+        this._invite(rowID)
+      } else {
+        alert('This event is full!')
+      }
+    }
+  }
+
+  _delete(rowID) {
+    var id = this.state.guestIds[rowID]
+    if (id != this.props.fbId) {
+      this.setState({
+        guests: [],
+        guestIds: [],
+        guestsStatus: []
+      })
+      message = this.state.guestsStatus[rowID] < 2 ?
+        Constants.messages[4] + this.props.name :
+        (Constants.messages[5] + this.props.name + Constants.messages[6])
+      this.state.partsRef.child(id).remove()
+      sendNotification(
+        this.props.firebaseApp.database().ref('Notifications/'+ id),
+        this.props.eventId,
+        message)
+    } else {
+      alert('You can not delete yourself!')
+    }
+  }
+
+  _invite(rowID) {
+    var id = this.state.guestIds[rowID]
+    var newPart = {}
+    newPart[id] = {'Host': false, 'Name': this.state.guests[rowID].Name, 'Status':1}
+    this.state.partsRef.update(newPart)
+    sendNotification(
+      this.props.firebaseApp.database().ref('Notifications/'+ id),
+      this.props.eventId,
+      Constants.messages[3] + this.props.name)
+      //console.log('should print ' + this.state.limited)
+  }
+
+  _accept(rowID) {
+    var id = this.state.guestIds[rowID]
+    var newPart = {}
+    newPart['Status'] = 0
+    this.state.partsRef.child(id).update(newPart)
+    sendNotification(
+      this.props.firebaseApp.database().ref('Notifications/'+ id),
+      this.props.eventId,
+      Constants.messages[7] + this.props.name)
+  }
+
+  _pending(rowID) {
+    var status = this.state.guestsStatus[rowID]
+    if (status == 2) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  _isMember(rowID) {
+    var id = this.state.guestIds[rowID]
+    var status = this.state.guestsStatus[id]
+    if (status != undefined) {
+      return true
+    } else {
+      return false
     }
   }
 
@@ -114,7 +217,6 @@ export default class GuestList extends Component {
             if (i >= 0) {
               this._addGuest(i, result)
             } else {
-              console.log(result)
               this._addFriends(result.friends.data)
             }
           }

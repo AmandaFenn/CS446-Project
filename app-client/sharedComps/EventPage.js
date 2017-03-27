@@ -2,36 +2,56 @@ import React, { Component, } from 'react'
 import {
   AppRegistry,
 } from 'react-native';
-import {createListdataSource} from '../utils/HelpFuncs';
-
-const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
+import {createListdataSource, sendNotification} from '../utils/HelpFuncs';
+import Constants from '../utils/Constants'
 
 export default class EventPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      name : '',
       description : '',
+      avatarSource : null,
       location : '',
-      type: 'Restaurants',
+      private: false,
+      type: 'Eatings',
       date: new Date(),
-      vote: true,
+      guestVote: true,
       unlimited: true,
-      limited: 1,
+      limited: -1,
       datePickerVisible: false,
       typePickerVisible: false,
       numberPickerVisible: false,
       guests: 0,
       eventRef : this.props.firebaseApp.database().ref('Events/'+ this.props.eventId),
-      comments: createListdataSource(['User1: comment1','User2: comment2','User3: comment3']),
+      commenters: {},
+      comments: createListdataSource([]),
+      tmpComment: '',
       descriptionModified: false,
       locationModified: false,
       dateModified: false,
       timeModified: false,
+      voteModified: false,
+      capModified: false,
       host: true,
+      member: true,
+      status: 0,
+      hostId: '',
       numbers : Array.apply(null, {length: 1000}).map(Number.call, Number),
       navUpdated: false,
+      modalVisible: false,
+      GeoCoordinate: {
+        latitude: 43.464258,
+        longitude: -80.520410,
+      },
     }
     this._initData()
+    var avatarRef = this.props.firebaseApp.storage().ref('Avatars/'+ this.props.eventId)
+    avatarRef.getDownloadURL().then(this._loadAvatar.bind(this)).catch(
+      function(error) {
+        console.log('error', error)
+      }
+    )
   }
 
   componentWillMount() {
@@ -49,37 +69,52 @@ export default class EventPage extends Component {
   }
 
   _updateNav(host) {
-    this.props.navigator.replace({
-      component: EventPage,
-      title: this.props.title,
-      rightButtonTitle: host ? 'Done' : '',
-      onRightButtonPress: host ? this._submit.bind(this) : null,
-      passProps: {
-        firebaseApp : this.props.firebaseApp,
-        name : this.props.name,
-        title: this.props.title,
-        fbId : this.props.fbId,
-        eventId : this.props.eventId
-      }
-    });
-  }
-
-  _createListdataSource(array) {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    return ds.cloneWithRows(array)
   }
 
   _loadEventCallBack(snapshot) {
     var parts = snapshot.child('Participants').numChildren()
+
     var numbers = Array.apply(null, {length: 1000}).map(Number.call, Number)
     for (i = 0; i < parts; i++) {
       numbers.shift()
     }
+
+    var part = snapshot.child('Participants/' + this.props.fbId).val()
+    var status = snapshot.child('Participants/' + this.props.fbId + '/Status').val()
+    var GeoCoordinate = snapshot.child('Participants/' + this.props.fbId + '/Location').val()
+    var guestVote = snapshot.child('GuestCanCreateVotes').val()
+
+    var comments = []
+
+    var userlistRef = this.props.firebaseApp.database().ref('Users')
+    var userInfoCallBack = this._userInfoCallBack.bind(this)
+    snapshot.child('Comments').forEach(
+      function(data) {
+        var tmp = {}
+        var id = data.val().id
+        tmp['id'] = id
+        tmp['comment'] = data.val().comment
+        comments.push(tmp)
+        userlistRef.child(id).once('value').then(userInfoCallBack)
+      }
+    )
+
+    comments.reverse()
+
     this.setState({
       guests: parts,
-      limited: parts,
-      numbers: numbers
+      numbers: numbers,
+      status: status!=null ? status : -1,
+      GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate,
+      guestVote: guestVote != undefined ? guestVote : true,
+      comments: createListdataSource(comments),
     });
+
+    if (!this.state.host) {
+      this._readCap(snapshot)
+      this._member(snapshot)
+    }
+
     if(!snapshot.child('Participants/' + this.props.fbId + '/Host').val()) {
       this.setState({host: false})
       if (!this.state.navUpdated) {
@@ -87,6 +122,15 @@ export default class EventPage extends Component {
         this.setState({navUpdated: true})
       }
     }
+  }
+
+  _userInfoCallBack(snapshot) {
+    console.log(snapshot.val())
+    var commenters = this.state.commenters
+    commenters[snapshot.key] = snapshot.val()
+    this.setState({
+      commenters: commenters
+    })
   }
 
   _loadEvent() {
@@ -110,13 +154,46 @@ export default class EventPage extends Component {
     return check
   }
 
+  _readCap(snapshot) {
+    var cap = snapshot != undefined ? snapshot.child('Cap').val() : -1
+    if (cap > 0) {
+      this.setState({
+        unlimited: false,
+        limited: cap
+      })
+    } else {
+      this.setState({
+        unlimited: true,
+        limited: this.state.guests
+      })
+    }
+  }
+
+  _member(snapshot) {
+    var parts = snapshot.child('Participants').val()
+    this.setState({
+      member: parts[this.props.fbId] ? true : false
+    })
+  }
+
   _initDataRead(snapshot) {
+    this._readCap(snapshot)
+    this._member(snapshot)
     var snapshotdata = snapshot.val()
     var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
+    var status = snapshot.child('Participants/' + this.props.fbId + '/Status').val()
+    var GeoCoordinate = snapshot.child('Participants' + this.props.fbId + '/Location').val()
+
     this.setState({
-      description:snapshotdata.Description,
-      location:snapshotdata.Location,
+      name: snapshotdata.Name,
+      hostId: snapshotdata.HostID,
+      private: snapshotdata.Private,
+      description: snapshotdata.Description,
+      location: snapshotdata.Location,
       date: date,
+      status: status!=null ? status : -1,
+      guestVote: snapshotdata.GuestCanCreateVotes,
+      GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate
     })
   }
 
@@ -152,6 +229,12 @@ export default class EventPage extends Component {
     if (this.state.locationModified) {
       newData['Location'] = this.state.location
     }
+    if (this.state.voteModified) {
+      newData['GuestCanCreateVotes'] = this.state.guestVote
+    }
+    if (this.state.capModified) {
+      newData['Cap'] = this.state.limited
+    }
     eventRef.update(newData)
   }
 
@@ -160,7 +243,9 @@ export default class EventPage extends Component {
       this.state.descriptionModified ||
       this.state.dateModified ||
       this.state.timeModified ||
-      this.state.locationModified) &&
+      this.state.locationModified ||
+      this.state.voteModified ||
+      this.state.capModified) &&
       !this._checkInfo()) {
         this._updateEvent()
         this._onBack()
@@ -169,17 +254,23 @@ export default class EventPage extends Component {
 
   _deleteEvent() {
     this.props.firebaseApp.database().ref('Events/'+ this.props.eventId).remove()
+    this.props.firebaseApp.storage().ref('Avatars/' + this.props.eventId).delete().catch(function(error) {})
     this._onBack()
   }
 
   _onJoin() {
-    var newPart = {}
-    newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2}
-    this.state.eventRef.child('Participants/').update(newPart)
+    if (this.state.unlimited || this.state.guests < this.state.limited) {
+      this._onGeoMap()
+    } else {
+      alert('This event is full!')
+    }
   }
 
   _onLeave() {
     this.state.eventRef.child('Participants/' + this.props.fbId).remove()
+    sendNotification(this.props.firebaseApp.database().ref('Notifications/'+ this.state.hostId),
+                      this.props.eventId,
+                      this.props.name + Constants.messages[2] + this.state.name)
   }
 
   onDateChange = (date) => {
@@ -199,15 +290,68 @@ export default class EventPage extends Component {
   }
 
   _onSwitchVote(value) {
-    this.setState({vote: value})
+    this.setState({
+      guestVote: value,
+      voteModified: !this.state.voteModified
+    })
   }
 
   _onSwitchCap(value) {
-    this.setState({unlimited: value})
+    this.setState({
+      unlimited: value,
+      capModified: !this.state.capModified
+    })
     if (value) {
       this.setState({numberPickerVisible: false})
     }
   }
+
+  _setModalVisible(visible) {
+    this.setState({modalVisible: visible});
+  }
+
+  _onGeoMap() {
+    this._setModalVisible(true)
+  }
+
+  _updateGeoCoordinate(newGeoCoordinate) {
+    var newPart = {}
+    var m = this.state.status > 0 ? 1 : 0
+    if (this.state.status > 0) {
+      newPart['Status'] = 0
+      newPart['Location'] = newGeoCoordinate
+      this.state.eventRef.child('Participants/' + this.props.fbId).update(newPart)
+    } else {
+      newPart[this.props.fbId] = {'Host': false, 'Name': this.props.name, 'Status':2, 'Location': newGeoCoordinate}
+      this.state.eventRef.child('Participants/').update(newPart)
+    }
+    sendNotification(this.props.firebaseApp.database().ref('Notifications/'+ this.state.hostId),
+                      this.props.eventId,
+                      this.props.name + Constants.messages[m] + this.state.name)
+    this.setState({
+      GeoCoordinate: newGeoCoordinate
+    })
+    this._setModalVisible(false)
+  }
+
+  _loadAvatar(url) {
+    //console.log('avatar', url)
+    if (url) {
+      this.setState({
+        avatarSource: {uri: url}
+      })
+    }
+  }
+
+  _comment() {
+    var commentRef = this.state.eventRef.child('Comments').push()
+    commentRef.set({
+      id: this.props.fbId,
+      comment: this.state.tmpComment,
+    })
+    this.setState({tmpComment: ''})
+  }
+
 }
 
 AppRegistry.registerComponent('EventPage', () => EvengPage);

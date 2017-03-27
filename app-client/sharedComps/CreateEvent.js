@@ -2,6 +2,9 @@ import React, { Component, } from 'react'
 import {
   AppRegistry,
 } from 'react-native';
+import ImagePicker from 'react-native-image-picker'
+import uploadImage from '../utils/ImageLoad'
+import Constants from '../utils/Constants'
 
 export default class CreateEvent extends Component {
   constructor(props) {
@@ -13,13 +16,21 @@ export default class CreateEvent extends Component {
       description : '',
       location : '',
       date: date,
-      vote: true,
-      type: 'Restaurants',
+      guestVote: true,
+      type: 'Eatings',
       unlimited: true,
       limited: 1,
+      private: false,
       datePickerVisible: false,
       typePickerVisible: false,
       numberPickerVisible: false,
+      modalVisible: false,
+      GeoCoordinate: {
+        latitude: 43.464258,
+        longitude: -80.520410,
+      },
+      avatarSource : null,
+      avatarURI : ''
     }
   }
 
@@ -61,16 +72,33 @@ export default class CreateEvent extends Component {
       'Time': this.state.date.toLocaleTimeString(),
       'Location': this.state.location,
       'Description': this.state.description,
+      'Type': this.state.type,
+      'Private': this.state.private,
+      'Cap': this.state.unlimited ? -1 : this.state.limited,
+      'GuestCanCreateVotes': this.state.guestVote,
+      'HostName' : this.props.name,
+      'HostID' : this.props.fbId
     })
     var addHost = {};
     var hostData = {
        'Name': this.props.name,
        'Host': true,
-       'Status': 0
+       'Status': 0,
+       'Location': this.state.GeoCoordinate,
     }
     var newPostKey = eventlistRef.key
-    addHost['/Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
+    addHost['Events/' + newPostKey + '/Participants/' + this.props.fbId] = hostData;
     this.props.firebaseApp.database().ref().update(addHost)
+
+    // Image
+    if (this.state.avatarURI != '') {
+      uploadImage(newPostKey, this.state.avatarURI)
+    }
+    //var storageRef = this.props.firebaseApp.storage().ref();
+    //var file = new File()
+    //storageRef.child('Avatars').put(file).then(function(snapshot) {
+    //});
+
   }
 
   _submit() {
@@ -96,8 +124,12 @@ export default class CreateEvent extends Component {
     this.setState({numberPickerVisible: !this.state.numberPickerVisible});
   }
 
+  _onSwitchPrivate(value) {
+    this.setState({private: value})
+  }
+
   _onSwitchVote(value) {
-    this.setState({vote: value})
+    this.setState({guestVote: value})
   }
 
   _onSwitchCap(value) {
@@ -105,6 +137,49 @@ export default class CreateEvent extends Component {
     if (value) {
       this.setState({numberPickerVisible: false})
     }
+  }
+
+  _setModalVisible(visible) {
+    this.setState({modalVisible: visible});
+  }
+
+  _onGeoMap() {
+    this._setModalVisible(true)
+  }
+
+  _updateGeoCoordinate(newGeoCoordinate) {
+    this.setState({
+      GeoCoordinate: newGeoCoordinate
+    })
+    this._setModalVisible(false)
+  }
+
+  _onImage() {
+    ImagePicker.showImagePicker(Constants.ImagePickerOptions, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      }
+      else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      }
+      else if (response.customButton) {
+        this.setState({
+          avatarSource: null,
+          avatarURI: ''
+        })
+        //console.log('User tapped custom button: ', response.customButton);
+      }
+      else {
+        let source = { uri: response.uri };
+
+        this.setState({
+          avatarSource: source,
+          avatarURI: response.uri
+        });
+      }
+    });
   }
 }
 

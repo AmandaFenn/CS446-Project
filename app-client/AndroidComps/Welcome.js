@@ -16,10 +16,11 @@ export default class Welcome extends SharedWelcome {
     super(props)
   }
 
-  _onForward() {
-    this.props.navigator.push({
+  _onForward(props) {
+    this.props.navigator.replace({
       title: 'Blink',
-      index: 1
+      index: 1,
+      passProps: props
     });
   }
 
@@ -47,27 +48,16 @@ export default class Welcome extends SharedWelcome {
           in the blink of an eye.
         </Text>
         <View elevation={3} backgroundColor="black">
-          <TouchableHighlight onPress={this._onForward.bind(this)}>
+          <TouchableHighlight onPress={this._getStarted.bind(this)}>
             <Text style={styles.button}> Get Started! </Text>
           </TouchableHighlight>
         </View>
         <View style={styles.space}/>
         <View elevation={3} backgroundColor="black">
           <LoginButton
-            readPermissions={["public_profile", "user_friends"]}
-            onLoginFinished={
-            (error, result) => {
-              if (error) {
-                alert("Login failed with error: " + result.error);
-              } else if (result.isCancelled) {
-                alert("Login was cancelled");
-              } else {
-                this._onForward();
-                //alert("Login was successful with permissions: " + result.grantedPermissions)
-              }
-            }
-          }
-            onLogoutFinished={this._onLogOut.bind(this)}/>
+            readPermissions={["public_profile", "user_friends", "user_location"]}
+            onLoginFinished={this._onLogin.bind(this)}
+          />
         </View>
       </View>
     );

@@ -11,15 +11,15 @@ import {
   PickerIOS,
   Switch,
   ScrollView,
-  ListView
+  ListView,
+  Modal
 } from 'react-native';
 import SharedEventPage from '../sharedComps/EventPage';
 import GuestList from '../iOSComps/GuestList';
 import SuggestMap from '../iOSComps/SuggestMap';
 import VotePage from '../iOSComps/VotePage';
-
-
-const eventTypes = ['Restaurants', 'Coffee', 'Bar', 'Movie', 'Sports', 'Casino', 'Others']
+import GeoLocation from './GeoLocation'
+import Constants from '../utils/Constants'
 
 export default class EventPage extends SharedEventPage {
   constructor(props) {
@@ -32,16 +32,10 @@ export default class EventPage extends SharedEventPage {
       title: this.props.title,
       rightButtonTitle: host ? 'Done' : '',
       onRightButtonPress: host ? this._submit.bind(this) : null,
-      passProps: { 
-        firebaseApp : this.props.firebaseApp,
-        name : this.props.name,
-        title: this.props.title,
-        fbId : this.props.fbId,
-        eventId : this.props.eventId
-      }
+      passProps: this.props
     });
   }
-  
+
   _onSuggest() {
     this.props.navigator.push({
       component: SuggestMap,
@@ -50,13 +44,14 @@ export default class EventPage extends SharedEventPage {
       onLeftButtonPress: ()=>{this.props.navigator.pop()},
       passProps: {
         firebaseApp : this.props.firebaseApp,
+        eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
-        guest: true
+        GeoCoordinate: this.state.GeoCoordinate
       }
     });
   }
-  
+
   _onVote() {
     this.props.navigator.push({
       component: VotePage,
@@ -66,10 +61,11 @@ export default class EventPage extends SharedEventPage {
         fbId : this.props.fbId,
         host: this.state.host,
         eventId : this.props.eventId,
+        guestVote: this.state.guestVote
       }
     });
   }
-  
+
   _guest() {
     this.props.navigator.push({
       component: GuestList,
@@ -81,7 +77,8 @@ export default class EventPage extends SharedEventPage {
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: true,
-        host: this.state.host
+        host: this.state.host,
+        name: this.state.name,
       }
     });
   }
@@ -97,14 +94,60 @@ export default class EventPage extends SharedEventPage {
         fbId : this.props.fbId,
         eventId : this.props.eventId,
         guest: false,
-        host: this.state.host
+        host: this.state.host,
+        name: this.state.name,
       }
     });
+  }
+  
+  _renderComments(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <View style = {styles.comment}>
+        <View style = {styles.comment_user}>
+          <Image source = {{uri: this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].pic : Constants.fbIcon}} style = {styles.comment_user_pic}/>
+          <View style = {styles.comment_user_name}>
+            <Text>{this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].name : ''}</Text>
+          </View>
+        </View>
+        <View style = {styles.comment_text}>
+          <Text> {rowData.comment} </Text>
+        </View>
+      </View>
+    )
+  }
+
+  _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
+    return (
+      <View
+        key={`${sectionID}-${rowID}`}
+        style={{
+        height: adjacentRowHighlighted ? 4 : 1,
+        backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
+      }}
+      />
+    );
   }
 
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Modal
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {alert("Modal has been closed.")}}>
+          <GeoLocation
+            region = {this.state.region}
+            markerCoordinate = {this.state.GeoCoordinate}
+            modalParent = {this}
+          />
+        </Modal>
+        
+        {this.state.avatarSource && <Image
+          source={this.state.avatarSource}
+          style = {{width:400, height:100}}
+          resizeMode={Image.resizeMode.stretch}/>
+        }
+        
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}
@@ -114,40 +157,48 @@ export default class EventPage extends SharedEventPage {
           multiline={true}
           editable={this.state.host}
         />
-        
+
         <View style={styles.location}>
-          {!this.state.host && <TouchableHighlight
+          {(this.state.status == -1 || this.state.status == 1) && <TouchableHighlight
             style={styles.button1}
             onPress={this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> Join </Text>
+            <Text style={styles.buttontext1}> {this.state.status > 0 ? 'Accept' : 'Join'} </Text>
           </TouchableHighlight>}
-          
-          {!this.state.host && <TouchableHighlight
+
+          {!this.state.host && this.state.status >= 0 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onLeave.bind(this)}>
             <Text style={styles.buttontext1}> Leave </Text>
           </TouchableHighlight>}
-          
+
           {this.state.host &&
           <TouchableHighlight
             style={styles.button1}
             onPress={this._friend.bind(this)}>
             <Text style={styles.buttontext1}> Invite </Text>
           </TouchableHighlight>}
-          
-          <TouchableHighlight
+
+          {this.state.status >= 0 && this.state.status < 2 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onSuggest.bind(this)}>
             <Text style={styles.buttontext1}> Suggest </Text>
-          </TouchableHighlight>
-          
-          <TouchableHighlight
+          </TouchableHighlight>}
+
+          {this.state.status == 0 && <TouchableHighlight
             style={styles.button1}
             onPress={this._onVote.bind(this)}>
             <Text style={styles.buttontext1}> Vote </Text>
-          </TouchableHighlight>
+          </TouchableHighlight>}
+          
+          {this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._deleteEvent.bind(this)}
+            underlayColor = 'lightgray'>
+            <Text style={styles.buttontext1}> Delete </Text>
+          </TouchableHighlight>}
         </View>
 
+        <View style={styles.emptyview}><Text style={styles.title1}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View>
@@ -176,7 +227,7 @@ export default class EventPage extends SharedEventPage {
           editable={this.state.host}
         />
 
-        <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
+        <View style={styles.emptyview}><Text style={styles.title}>Category:</Text></View>
         <TouchableHighlight
           style={styles.typeandnumber}
           onPress={this._onTypePress.bind(this)}
@@ -188,7 +239,7 @@ export default class EventPage extends SharedEventPage {
         <PickerIOS
           selectedValue = {this.state.type}
           onValueChange={(value) => this.setState({type : value})}>
-          {eventTypes.map((e) => (
+          {Constants.eventTypes.map((e) => (
             <PickerIOS.Item
               key= 'key'
               value= {e}
@@ -204,10 +255,10 @@ export default class EventPage extends SharedEventPage {
           <Switch
             onValueChange={this._onSwitchVote.bind(this)}
             style={{marginTop: 5}}
-            value={this.state.vote}
+            value={this.state.guestVote}
             disabled={!this.state.host} />
         </View>
-        
+
         <TouchableHighlight
           style={styles.typeandnumber}
           onPress={this._guest.bind(this)}
@@ -238,7 +289,7 @@ export default class EventPage extends SharedEventPage {
         {this.state.numberPickerVisible && !this.state.unlimited &&
         <PickerIOS
           selectedValue = {this.state.limited}
-          onValueChange={(value) => this.setState({limited : value})}>
+          onValueChange={(value) => this.setState({limited: value, capModified:true})}>
           {this.state.numbers.map((n) => (
             <PickerIOS.Item
               key= 'key'
@@ -248,25 +299,32 @@ export default class EventPage extends SharedEventPage {
           ))}
         </PickerIOS>
         }
+        
+        {this.state.status == 0 && <TextInput
+          style={styles.textinput}
+          placeholder="Comment"
+          defaultValue={this.state.tmpComment}
+          onChangeText={(text) => this.setState({tmpComment : text})}
+          underlineColorAndroid = 'transparent'
+        />}
 
-        <View style={styles.emptyview}><Text style={styles.title}>Comments:</Text></View>
+        {this.state.status == 0 && <TouchableHighlight
+          style={styles.button2}
+          onPress={this._comment.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.buttontext2}> Comment </Text>
+        </TouchableHighlight>}
 
         <View style={styles.comments}>
           <ListView
             dataSource={this.state.comments}
-            renderRow={(rowData) => <Text style = {styles.commenttext}>{rowData}</Text>}
+            renderRow={this._renderComments.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+            automaticallyAdjustContentInsets={false} 
+            renderSeparator={this._renderSeparator} />
         </View>
 
         <View style={styles.emptyview} />
-
-        {this.state.host && <TouchableHighlight
-          style={styles.typeandnumber}
-          onPress={this._deleteEvent.bind(this)}
-          underlayColor = 'lightgray'>
-          <Text style={styles.buttontext2}> Delete </Text>
-        </TouchableHighlight>}
       </ScrollView>
     )
   }
@@ -382,6 +440,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  comment: {
+    flexDirection: 'row',
+    width: 400,
+    height: 60
+  },
+  comment_user: {
+    flex: 1,
+    flexDirection: 'column',
+    height: 60
+  },
+  comment_user_pic: {
+    flex: 2,
+    width: 40,
+    height: 40
+  },
+  comment_user_name: {
+    flex: 1
+  },
+  comment_text: {
+    flex: 9
+  }
 });
 
 AppRegistry.registerComponent('EventPage', () => EvengPage);

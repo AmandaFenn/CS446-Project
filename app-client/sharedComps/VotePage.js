@@ -64,8 +64,12 @@ export default class VotePage extends Component {
   }
 
   _newVote() {
-    this.setState({createMode: true})
-    this._setModalVisible(true)
+    if (this.props.host || this.props.guestVote) {
+      this.setState({createMode: true})
+      this._setModalVisible(true)
+    } else {
+      alert('You are not allowd to create vote!')
+    }
   }
 
   _deleteVote(rowID) {

@@ -6,7 +6,8 @@ import {
   View,
   Image,
   TouchableHighlight,
-  ListView
+  ListView,
+  ActivityIndicator
 } from 'react-native';
 import SharedMainMenu from '../sharedComps/MainMenu';
 import SearchEvent from '../iOSComps/SearchEvent';
@@ -103,12 +104,16 @@ export default class MainMenu extends SharedMainMenu {
           </TouchableHighlight>
         </View>
         <View style={styles.container2}>
+          {this.state.loadingEvents ? <ActivityIndicator
+            animating={this.state.loadingEvents}
+            style={[styles.centering, {height: 80}]}
+            size="large"/> :
           <ListView 
             dataSource={this.state.myevents}
             renderRow={this._renderRow.bind(this)}
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false}
-            renderSeparator={this._renderSeparator} />
+            renderSeparator={this._renderSeparator} />}
         </View>
       </View>
     );
@@ -124,7 +129,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 60,
-    paddingBottom:10,
+    paddingBottom: 60,
   },
   container1: {
     flex: 2,
@@ -132,8 +137,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container2: {
-    flex: 3,
+    //flex: 3,
     width: 360,
+    height: 300
   },
   profile: {
     justifyContent: 'space-around',
@@ -160,7 +166,12 @@ const styles = StyleSheet.create({
     //fontFamily: 'sans-serif',
     fontWeight: '300',
     backgroundColor: 'transparent'
-  }
+  },
+  centering: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+  },
 });
 
 AppRegistry.registerComponent('MainMenu', () => MainMenu);

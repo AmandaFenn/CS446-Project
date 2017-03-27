@@ -54,7 +54,7 @@ export default class Welcome extends SharedWelcome {
         </TouchableHighlight>
         <View style={styles.space}/>
         <LoginButton
-          readPermissions={["public_profile", "user_friends, "user_location""]}
+          readPermissions={["public_profile", "user_friends", "user_location"]}
           onLoginFinished={this._onLogin.bind(this)}/>
       </View>
     );

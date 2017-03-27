@@ -55,6 +55,22 @@ export default class CreateEvent extends SharedCreateEvent {
             onChangeText={(text) => this.setState({name : text})}
           />
         </View>
+        
+        {this.state.avatarSource && <Image
+          source={this.state.avatarSource}
+          style = {{width:400, height:100}}
+          resizeMode={Image.resizeMode.stretch}/>
+        }
+        
+        <TouchableHighlight
+          style={{width: 40, height:40}}
+          onPress={this._onImage.bind(this)}
+          underlayColor = 'lightgray'>
+          <Image
+            style={{width: 40, height:40}}
+            source={require('../img/GoogleImages.png')} />
+        </TouchableHighlight>
+        
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
         <View>
           <TouchableHighlight

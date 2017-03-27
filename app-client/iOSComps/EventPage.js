@@ -99,6 +99,34 @@ export default class EventPage extends SharedEventPage {
       }
     });
   }
+  
+  _renderComments(rowData, sectionID, rowID, highlightRow) {
+    return (
+      <View style = {styles.comment}>
+        <View style = {styles.comment_user}>
+          <Image source = {{uri: this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].pic : Constants.fbIcon}} style = {styles.comment_user_pic}/>
+          <View style = {styles.comment_user_name}>
+            <Text>{this.state.commenters[rowData.id] ? this.state.commenters[rowData.id].name : ''}</Text>
+          </View>
+        </View>
+        <View style = {styles.comment_text}>
+          <Text> {rowData.comment} </Text>
+        </View>
+      </View>
+    )
+  }
+
+  _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
+    return (
+      <View
+        key={`${sectionID}-${rowID}`}
+        style={{
+        height: adjacentRowHighlighted ? 4 : 1,
+        backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
+      }}
+      />
+    );
+  }
 
   render() {
     return (
@@ -113,6 +141,13 @@ export default class EventPage extends SharedEventPage {
             modalParent = {this}
           />
         </Modal>
+        
+        {this.state.avatarSource && <Image
+          source={this.state.avatarSource}
+          style = {{width:400, height:100}}
+          resizeMode={Image.resizeMode.stretch}/>
+        }
+        
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}
@@ -153,6 +188,13 @@ export default class EventPage extends SharedEventPage {
             style={styles.button1}
             onPress={this._onVote.bind(this)}>
             <Text style={styles.buttontext1}> Vote </Text>
+          </TouchableHighlight>}
+          
+          {this.state.host && <TouchableHighlight
+            style={styles.button1}
+            onPress={this._deleteEvent.bind(this)}
+            underlayColor = 'lightgray'>
+            <Text style={styles.buttontext1}> Delete </Text>
           </TouchableHighlight>}
         </View>
 
@@ -257,25 +299,32 @@ export default class EventPage extends SharedEventPage {
           ))}
         </PickerIOS>
         }
+        
+        {this.state.status == 0 && <TextInput
+          style={styles.textinput}
+          placeholder="Comment"
+          defaultValue={this.state.tmpComment}
+          onChangeText={(text) => this.setState({tmpComment : text})}
+          underlineColorAndroid = 'transparent'
+        />}
 
-        <View style={styles.emptyview}><Text style={styles.title}>Comments:</Text></View>
+        {this.state.status == 0 && <TouchableHighlight
+          style={styles.button2}
+          onPress={this._comment.bind(this)}
+          underlayColor = 'lightgray'>
+          <Text style={styles.buttontext2}> Comment </Text>
+        </TouchableHighlight>}
 
         <View style={styles.comments}>
           <ListView
             dataSource={this.state.comments}
-            renderRow={(rowData) => <Text style = {styles.commenttext}>{rowData}</Text>}
+            renderRow={this._renderComments.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+            automaticallyAdjustContentInsets={false} 
+            renderSeparator={this._renderSeparator} />
         </View>
 
         <View style={styles.emptyview} />
-
-        {this.state.host && <TouchableHighlight
-          style={styles.typeandnumber}
-          onPress={this._deleteEvent.bind(this)}
-          underlayColor = 'lightgray'>
-          <Text style={styles.buttontext2}> Delete </Text>
-        </TouchableHighlight>}
       </ScrollView>
     )
   }
@@ -391,6 +440,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  comment: {
+    flexDirection: 'row',
+    width: 400,
+    height: 60
+  },
+  comment_user: {
+    flex: 1,
+    flexDirection: 'column',
+    height: 60
+  },
+  comment_user_pic: {
+    flex: 2,
+    width: 40,
+    height: 40
+  },
+  comment_user_name: {
+    flex: 1
+  },
+  comment_text: {
+    flex: 9
+  }
 });
 
 AppRegistry.registerComponent('EventPage', () => EvengPage);

@@ -47,7 +47,11 @@ export default class EventPage extends Component {
     }
     this._initData()
     var avatarRef = this.props.firebaseApp.storage().ref('Avatars/'+ this.props.eventId)
-    avatarRef.getDownloadURL().then(this._loadAvatar.bind(this)).catch(function(error) {})
+    avatarRef.getDownloadURL().then(this._loadAvatar.bind(this)).catch(
+      function(error) {
+        console.log('error', error)
+      }
+    )
   }
 
   componentWillMount() {
@@ -331,6 +335,7 @@ export default class EventPage extends Component {
   }
 
   _loadAvatar(url) {
+    //console.log('avatar', url)
     if (url) {
       this.setState({
         avatarSource: {uri: url}

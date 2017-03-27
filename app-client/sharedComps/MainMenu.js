@@ -13,6 +13,7 @@ export default class MainMenu extends Component {
       myevents: createListdataSource([]),
       myeventIds: [],
       eventsRef : this.props.firebaseApp.database().ref('Events/'),
+      loadingEvents : true,
     }
   }
 
@@ -42,7 +43,8 @@ export default class MainMenu extends Component {
     });
     this.setState({
       myevents: createListdataSource(events),
-      myeventIds: eventIds
+      myeventIds: eventIds,
+      loadingEvents: false
     });
   }
 

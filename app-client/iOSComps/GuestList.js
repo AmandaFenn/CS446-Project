@@ -30,7 +30,7 @@ export default class GuestList extends SharedGuestList {
           <Text style = {styles.buttontext}> Accept </Text>
         </TouchableHighlight>}
 
-        {this.props.host && <TouchableHighlight
+        {this.props.host && (this.props.guest || !this._isMember(rowID)) && <TouchableHighlight
           style={styles.button}
           onPress = {this._deleteOrInvite.bind(this, rowID)}>
           <Text style = {styles.buttontext}> {this.props.guest ? 'Delete' : 'Invite'} </Text>
@@ -88,16 +88,16 @@ const styles = StyleSheet.create({
   button: {
     flex: 3,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#303F9F',
     padding: 5
   },
   buttontext: {
     color: 'white',
-    fontSize: 25,
+    fontSize: 15,
     fontWeight: '600',
-    width:100,
+    width:60,
     textAlign: 'center',
-    padding: 5,
   },
 });
 

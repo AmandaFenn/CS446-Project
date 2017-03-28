@@ -51,7 +51,13 @@ const Constants = {
       path: 'images'
     }
   },
-  fbIcon : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png'
+  defaultSettings : {
+    location : true,
+    cover : true,
+    event : true,
+  },
+  fbIcon : 'https://en.facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-logo.png',
+  fbCover : 'https://tctechcrunch2011.files.wordpress.com/2016/07/facebook-search.png?w=738'
 }
 
 export default Constants;

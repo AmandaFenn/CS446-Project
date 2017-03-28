@@ -18,7 +18,7 @@ export default class Menus extends SharedMenus {
   constructor(props){
     super(props)
   }
-  
+
   componentWillMount() {
   }
 
@@ -50,13 +50,13 @@ export default class Menus extends SharedMenus {
               selectedTab: 0,
             });
           }}>
-          <EventNavigation 
-            firebaseApp = {this.props.firebaseApp} 
+          <EventNavigation
+            firebaseApp = {this.props.firebaseApp}
             name = {this.props.name}
             pic = {this.props.pic}
             fbId = {this.props.fbId}/>
         </TabBarIOS.Item>
-        
+
         <TabBarIOS.Item
           icon={require('../img/TabBarIcons/Info.png')}
           selectedIcon={require('../img/TabBarIcons/InfoFill.png')}
@@ -67,11 +67,11 @@ export default class Menus extends SharedMenus {
               selectedTab: 1,
             });
           }}>
-          <Notifications 
-            firebaseApp = {this.props.firebaseApp} 
+          <Notifications
+            firebaseApp = {this.props.firebaseApp}
             fbId = {this.props.fbId}/>
         </TabBarIOS.Item>
-        
+
         <TabBarIOS.Item
           icon={require('../img/TabBarIcons/Settings.png')}
           selectedIcon={require('../img/TabBarIcons/SettingsFill.png')}
@@ -82,7 +82,11 @@ export default class Menus extends SharedMenus {
               selectedTab: 2,
             });
           }}>
-          {<Settings getBack = {this._onBack.bind(this)}/>}
+          <Settings
+            firebaseApp = {this.props.firebaseApp}
+            fbId = {this.props.fbId}
+            getBack = {this._onBack.bind(this)}
+          />
         </TabBarIOS.Item>
       </TabBarIOS>
     );

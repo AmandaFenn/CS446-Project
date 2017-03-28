@@ -48,15 +48,11 @@ export default class Welcome extends Component {
   }
 
   _initPersonalInfo(result) {
-    var userlistRef = firebaseApp.database().ref('Users/')
-    var addUser = {};
-    addUser[result.id] = {
-      name: result.name,
-      pic: result.picture.data.url,
-      cover: result.cover ? result.cover.source: '',
-      location: result.location ? result.location.name : ''
-    }
-    userlistRef.update(addUser)
+    var userInfoRef = firebaseApp.database().ref('Users/' + result.id)
+    userInfoRef.update({'name': result.name})
+    userInfoRef.update({'pic': result.picture.data.url})
+    userInfoRef.update({'cover': result.cover ? result.cover.source: ''})
+    userInfoRef.update({'location': result.location ? result.location.name : ''})
   }
 
   _loadPersonalInfo() {

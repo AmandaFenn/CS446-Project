@@ -8,18 +8,37 @@ import {
   TouchableHighlight,
   ListView,
 } from 'react-native';
-import SharedGuestList from '../sharedComps/GuestList';
+import SharedGuestList from '../sharedComps/GuestList'
+import Profile from '../iOSComps/Profile'
 
 export default class GuestList extends SharedGuestList {
   constructor(props){
     super(props)
   }
 
+  _onProfile(rowID) {
+    this.props.navigator.push({
+      component: Profile,
+      title: 'Profile',
+      passProps: {
+        firebaseApp : this.props.firebaseApp,
+        name : this.state.guests[rowID].Name,
+        pic : this.state.guests[rowID].pic,
+        fbId : this.state.guestIds[rowID],
+        myfbId: this.props.fbId
+      }
+    })
+  }
+
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <View style = {styles.profile}>
-        <Image source={{uri: rowData.pic}}
-              style={{width:50, height: 50}} />
+        <TouchableHighlight
+          onPress = {this._onProfile.bind(this, rowID)}>
+          <Image
+            source={{uri: rowData.pic}}
+            style={{width:50, height: 50}} />
+        </TouchableHighlight>
         <Text style = {styles.text1}
           numberOfLines={1}>
           {rowData.Name}
@@ -54,6 +73,7 @@ export default class GuestList extends SharedGuestList {
   }
 
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

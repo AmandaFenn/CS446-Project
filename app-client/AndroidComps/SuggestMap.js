@@ -54,7 +54,6 @@ export default class SuggestMap extends SharedSuggestMap {
           initialRegion={this.state.region}
           onPress={this._onMapPress.bind(this)}
           onMarkerPress={this._onMarkerPress.bind(this)}
-          fitToElements={true}
           provider='google'>
           <MapView.Marker draggable
             coordinate={this.state.markerCoordinate}
@@ -65,11 +64,12 @@ export default class SuggestMap extends SharedSuggestMap {
         </MapView>
         <View style={styles.suggestions}>
           <View>
-          <Text>{this.state.selectedPlace.name}</Text>
-          <Image source = {{uri: this.state.selectedPlace.rating_img_url}} style = {{width:60, height:10}}/>
-          <Image source = {{uri: this.state.selectedPlace.image_url}} style = {{width:60, height:60}}/>
-          <Text>Contact: {this.state.selectedPlace.phone}</Text>
-          <Text>{this.state.selectedAddress}</Text>
+            <Text>{this.state.selectedPlace.name}</Text>
+            <Text> {this.state.selectedPlace ? 'Reviews: ' + this.state.selectedPlace.review_count : ''}</Text>
+            <Image source = {{uri: this.state.selectedPlace.rating_img_url}} style = {{width:60, height:10}}/>
+            <Image source = {{uri: this.state.selectedPlace.image_url}} style = {{width:60, height:60}}/>
+            <Text>{this.state.selectedPlace ? 'Contact: ' + this.state.selectedPlace.phone : ''}</Text>
+            <Text>{this.state.selectedAddress}</Text>
           </View>
         </View>
       </View>

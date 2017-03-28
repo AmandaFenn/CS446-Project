@@ -51,16 +51,22 @@ export default class SuggestMap extends Component {
 
   _loadLocationCallBack(snapshot) {
     locations = []
+    allLocations = []
+    var fbId = this.props.fbId
 
     snapshot.forEach(
       function(data) {
         value = data.val()
         console.log('location', value)
         if (value.Status == 0) {
-          locations.push({
+          locationData = {
             id: data.key,
             location: value.Location
-          })
+          }
+          allLocations.push(locationData)
+          if (fbId != data.key) {
+            locations.push(locationData)
+          }
         }
       }
     )
@@ -68,8 +74,11 @@ export default class SuggestMap extends Component {
     this.setState({
       locations: locations
     })
-    console.log('location', locations)
-    this._suggest(averageLatLng(locations))
+
+    this._suggest(averageLatLng(allLocations))
+
+    console.log('location1', allLocations)
+    console.log('location2', locations)
   }
 
   _loadLocation() {

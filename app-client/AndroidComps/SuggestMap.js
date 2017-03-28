@@ -17,24 +17,31 @@ export default class SuggestMap extends SharedSuggestMap {
     super(props)
   }
 
-  _renderRow(rowData, sectionID, rowID, highlightRow) {
+  _updateNav() {
+    this.props.route.RightButtonTitle = 'Done'
+    this.props.route.RightButtonPress = this._updateLocation.bind(this)
+  }
+
+  _renderLocationMarkers(data) {
     return (
-      <View style = {styles.location}>
-        <Text style = {styles.text}
-          numberOfLines={1}>
-          {rowData}
-        </Text>
-        <TouchableHighlight
-          style={styles.vote}
-          onPress = {this._doNothing.bind(this)}>
-          <Text style = {styles.votetext}> Remove </Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.vote}
-          onPress = {this._doNothing.bind(this)}>
-          <Text style = {styles.votetext}> Vote </Text>
-        </TouchableHighlight>
-      </View>
+      <MapView.Marker
+        key = {data.id}
+        identifier = {data.id}
+        coordinate={data.location.coordinate}
+        onPress={this._onMarkerPress.bind(this,data)}
+        image = {require('../img/location_marker.png')}
+        >
+      </MapView.Marker>
+    )
+  }
+
+  _renderUserMarkers(data) {
+    return (
+      <MapView.Marker
+        key = {data.id}
+        coordinate={data.location}
+        image = {require('../img/user_marker.png')}>
+      </MapView.Marker>
     )
   }
 
@@ -42,33 +49,29 @@ export default class SuggestMap extends SharedSuggestMap {
     return (
       <View style={styles.container}>
         <MapView
+          ref='map'
           style={styles.map}
           initialRegion={this.state.region}
           onPress={this._onMapPress.bind(this)}
           onMarkerPress={this._onMarkerPress.bind(this)}
+          fitToElements={true}
           provider='google'>
           <MapView.Marker draggable
             coordinate={this.state.markerCoordinate}
             onDragEnd={this._onDragMarkerEnd.bind(this)}>
           </MapView.Marker>
+          {this.state.yelpData.map(this._renderLocationMarkers.bind(this))}
+          {this.state.locations.map(this._renderUserMarkers.bind(this))}
         </MapView>
-        <View style={styles.emptyview}><Text style={styles.title}>Suggested locations:</Text></View>
-
         <View style={styles.suggestions}>
-          <ListView
-            dataSource={this.state.suggestions}
-            renderRow={this._renderRow.bind(this)}
-            enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+          <View>
+          <Text>{this.state.selectedPlace.name}</Text>
+          <Image source = {{uri: this.state.selectedPlace.rating_img_url}} style = {{width:60, height:10}}/>
+          <Image source = {{uri: this.state.selectedPlace.image_url}} style = {{width:60, height:60}}/>
+          <Text>Contact: {this.state.selectedPlace.phone}</Text>
+          <Text>{this.state.selectedAddress}</Text>
+          </View>
         </View>
-
-        <View style={styles.emptyview} />
-
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this._updateLocation.bind(this)}>
-          <Text style={styles.buttontext}> Suggest </Text>
-        </TouchableHighlight>
       </View>
     );
   }
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
   },
   suggestions: {
     width: 400,
-    height: 130,
+    height: 200,
     backgroundColor: '#C5CAE9',
     paddingHorizontal: 5,
     marginHorizontal: 7

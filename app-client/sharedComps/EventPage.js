@@ -125,7 +125,7 @@ export default class EventPage extends Component {
   }
 
   _userInfoCallBack(snapshot) {
-    console.log(snapshot.val())
+    //console.log(snapshot.val())
     var commenters = this.state.commenters
     commenters[snapshot.key] = snapshot.val()
     this.setState({

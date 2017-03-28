@@ -16,32 +16,45 @@ export default class SuggestMap extends SharedSuggestMap {
   constructor(props){
     super(props)
   }
-  
-  _renderRow(rowData, sectionID, rowID, highlightRow) {
+
+  _updateNav() {
+    this.props.navigator.replace({
+      component: SuggestMap,
+      title: 'Map',
+      rightButtonTitle: 'Done',
+      onRightButtonPress: this._updateLocation.bind(this),
+      passProps: this.props
+    })
+  }
+
+  _renderLocationMarkers(data) {
     return (
-      <View style = {styles.location}>
-        <Text style = {styles.text}
-          numberOfLines={1}> 
-          {rowData} 
-        </Text>
-        <TouchableHighlight
-          style={styles.vote}
-          onPress = {this._doNothing.bind(this)}>
-          <Text style = {styles.votetext}> Remove </Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.vote}
-          onPress = {this._doNothing.bind(this)}>
-          <Text style = {styles.votetext}> Vote </Text>
-        </TouchableHighlight>
-      </View>
+      <MapView.Marker
+        key = {data.id}
+        identifier = {data.id}
+        coordinate={data.location.coordinate}
+        onPress={this._onMarkerPress.bind(this,data)}
+        image = {require('../img/location_marker_ios.png')}
+        >
+      </MapView.Marker>
     )
   }
-  
+
+  _renderUserMarkers(data) {
+    return (
+      <MapView.Marker
+        key = {data.id}
+        coordinate={data.location}
+        image = {require('../img/user_marker_ios.png')}>
+      </MapView.Marker>
+    )
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <MapView
+          ref='map'
           style={styles.map}
           initialRegion={this.state.region}
           onPress={this._onMapPress.bind(this)}
@@ -51,37 +64,34 @@ export default class SuggestMap extends SharedSuggestMap {
             coordinate={this.state.markerCoordinate}
             onDragEnd={this._onDragMarkerEnd.bind(this)}>
           </MapView.Marker>
+          {this.state.yelpData.map(this._renderLocationMarkers.bind(this))}
+          {this.state.locations.map(this._renderUserMarkers.bind(this))}
         </MapView>
-        <View style={styles.emptyview}><Text style={styles.title}>Suggested locations:</Text></View>
-        
         <View style={styles.suggestions}>
-          <ListView 
-            dataSource={this.state.suggestions}
-            renderRow={this._renderRow.bind(this)}
-            enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+          <View>
+            <Text>{this.state.selectedPlace.name}</Text>
+            <Text> {this.state.selectedPlace ? 'Reviews: ' + this.state.selectedPlace.review_count : ''}</Text>
+            <Image source = {{uri: this.state.selectedPlace.rating_img_url}} style = {{width:60, height:10}}/>
+            <Image source = {{uri: this.state.selectedPlace.image_url}} style = {{width:60, height:60}}/>
+            <Text>{this.state.selectedPlace ? 'Contact: ' + this.state.selectedPlace.phone : ''}</Text>
+            <Text>{this.state.selectedAddress}</Text>
+          </View>
         </View>
-        
-        <View style={styles.emptyview} />
-        
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this._updateLocation.bind(this)}>
-          <Text style={styles.buttontext}> Suggest </Text>
-        </TouchableHighlight>
       </View>
     );
   }
-
 }
+
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
+    paddingTop: 50,
+    paddingBottom: 30
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    height: 400,
+    height: 450,
   },
   emptyview: {
     height: 40,
@@ -93,16 +103,16 @@ const styles = StyleSheet.create({
     paddingTop:10
   },
   suggestions: {
-    width: 350,
-    height: 130,
-    backgroundColor: '#C5CAE9', 
+    width: 360,
+    height: 180,
+    backgroundColor: '#C5CAE9',
     paddingHorizontal: 5,
     marginHorizontal: 7
   },
   location: {
     flex : 1,
     flexDirection: 'row',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
     padding : 5
   },
   text: {
@@ -127,7 +137,7 @@ const styles = StyleSheet.create({
     paddingVertical:5,
   },
   button: {
-    alignItems: 'center',  
+    alignItems: 'center',
     marginHorizontal: 100,
     backgroundColor: '#303F9F',
   },

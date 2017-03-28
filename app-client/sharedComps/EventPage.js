@@ -46,18 +46,13 @@ export default class EventPage extends Component {
       },
     }
     this._initData()
-    var avatarRef = this.props.firebaseApp.storage().ref('Avatars/'+ this.props.eventId)
-    avatarRef.getDownloadURL().then(this._loadAvatar.bind(this)).catch(
-      function(error) {
-        console.log('error', error)
-      }
-    )
   }
 
   componentWillMount() {
     this._updateNav(this.state.host)
-    this._loadEventCallBack = this._loadEventCallBack.bind(this)
-    this._loadEvent()
+    this._loadUserInfo()
+    //this._loadEventCallBack = this._loadEventCallBack.bind(this)
+    //this._loadEvent()
   }
 
   componentWillUnmount() {
@@ -86,8 +81,6 @@ export default class EventPage extends Component {
 
     var comments = []
 
-    var userlistRef = this.props.firebaseApp.database().ref('Users')
-    var userInfoCallBack = this._userInfoCallBack.bind(this)
     snapshot.child('Comments').forEach(
       function(data) {
         var tmp = {}
@@ -95,7 +88,6 @@ export default class EventPage extends Component {
         tmp['id'] = id
         tmp['comment'] = data.val().comment
         comments.push(tmp)
-        userlistRef.child(id).once('value').then(userInfoCallBack)
       }
     )
 
@@ -124,19 +116,34 @@ export default class EventPage extends Component {
     }
   }
 
-  _userInfoCallBack(snapshot) {
-    console.log(snapshot.val())
-    var commenters = this.state.commenters
-    commenters[snapshot.key] = snapshot.val()
-    this.setState({
-      commenters: commenters
-    })
-  }
-
   _loadEvent() {
     this.state.eventRef.on('value', this._loadEventCallBack, function(error) {
       console.error(error);
     });
+  }
+
+  _userInfoCallBack(snapshot) {
+    var commenters = {}
+    snapshot.forEach(
+      function(data) {
+        var id = data.val().id
+        commenters[data.key] = data.val()
+      }
+    )
+
+    this.setState({
+      commenters: commenters
+    })
+
+    // Load event info and add listener to events
+    this._loadEventCallBack = this._loadEventCallBack.bind(this)
+    this._loadEvent()
+  }
+
+  _loadUserInfo() {
+    var userInfoListRef = this.props.firebaseApp.database().ref('Users')
+    var userInfoCallBack = this._userInfoCallBack.bind(this)
+    userInfoListRef.once('value').then(userInfoCallBack)
   }
 
   _checkInfo() {
@@ -198,8 +205,13 @@ export default class EventPage extends Component {
   }
 
   _initData() {
-    var eventRef = this.props.firebaseApp.database().ref('Events/'+ this.props.eventId)
-    eventRef.once('value').then(this._initDataRead.bind(this))
+    var avatarRef = this.props.firebaseApp.storage().ref('Avatars/'+ this.props.eventId)
+    avatarRef.getDownloadURL().then(this._loadAvatar.bind(this)).catch(
+      function(error) {
+        console.log('error', error)
+      }
+    )
+    this.state.eventRef.once('value').then(this._initDataRead.bind(this))
   }
 
   _onSuggest() {

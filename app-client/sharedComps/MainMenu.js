@@ -21,7 +21,7 @@ export default class MainMenu extends Component {
     this._eventsChangeCallBack = this._eventsChangeCallBack.bind(this)
     this._updateEvents()
   }
-  
+
   componentWillUnmount() {
     this.state.eventsRef.off('value', this._eventsChangeCallBack);
   }
@@ -34,7 +34,6 @@ export default class MainMenu extends Component {
     var events = []
     var eventIds = []
     var fbId = this.props.fbId.toString()
-    console.log('facebookid--------: ' + this.props.name)
     snapshot.forEach(function(data) {
       if (data.child('Participants').hasChild(fbId)) {
         events.push(data.val().Name)
@@ -101,7 +100,7 @@ export default class MainMenu extends Component {
   }
 
   // Above: test methods
-  
+
   _onMyEvent(rowData, rowID) {
   }
 

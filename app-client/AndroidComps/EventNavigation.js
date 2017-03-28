@@ -10,13 +10,14 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-import MainMenu from './MainMenu';
-import CreateEvent from './CreateEvent';
-import EventPage from './EventPage';
-import GuestList from './GuestList';
-import SearchEvent from './SearchEvent';
-import SuggestMap from './SuggestMap';
-import VotePage from './VotePage';
+import MainMenu from './MainMenu'
+import CreateEvent from './CreateEvent'
+import EventPage from './EventPage'
+import GuestList from './GuestList'
+import SearchEvent from './SearchEvent'
+import SuggestMap from './SuggestMap'
+import VotePage from './VotePage'
+import Profile from './Profile'
 import Constants from '../utils/Constants'
 const firebaseApp = Constants.firebaseApp
 
@@ -47,6 +48,8 @@ export default class EventNavigation extends Component {
         return (<SuggestMap route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
       case 7:
         return (<VotePage route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
+      case 8:
+        return (<Profile route = {route} navigator = {navigator} {... route.passProps} firebaseApp = {firebaseApp}/>)
     }
   }
 

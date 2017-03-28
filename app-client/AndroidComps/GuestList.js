@@ -15,11 +15,29 @@ export default class GuestList extends SharedGuestList {
     super(props)
   }
 
+  _onProfile(rowID) {
+    this.props.navigator.push({
+      title: 'Profile',
+      index : 8,
+      passProps: {
+        firebaseApp : this.props.firebaseApp,
+        name : this.state.guests[rowID].Name,
+        pic : this.state.guests[rowID].pic,
+        fbId : this.state.guestIds[rowID],
+        myfbId: this.props.fbId
+      }
+    })
+  }
+
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <View style = {styles.profile}>
-        <Image source={{uri: rowData.pic}}
-              style={{width:50, height: 50}} />
+        <TouchableHighlight
+          onPress = {this._onProfile.bind(this, rowID)}>
+          <Image
+            source={{uri: rowData.pic}}
+            style={{width:50, height: 50}} />
+        </TouchableHighlight>
         <Text style = {styles.text1}> {rowData.Name} </Text>
         {this.props.host && this.props.guest && this._pending(rowID) && <TouchableHighlight
           style={styles.button}

@@ -37,7 +37,8 @@ export default class EvengPage extends SharedEventPage {
         eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
-        GeoCoordinate: this.state.GeoCoordinate
+        GeoCoordinate: this.state.GeoCoordinate,
+        type: this.state.type
       }
     });
   }

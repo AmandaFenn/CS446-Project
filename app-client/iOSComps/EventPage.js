@@ -47,7 +47,8 @@ export default class EventPage extends SharedEventPage {
         eventRef: this.state.eventRef,
         fbId : this.props.fbId,
         eventId : this.props.eventId,
-        GeoCoordinate: this.state.GeoCoordinate
+        GeoCoordinate: this.state.GeoCoordinate,
+        type: this.state.type
       }
     });
   }
@@ -99,7 +100,7 @@ export default class EventPage extends SharedEventPage {
       }
     });
   }
-  
+
   _renderComments(rowData, sectionID, rowID, highlightRow) {
     return (
       <View style = {styles.comment}>
@@ -141,13 +142,13 @@ export default class EventPage extends SharedEventPage {
             modalParent = {this}
           />
         </Modal>
-        
+
         {this.state.avatarSource && <Image
           source={this.state.avatarSource}
           style = {{width:400, height:100}}
           resizeMode={Image.resizeMode.stretch}/>
         }
-        
+
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
           style={styles.description}
@@ -189,7 +190,7 @@ export default class EventPage extends SharedEventPage {
             onPress={this._onVote.bind(this)}>
             <Text style={styles.buttontext1}> Vote </Text>
           </TouchableHighlight>}
-          
+
           {this.state.host && <TouchableHighlight
             style={styles.button1}
             onPress={this._deleteEvent.bind(this)}
@@ -299,7 +300,7 @@ export default class EventPage extends SharedEventPage {
           ))}
         </PickerIOS>
         }
-        
+
         {this.state.status == 0 && <TextInput
           style={styles.textinput}
           placeholder="Comment"
@@ -320,7 +321,7 @@ export default class EventPage extends SharedEventPage {
             dataSource={this.state.comments}
             renderRow={this._renderComments.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} 
+            automaticallyAdjustContentInsets={false}
             renderSeparator={this._renderSeparator} />
         </View>
 

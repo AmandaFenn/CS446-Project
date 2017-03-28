@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
+    backgroundColor: 'white'
   },
   map: {
     ...StyleSheet.absoluteFillObject,

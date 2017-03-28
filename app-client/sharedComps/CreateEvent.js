@@ -38,6 +38,10 @@ export default class CreateEvent extends Component {
     this._updateNav()
   }
 
+  componentDidMount() {
+    this._getCurrentLocation()
+  }
+
   _onBack() {
     this.props.navigator.pop();
   }
@@ -152,6 +156,23 @@ export default class CreateEvent extends Component {
       GeoCoordinate: newGeoCoordinate
     })
     this._setModalVisible(false)
+  }
+
+  _getCurrentLocation() {
+    navigator.geolocation.getCurrentPosition(
+      this._getCurrentLocationCallBack.bind(this),
+      (error) => {console.log(error)},
+      {enableHighAccuracy: true, timeout: 5000, maximumAge: 5000}
+    );
+  }
+
+  _getCurrentLocationCallBack(position) {
+    this.setState({
+      GeoCoordinate: {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      },
+    })
   }
 
   _onImage() {

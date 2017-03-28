@@ -67,7 +67,7 @@ export default class CreateEvent extends SharedCreateEvent {
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <Modal
-          transparent={false}
+          transparent={true}
           visible={this.state.modalVisible}
           onRequestClose={() => {alert("Modal has been closed.")}}>
           <GeoLocation

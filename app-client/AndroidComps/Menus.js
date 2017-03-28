@@ -82,7 +82,11 @@ export default class Menus extends SharedMenus {
           tabLabel='Notifications'
           firebaseApp = {this.props.firebaseApp}
           fbId = {this.props.fbId}/>
-        <Settings tabLabel='Settings' getBack = {this._onBack.bind(this)}/>
+        <Settings
+          tabLabel='Settings'
+          firebaseApp = {this.props.firebaseApp}
+          fbId = {this.props.fbId}
+          getBack = {this._onBack.bind(this)}/>
       </ScrollableTabView>
     );
   }

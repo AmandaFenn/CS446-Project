@@ -14,7 +14,7 @@ export default class Profile extends Component {
       events: createListdataSource([]),
       eventIds: [],
       eventsRef : this.props.firebaseApp.database().ref('Events/'),
-      loadingEvents : true,
+      myEvent : this.props.fbId == this.props.myfbId
     }
   }
 
@@ -49,7 +49,7 @@ export default class Profile extends Component {
     var events = []
     var eventIds = []
     var fbId = this.props.fbId.toString()
-    if (this.state.userInfo && this.state.userInfo.Settings && this.state.userInfo.Settings.event) {
+    if (this.state.myEvent || (this.state.userInfo && this.state.userInfo.Settings && this.state.userInfo.Settings.event)) {
       snapshot.forEach(function(data) {
         if (data.child('Participants').hasChild(fbId)) {
           events.push(data.val().Name)

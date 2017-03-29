@@ -7,6 +7,7 @@ import {
   Image,
   TouchableHighlight,
   ListView,
+  ActivityIndicator
 } from 'react-native';
 import SharedMainMenu from '../sharedComps/MainMenu';
 
@@ -93,11 +94,15 @@ export default class MainMenu extends SharedMainMenu {
           </TouchableHighlight>
         </View>
         <View style={styles.container2}>
+          {this.state.loadingEvents ? <ActivityIndicator
+            animating={this.state.loadingEvents}
+            style={[styles.centering, {height: 80}]}
+            size="large"/> :
           <ListView
             dataSource={this.state.myevents}
             renderRow={this._renderRow.bind(this)}
             enableEmptySections={true}
-            renderSeparator={this._renderSeparator}/>
+            renderSeparator={this._renderSeparator}/>}
         </View>
       </View>
     );

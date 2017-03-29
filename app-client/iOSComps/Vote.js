@@ -8,18 +8,21 @@ import {
   Image,
   TouchableHighlight,
   ListView,
+  StatusBar
 } from 'react-native';
 import SharedVote from '../Modals/Vote';
+import {renderSeparator} from '../utils/HelpFuncs';
 
 export default class Vote extends SharedVote {
   constructor(props) {
     super(props)
   }
-  
+
   _renderItem(rowData, sectionID, rowID, highlightRow) {
     return (
       <View style = {styles.profile}>
-        <Text style = {styles.text1}> {rowData}: {this.state.voteItemScores[rowID]} </Text>
+        <Text style = {styles.text1}> {rowData} </Text>
+        <Text style = {styles.count}> {this.state.voteItemScores[rowID]} </Text>
         <View style={{flex:1}}>
           {!this.props.createMode && <TouchableHighlight
             style={{width: 30, height: 30}}
@@ -28,7 +31,7 @@ export default class Vote extends SharedVote {
               style={{width: 30, height: 30}}
               source={require('../img/like.png')} />
           </TouchableHighlight>}
-        </View>  
+        </View>
         <View style={{flex:1}}>
           {!this.props.createMode && <TouchableHighlight
             style={{width: 30, height: 30}}
@@ -37,7 +40,7 @@ export default class Vote extends SharedVote {
               style={{width: 30, height: 30}}
               source={require('../img/unlike.png')} />
           </TouchableHighlight>}
-        </View>  
+        </View>
         <View style={{flex:1}}>
           <TouchableHighlight
             style={{width: 30, height: 30}}
@@ -46,7 +49,7 @@ export default class Vote extends SharedVote {
               style={{width: 30, height: 30}}
               source={require('../img/android_minus.png')} />
           </TouchableHighlight>
-        </View>  
+        </View>
       </View>
     )
   }
@@ -54,31 +57,34 @@ export default class Vote extends SharedVote {
   render() {
     return (
       <View style={styles.container}>
-        <View style={{flex:1}}><Text style={{color:'blue'}}>Topic:</Text></View>
-        <View style={{flex:1}}>
-          <TextInput
-            style={{flex:1}}
-            placeholder={this.props.createMode ? 'Type event name' : ''}
-            defaultValue={this.props.createMode ? '' : this.props.topic}
-            onChangeText={(text) => this.setState({voteTopicTmp : text})}
-            editable={this.props.createMode} />
+        <StatusBar hidden={true}/>
+        <View style={styles.topic}>
+          <View style={{flex:2}}><Text style={styles.topictext}>Topic:</Text></View>
+          <View style={{flex:7}}>
+            <TextInput
+              style={styles.topicinput}
+              placeholder={this.props.createMode ? 'Type topic name' : ''}
+              defaultValue={this.props.createMode ? '' : this.props.topic}
+              onChangeText={(text) => this.setState({voteTopicTmp : text})}
+              editable={this.props.createMode} />
+          </View>
         </View>
-        <View style={{flex:1}}><Text style={{color:'blue'}}>Description:</Text></View>
         <View style={styles.list}>
           <ListView
             dataSource={this.state.voteItemsDataSource}
             renderRow={this._renderItem.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+            automaticallyAdjustContentInsets={false}
+            renderSeparator={renderSeparator}/>
         </View>
         <View style={styles.buttons1}>
           <TextInput
-            style={{flex:7}}
+            style={styles.iteminput}
             placeholder='Add vote item.'
             onChangeText={(text) => this.setState({voteItemTmp : text})}
           />
           <TouchableHighlight
-            style={{flex:1}}
+            style={{flex:1, alignItems: 'center'}}
             onPress={this._addItem.bind(this)}>
             <Image
               style={this.props.stylePlusButtonImage}
@@ -86,16 +92,18 @@ export default class Vote extends SharedVote {
           </TouchableHighlight>
         </View>
         <View style={styles.buttons2}>
-          <TouchableHighlight
-            style={{flex:1}}
-            onPress={this._leaveModal.bind(this)}>
-            <Text style={{color: 'green'}}> Cancel </Text>
-          </TouchableHighlight>
-          {this.props.createMode && <TouchableHighlight
-            style={{flex:1}}
-            onPress={this._submit.bind(this)}>
-            <Text style={{color:'green'}}> Create </Text>
-          </TouchableHighlight>}
+          <View style={{flex:1, alignItems: 'center'}}>
+            <TouchableHighlight
+              onPress={this._leaveModal.bind(this)}>
+              <Text style={styles.buttontext}> {this.props.createMode? 'Cancel': 'Done'} </Text>
+            </TouchableHighlight>
+          </View>
+          {this.props.createMode && <View style={{flex:1, alignItems: 'center'}}>
+            <TouchableHighlight
+              onPress={this._submit.bind(this)}>
+              <Text style={styles.buttontext}> Create </Text>
+            </TouchableHighlight>
+          </View>}
         </View>
       </View>
     )
@@ -105,39 +113,81 @@ export default class Vote extends SharedVote {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    height: 670
+    height: 670,
+    padding: 5
   },
   topic: {
-    flex: 1
-  },
-  description: {
-    flex: 1
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   list: {
-    flex: 12
+    flex: 15,
   },
   buttons1: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  iteminput: {
+    flex: 7,
+    fontSize: 30,
+    fontWeight: '300',
+    borderColor: '#add8e6',
+    borderWidth: 1,
+    padding: 5,
+    backgroundColor: '#e6e6fa'
   },
   buttons2: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  buttontext: {
+    fontSize: 25,
+    fontWeight: '300',
+    color:'rgba(5, 123, 253, 1.0)'
   },
   profile: {
     flex : 1,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    padding : 10
+    paddingVertical : 5
   },
-  text1: {
-    flex: 5,
-    color: '#fffff0',
+  topictext: {
+    fontSize: 30,
+    fontWeight: '300',
+  },
+  topicinput: {
+    flex: 1,
+    fontSize: 30,
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 5,
+    backgroundColor: '#d3d3d3'
+  },
+  text: {
     fontSize: 30,
     fontWeight: '600',
     backgroundColor: 'transparent'
+  },
+  count: {
+    flex: 1,
+    fontSize: 30,
+    fontWeight: '600',
+    backgroundColor: 'transparent',
+    color: 'red'
+  },
+  text1: {
+    flex: 5,
+    fontSize: 30,
+    fontWeight: '600',
+    backgroundColor: 'transparent',
+    color: 'blue'
   },
 });
 

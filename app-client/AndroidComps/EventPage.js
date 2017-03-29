@@ -244,7 +244,7 @@ export default class EvengPage extends SharedEventPage {
           <Picker
             style={styles.emptyview, {width: 350}}
             selectedValue = {this.state.type}
-            onValueChange={(value) => this.setState({type : value})}
+            onValueChange={this._onTypeChange.bind(this)}
             enabled = {this.state.host}>
             {Constants.eventTypes.map((e) => (
               <Picker.Item

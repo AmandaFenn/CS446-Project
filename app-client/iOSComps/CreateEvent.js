@@ -48,31 +48,35 @@ export default class CreateEvent extends SharedCreateEvent {
             modalParent = {this}
           />
         </Modal>
-        <View style={styles.emptyview}><Text style={styles.title}>Name:</Text></View>
-        <View style={styles.textinputview}>
-          <TextInput style={styles.textinput}
-            placeholder="Type event name."
-            onChangeText={(text) => this.setState({name : text})}
-          />
-        </View>
-        
         {this.state.avatarSource && <Image
           source={this.state.avatarSource}
-          style = {{width:400, height:100}}
+          style = {{width:360, height:100}}
           resizeMode={Image.resizeMode.stretch}/>
         }
-        
-        <TouchableHighlight
-          style={{width: 40, height:40}}
-          onPress={this._onImage.bind(this)}
-          underlayColor = 'lightgray'>
-          <Image
-            style={{width: 40, height:40}}
-            source={require('../img/GoogleImages.png')} />
-        </TouchableHighlight>
-        
+
+        <View style = {{height:5}}/>
+
+        <View style={styles.location}>
+          <View style={{flex: 2}}><Text style={styles.title}>Name:</Text></View>
+          <View style={{flex: 8}}>
+            <TextInput style={styles.locationtextinput}
+              placeholder="Type event name."
+              onChangeText={(text) => this.setState({name : text})}/>
+          </View>
+          <View style={{flex: 1}}>
+            <TouchableHighlight
+              style={{width: 40, height:40}}
+              onPress={this._onImage.bind(this)}
+              underlayColor = 'lightgray'>
+              <Image
+                style={{width: 40, height:40}}
+                source={require('../img/GoogleImages.png')} />
+            </TouchableHighlight>
+          </View>
+        </View>
+
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
-        <View>
+        <View style = {styles.emptyview1}>
           <TouchableHighlight
             style={styles.datetime}
             onPress={this._onDatePress.bind(this)}
@@ -86,94 +90,118 @@ export default class CreateEvent extends SharedCreateEvent {
             onDateChange={this.onDateChange}
           />}
         </View>
-        <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
-        <View style={styles.textinputview}>
-          <TextInput
-            style={styles.textinput}
-            placeholder="Type event location"
-            onChangeText={(text) => this.setState({location : text})}
-          />
-        </View>
-        <TouchableHighlight
-          style={{width: 40, height:40}}
-          onPress={this._onGeoMap.bind(this)}
-          underlayColor = 'lightgray'>
-          <Image
-            style={{width: 40, height:40}}
-            source={require('../img/GoogleMap.png')} />
-        </TouchableHighlight>
 
-        <View style={styles.emptyview}><Text style={styles.title}>Type:</Text></View>
-        <TouchableHighlight
-          style={styles.typeandnumber}
-          onPress={this._onTypePress.bind(this)}
-          underlayColor = 'lightgray'>
-          <Text style={styles.text1}> {this.state.type} </Text>
-        </TouchableHighlight>
+        <View style = {{height:5}}/>
 
-        {this.state.typePickerVisible && <PickerIOS
-          selectedValue = {this.state.type}
-          onValueChange={(value) => this.setState({type : value})}>
-          {Constants.eventTypes.map((e) => (
-            <PickerIOS.Item
-              key= 'key'
-              value= {e}
-              label= {e}
-            />
-          ))}
-        </PickerIOS>}
-
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Private
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchPrivate.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.private} />
+        <View style={styles.location}>
+          <View style={{flex: 2}}><Text style={styles.title}>Location:</Text></View>
+          <View style={{flex: 5}}>
+            <TextInput
+              style={styles.locationtextinput}
+              placeholder="Type location"
+              onChangeText={(text) => this.setState({location : text})}/>
+          </View>
+          <View style={{flex: 1, alignItems: 'center'}}>
+            <TouchableHighlight
+              style={{width: 40, height:40}}
+              onPress={this._onGeoMap.bind(this)}
+              underlayColor = 'lightgray'>
+              <Image
+                style={{width: 40, height:40}}
+                source={require('../img/GoogleMap.png')} />
+            </TouchableHighlight>
+          </View>
         </View>
 
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Guests can create votes
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchVote.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.guestVote} />
+        <View style = {{height:5}}/>
+
+        <View style = {styles.location}>
+          <View style={{flex: 3}}><Text style={styles.title}>Category:</Text></View>
+          <View style={{flex: 8}}>
+            <TouchableHighlight
+              style={styles.type}
+              onPress={this._onTypePress.bind(this)}
+              underlayColor = 'lightgray'>
+              <Text style={styles.guest}> {this.state.type} </Text>
+            </TouchableHighlight>
+          </View>
         </View>
 
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Unlimited number of people
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchCap.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.unlimited} />
+        {this.state.typePickerVisible && <View style = {styles.emptyview1}>
+          <PickerIOS
+            selectedValue = {this.state.type}
+            onValueChange={(value) => this.setState({type : value})}>
+            {Constants.eventTypes.map((e) => (
+              <PickerIOS.Item
+                key= 'key'
+                value= {e}
+                label= {e}
+              />
+            ))}
+          </PickerIOS>
+        </View>}
+
+        <View style = {{height:5}}/>
+
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Private</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchPrivate.bind(this)}
+              value={this.state.private} />
+          </View>
+        </View>
+
+        <View style = {{height:5}}/>
+
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Guests can create votes</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchVote.bind(this)}
+              value={this.state.guestVote} />
+          </View>
+        </View>
+
+        <View style = {{height:5}}/>
+
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Unlimited number of people</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchCap.bind(this)}
+              value={this.state.unlimited} />
+          </View>
         </View>
 
         {!this.state.unlimited &&
           <TouchableHighlight
-            style={styles.typeandnumber}
+            style={styles.number}
             onPress={this._onNumberPress.bind(this)}
             underlayColor = 'lightgray'>
-            <Text style={styles.text1}> {'Number of people: ' + this.state.limited} </Text>
+            <Text style={styles.guest}> {'Number of people: ' + this.state.limited} </Text>
           </TouchableHighlight>
         }
 
-        {this.state.numberPickerVisible && !this.state.unlimited &&
-        <PickerIOS
-          selectedValue = {this.state.limited}
-          onValueChange={(value) => this.setState({limited : value})}>
-          {numbers.map((n) => (
-            <PickerIOS.Item
-              key= 'key'
-              value= {n}
-              label= {n.toString()}
-            />
-          ))}
-        </PickerIOS>}
+        {this.state.numberPickerVisible && !this.state.unlimited && <View style = {styles.emptyview1}>
+          <PickerIOS
+            selectedValue = {this.state.limited}
+            onValueChange={(value) => this.setState({limited : value})}>
+            {numbers.map((n) => (
+              <PickerIOS.Item
+                key= 'key'
+                value= {n}
+                label= {n.toString()}
+              />
+            ))}
+          </PickerIOS>
+        </View>}
 
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
@@ -182,7 +210,6 @@ export default class CreateEvent extends SharedCreateEvent {
           onChangeText={(text) => this.setState({description : text})}
           multiline={true}
         />
-        <View style={styles.emptyview} />
       </ScrollView>
     )
   }
@@ -191,16 +218,50 @@ export default class CreateEvent extends SharedCreateEvent {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
-    paddingHorizontal: 5,
-    //paddingTop: 40,
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingHorizontal: 5
   },
   emptyview: {
+    width: 360,
     height: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  emptyview1: {
+    width: 360
   },
   title: {
     fontSize:20,
     color:'rgba(5, 123, 253, 1.0)',
-    paddingTop: 10
+  },
+  location: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 40
+  },
+  locationtextinput: {
+    flex: 1,
+    fontSize: 30,
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 5,
+  },
+  type: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    backgroundColor: 'white',
+    height: 40
+  },
+  number: {
+    height: 40,
+    width: 360,
+    borderColor: 'grey',
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    backgroundColor: 'white'
   },
   textinputview: {
     borderColor: 'grey',
@@ -214,7 +275,7 @@ const styles = StyleSheet.create({
     padding: 5
   },
   description: {
-    height: 120,
+    height: 160,
     borderColor: 'grey',
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
@@ -233,33 +294,9 @@ const styles = StyleSheet.create({
     fontSize: 25,
     padding: 5
   },
-  typeandnumber: {
-    height: 40,
-    borderColor: 'grey',
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    backgroundColor: 'white'
-  },
-  text1: {
-    fontSize: 20,
-    paddingTop: 10
-  },
-  unlimited: {
-    height: 40,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  button: {
-    alignItems: 'center',
-    marginHorizontal: 100,
-    backgroundColor: '#303F9F',
-  },
-  buttontext: {
-    fontSize: 25,
-    fontWeight: '600',
-    color: '#fffff0',
-    textAlign: 'center',
-    paddingVertical:6,
+  guest: {
+    fontSize:30,
+    fontWeight: '300',
   },
 });
 

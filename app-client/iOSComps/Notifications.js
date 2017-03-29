@@ -11,18 +11,20 @@ import {
 import SharedNotifications from '../sharedComps/Notifications';
 
 export default class Notifications extends SharedNotifications {
-  
+
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
-      <TouchableHighlight onPress = {this._viewNotification.bind(this, rowData, rowID)}>
+      <TouchableHighlight
+        onPress = {this._viewNotification.bind(this, rowData, rowID)}
+        onLongPress = {this._deleteNotification.bind(this, rowData, rowID)}>
         <Text style = {[styles.text1, {backgroundColor: rowData.Status ? 'grey': 'white'}]}
-          numberOfLines={3}> 
+          numberOfLines={3}>
           {rowData.Message}, {rowData.Date} at {rowData.Time}
       </Text>
       </TouchableHighlight>
     )
   }
-  
+
   _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
     return (
       <View
@@ -34,17 +36,20 @@ export default class Notifications extends SharedNotifications {
       />
     );
   }
-  
+
   render() {
     return (
-      <View style = {{flex:1, justifyContent: 'center', paddingTop: 50}}>
+      <View style = {{flex:1, justifyContent: 'center', paddingBottom: 60}}>
+        <View style= {styles.bar}>
+          <Text style={styles.text2}>Notifications</Text>
+        </View>
         <ListView
           dataSource={this.state.notifications}
           renderRow={this._renderRow.bind(this)}
           enableEmptySections={true}
           automaticallyAdjustContentInsets={false}
           renderSeparator={this._renderSeparator}
-        />      
+        />
       </View>
     );
   }
@@ -52,14 +57,21 @@ export default class Notifications extends SharedNotifications {
 
  const styles = StyleSheet.create({
    bar: {
-     backgroundColor: '#3F51B5',
+     backgroundColor: '#7b68ee',
+     justifyContent: 'center',
+     alignItems: 'center',
+     padding: 17,
    },
    text1: {
      color: '#303F9F',
-     fontSize: 30,
+     fontSize: 25,
      //fontFamily: 'sans-serif',
      fontWeight: '300',
      backgroundColor: 'transparent'
+   },
+   text2: {
+     fontSize: 20,
+     fontWeight: '600'
    }
  });
 

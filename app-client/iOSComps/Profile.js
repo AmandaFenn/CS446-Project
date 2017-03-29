@@ -60,20 +60,29 @@ export default class Profile extends SharedProfile {
     return (
       <View style={styles.container}>
         <Image
-          source={{uri: this.state.userInfo && this.state.userInfo.Settings && this.state.userInfo.Settings.cover && this.state.userInfo.cover ? this.state.userInfo.cover : Constants.fbCover}}
-          style={{width: 400, height: 120}}/>
+          source={{uri: this.state.userInfo && this.state.userInfo.Settings &&
+            (this.state.myEvent || this.state.userInfo.Settings.cover) &&
+            this.state.userInfo.cover != '' ? this.state.userInfo.cover : Constants.fbCover}}
+          style={{width: 360, height: 120}}/>
         <View style={styles.container1}>
           <View style={styles.profile}>
             <Image
-              source={{uri: this.props.pic}}
+              source={{uri: this.props.pic != '' ? this.props.pic : Constants.fbIcon}}
               style={{width: 80, height: 80}}
               boarderWidth="2"
               borderColor="black" />
+            <View style = {{justifyContent: 'space-around'}}>
+              <Text style={styles.text}>
+                {' ' + this.props.name}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.location}>
             <Text style={styles.text}>
-              {this.props.name}
-            </Text>
-            <Text style={styles.text}>
-              Location: {this.state.userInfo && this.state.userInfo.Settings && this.state.userInfo.Settings.location && this.state.userInfo.location ? this.state.userInfo.location : ''}
+              Location: {
+                this.state.userInfo && this.state.userInfo.Settings &&
+                (this.state.myEvent || this.state.userInfo.Settings.location && this.state.userInfo.location)
+                ? this.state.userInfo.location : ''}
             </Text>
           </View>
         </View>
@@ -106,9 +115,8 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   container1: {
-    flex: 2,
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    flex: 1,
+    width: 360
   },
   container2: {
     //flex: 3,
@@ -116,8 +124,7 @@ const styles = StyleSheet.create({
     height: 300
   },
   profile: {
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    flexDirection: 'row',
   },
   button: {
     fontSize: 15,
@@ -130,7 +137,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#212121',
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: '300',
     backgroundColor: 'transparent'
   },

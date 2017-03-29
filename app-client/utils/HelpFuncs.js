@@ -1,4 +1,6 @@
+import React, { Component } from 'react';
 import {
+  View,
   ListView,
 } from 'react-native';
 
@@ -32,4 +34,16 @@ export function averageLatLng(location) {
     latitude: lat / n,
     longitude: lng / n,
   }
+}
+
+export function renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
+  return (
+    <View
+      key={`${sectionID}-${rowID}`}
+      style={{
+      height: adjacentRowHighlighted ? 4 : 1,
+      backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
+    }}
+    />
+  );
 }

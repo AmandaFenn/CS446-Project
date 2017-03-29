@@ -40,7 +40,7 @@ export default class Notifications extends SharedNotifications {
   render() {
     return (
       <View style = {{flex:1, justifyContent: 'center', paddingBottom: 60}}>
-        <View style= {{backgroundColor: '#7b68ee', justifyContent: 'center', alignItems: 'center', padding: 17}}>
+        <View style= {styles.bar}>
           <Text style={styles.text2}>Notifications</Text>
         </View>
         <ListView
@@ -57,7 +57,10 @@ export default class Notifications extends SharedNotifications {
 
  const styles = StyleSheet.create({
    bar: {
-     backgroundColor: '#3F51B5',
+     backgroundColor: '#7b68ee',
+     justifyContent: 'center',
+     alignItems: 'center',
+     padding: 17,
    },
    text1: {
      color: '#303F9F',

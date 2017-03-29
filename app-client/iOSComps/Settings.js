@@ -15,35 +15,44 @@ import SharedSettings from '../sharedComps/Settings'
 export default class Settings extends SharedSettings {
   render() {
     return (
-      <View style = {{flex:1, justifyContent: 'center', alignItems: 'center'}}>
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Allow others see my location
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchLocationSetting.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.location} />
+      <View style = {styles.container}>
+        <View style= {styles.bar}>
+          <Text style={styles.text2}>Settings</Text>
         </View>
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Allow others see my cover
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchCoverSetting.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.cover} />
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Allow others see my location</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchLocationSetting.bind(this)}
+              value={this.state.location} />
+          </View>
         </View>
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Allow others see my events
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchEventSetting.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.event} />
+
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Allow others see my cover</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchCoverSetting.bind(this)}
+              value={this.state.cover} />
+          </View>
         </View>
-        <View elevation={3}>
+
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Allow others see my events</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchEventSetting.bind(this)}
+              value={this.state.event} />
+          </View>
+        </View>
+
+        <View elevation={3} style = {{flex: 1}}>
           <LoginButton
             onLogoutFinished={this.props.getBack}/>
         </View>
@@ -53,8 +62,19 @@ export default class Settings extends SharedSettings {
 }
 
  const styles = StyleSheet.create({
+   container: {
+     flexDirection: 'column',
+     alignItems: 'center',
+     justifyContent: 'space-between',
+     paddingHorizontal: 5,
+     height: 600,
+   },
    bar: {
-     backgroundColor: '#3F51B5',
+     backgroundColor: '#7b68ee',
+     justifyContent: 'center',
+     alignItems: 'center',
+     padding: 17,
+     width: 375
    },
    text: {
      color: '#fffff0',
@@ -62,16 +82,21 @@ export default class Settings extends SharedSettings {
      textAlign: 'center',
      alignItems: 'center'
    },
-   unlimited: {
-     height: 40,
+   location: {
+     flex:3,
      flexDirection: 'row',
      justifyContent: 'space-between',
+     alignItems: 'center',
+     height: 40
    },
    title: {
      fontSize:20,
      color:'rgba(5, 123, 253, 1.0)',
-     paddingTop: 10
    },
+   text2: {
+     fontSize: 20,
+     fontWeight: '600',
+   }
  });
 
 AppRegistry.registerComponent('Settings', () => Settings);

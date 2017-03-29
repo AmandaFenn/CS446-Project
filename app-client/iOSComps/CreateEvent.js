@@ -150,7 +150,6 @@ export default class CreateEvent extends SharedCreateEvent {
           <View style={{flex: 1}}>
             <Switch
               onValueChange={this._onSwitchPrivate.bind(this)}
-              style={{marginTop: 5}}
               value={this.state.private} />
           </View>
         </View>
@@ -164,7 +163,6 @@ export default class CreateEvent extends SharedCreateEvent {
           <View style={{flex: 1}}>
             <Switch
               onValueChange={this._onSwitchVote.bind(this)}
-              style={{marginTop: 5}}
               value={this.state.guestVote} />
           </View>
         </View>
@@ -178,7 +176,6 @@ export default class CreateEvent extends SharedCreateEvent {
           <View style={{flex: 1}}>
             <Switch
               onValueChange={this._onSwitchCap.bind(this)}
-              style={{marginTop: 5}}
               value={this.state.unlimited} />
           </View>
         </View>

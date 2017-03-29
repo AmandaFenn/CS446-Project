@@ -14,7 +14,7 @@ export default class GeoLocation extends SharedGeoLocation {
   constructor(props){
     super(props)
   }
-  
+
   render() {
     return (
       <View style={styles.container}>
@@ -30,21 +30,25 @@ export default class GeoLocation extends SharedGeoLocation {
               onDragEnd={this._onDragMarkerEnd.bind(this)}>
             </MapView.Marker>
           </MapView>
-        </View>  
+        </View>
         <View style={styles.emptyview}><Text style={styles.title}>Please select your geolocation!</Text></View>
-        <View style={styles.emptyview}/>       
-        <View style={styles.buttons}>          
-          <TouchableHighlight
-            style={styles.button}
-            onPress={this._leaveModal.bind(this)}>
-            <Text style={styles.buttontext}> Cancel </Text>
-          </TouchableHighlight>
-          
-          <TouchableHighlight
-            style={styles.button}
-            onPress={this.props.updateGeolaction ? this.props.updateGeolaction : this._updateGeoLocation.bind(this)}>
-            <Text style={styles.buttontext}> Save </Text>
-          </TouchableHighlight>
+        <View style={styles.buttons}>
+          <View style={{flex:1, alignItems: 'center'}}>
+            <TouchableHighlight
+              style={styles.button}
+              onPress={this._leaveModal.bind(this)}
+              underlayColor = 'lightgray'>
+              <Text style={styles.buttontext}> Cancel </Text>
+            </TouchableHighlight>
+          </View>
+          <View style={{flex:1, alignItems: 'center'}}>
+            <TouchableHighlight
+              style={styles.button}
+              onPress={this.props.updateGeolaction ? this.props.updateGeolaction : this._updateGeoLocation.bind(this)}
+              underlayColor = 'lightgray'>
+              <Text style={styles.buttontext}> Save </Text>
+            </TouchableHighlight>
+          </View>
         </View>
       </View>
     );
@@ -62,29 +66,27 @@ const styles = StyleSheet.create({
   emptyview: {
     flex: 1,
     height: 40,
-    marginHorizontal: 5
+    marginHorizontal: 5,
+    alignItems: 'center'
   },
   title: {
-    fontSize:20,
-    color:'rgba(5, 123, 253, 1.0)',
+    fontSize:25,
+    color:'red',
     paddingTop:10
   },
   buttons: {
-    flex:1,
+    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   button: {
     alignItems: 'center',
-    backgroundColor: 'lightgray',
   },
   buttontext: {
-    fontSize: 15,
+    fontSize: 25,
     fontWeight: '300',
-    width:80,
-    color: 'black',
-    textAlign: 'center',
-    paddingVertical:5,
+    color:'rgba(5, 123, 253, 1.0)'
   },
 });
 

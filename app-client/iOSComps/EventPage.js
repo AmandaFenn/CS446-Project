@@ -249,12 +249,12 @@ export default class EventPage extends SharedEventPage {
         <View style = {styles.location}>
           <View style={{flex: 3}}><Text style={styles.title}>Location:</Text></View>
           <View style={{flex: 8}}>
-          <TextInput
-            style={styles.locationtextinput}
-            placeholder="Type event location"
-            defaultValue={this.state.location}
-            onChangeText={(text) => this.setState({location : text, locationModified: true})}
-            editable={this.state.host} />
+            <TextInput
+              style={styles.locationtextinput}
+              placeholder="Type event location"
+              defaultValue={this.state.location}
+              onChangeText={(text) => this.setState({location : text, locationModified: true})}
+              editable={this.state.host} />
           </View>
         </View>
 
@@ -332,8 +332,7 @@ export default class EventPage extends SharedEventPage {
           </TouchableHighlight>
         }
 
-        {this.state.numberPickerVisible && !this.state.unlimited &&
-        <View style = {styles.emptyview1}>
+        {this.state.numberPickerVisible && !this.state.unlimited && <View style = {styles.emptyview1}>
           <PickerIOS
             selectedValue = {this.state.limited}
             onValueChange={(value) => this.setState({limited: value, capModified:true})}>

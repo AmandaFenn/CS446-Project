@@ -18,7 +18,7 @@ export default class Notifications extends SharedNotifications {
       <TouchableHighlight onPress = {this._viewNotification.bind(this, rowData, rowID)}>
         <Text style = {[styles.text1, {backgroundColor: rowData.Status ? 'grey': 'white'}]}
           numberOfLines={3}>
-          {rowData.Message}, {rowData.Date} at {rowData.Time}
+          {rowData.Message}, <Text style={{color: '#1A237E'}}>{rowData.Date}</Text> at <Text style={{color: '#1A237E'}}>{rowData.Time}</Text>
       </Text>
       </TouchableHighlight>
     )
@@ -38,7 +38,10 @@ export default class Notifications extends SharedNotifications {
 
   render() {
     return (
-      <View style = {{flex:1, justifyContent: 'center', paddingTop: 50}}>
+      <View style = {{flex:1, justifyContent: 'center'}}>
+      <View style= {{backgroundColor: '#3F51B5', justifyContent: 'center', alignItems: 'center', padding: 17}}>
+        <Text style={styles.text2}>Notifications</Text>
+          </View>
         <ListView
           dataSource={this.state.notifications}
           renderRow={this._renderRow.bind(this)}
@@ -57,10 +60,15 @@ const styles = StyleSheet.create({
    },
    text1: {
      color: '#303F9F',
-     fontSize: 30,
+     fontSize: 25,
      //fontFamily: 'sans-serif',
      fontWeight: '300',
      backgroundColor: 'transparent'
+   },
+   text2: {
+     color: 'white',
+     fontSize: 22,
+
    }
  });
 

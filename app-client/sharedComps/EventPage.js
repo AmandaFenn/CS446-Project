@@ -55,6 +55,10 @@ export default class EventPage extends Component {
     //this._loadEvent()
   }
 
+  componentDidMount() {
+    this._getCurrentLocation()
+  }
+
   componentWillUnmount() {
     this.state.eventRef.off('value', this._loadEventCallBack);
   }
@@ -344,6 +348,23 @@ export default class EventPage extends Component {
       GeoCoordinate: newGeoCoordinate
     })
     this._setModalVisible(false)
+  }
+
+  _getCurrentLocation() {
+    navigator.geolocation.getCurrentPosition(
+      this._getCurrentLocationCallBack.bind(this),
+      (error) => {console.log(error)},
+      {enableHighAccuracy: true, timeout: 5000, maximumAge: 5000}
+    );
+  }
+
+  _getCurrentLocationCallBack(position) {
+    this.setState({
+      GeoCoordinate: {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      },
+    })
   }
 
   _loadAvatar(url) {

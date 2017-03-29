@@ -151,7 +151,7 @@ export default class EvengPage extends SharedEventPage {
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <Modal
-          transparent={false}
+          transparent={true}
           visible={this.state.modalVisible}
           onRequestClose={() => {alert("Modal has been closed.")}}>
           <GeoLocation

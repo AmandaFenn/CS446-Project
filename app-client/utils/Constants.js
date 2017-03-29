@@ -1,10 +1,10 @@
 import * as firebase from 'firebase';
 
 const Constants = {
-  eventTypes : ['Eatings', 'Drinkings', 'Nightlife', 'Movies', 'Sports', 'Casino', 'Others'],
+  eventTypes : ['Food', 'Drinks', 'Nightlife', 'Movies', 'Sports', 'Casino', 'Others'],
   eventTypeMapping : {
-    'Eatings' : 'restaurants',
-    'Drinkings' : 'coffee',
+    'Food' : 'restaurants',
+    'Drinks' : 'coffee',
     'Nightlife' : 'nightlife',
     'Movies' : 'movietheaters',
     'Sports' : 'sportsteams',

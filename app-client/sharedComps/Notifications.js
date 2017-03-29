@@ -13,7 +13,7 @@ export default class Notifications extends Component {
       notificationsRef : this.props.firebaseApp.database().ref('Notifications/' + this.props.fbId),
     }
   }
-  
+
   componentWillMount() {
     this._loadNotificationsCallBack = this._loadNotificationsCallBack.bind(this)
     this._loadNotifications()
@@ -22,12 +22,12 @@ export default class Notifications extends Component {
   componentWillUnmount() {
     this.state.notificationsRef.off('value', this._loadNotificationsCallBack);
   }
-  
+
   _loadNotificationsCallBack(snapshot) {
     var notifications = []
     var notificationIds = []
     snapshot.forEach(function(data) {
-      if (data) {        
+      if (data) {
         notifications.push(data.val())
         notificationIds.push(data.key)
       }
@@ -45,13 +45,18 @@ export default class Notifications extends Component {
       console.error(error);
     });
   }
-  
-  _viewNotification( rowData, rowID) {
+
+  _viewNotification(rowData, rowID) {
     if (rowData.Status > 0) {
       this.state.notificationsRef.child(this.state.notificationIds[rowID]).update({Status: 0})
     }
   }
-  
+
+  _deleteNotification(rowData, rowID) {
+    this.state.notificationsRef.child(this.state.notificationIds[rowID]).remove()
+  }
+
+
 }
 
 AppRegistry.registerComponent('Notifications', () => Notifications);

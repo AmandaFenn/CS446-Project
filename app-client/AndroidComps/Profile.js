@@ -58,7 +58,9 @@ export default class Profile extends SharedProfile {
     return (
       <View style={styles.container}>
         <Image
-          source={{uri: this.state.userInfo && this.state.userInfo.Settings && (this.state.myEvent || this.state.userInfo.Settings.cover)  && this.state.userInfo.cover != '' ? this.state.userInfo.cover : Constants.fbCover}}
+          source={{uri: this.state.userInfo && this.state.userInfo.Settings &&
+            (this.state.myEvent || this.state.userInfo.Settings.cover) && 
+            this.state.userInfo.cover != '' ? this.state.userInfo.cover : Constants.fbCover}}
           style={{width: 400, height: 120}}/>
         <View style={styles.container1}>
           <View style={styles.profile}>

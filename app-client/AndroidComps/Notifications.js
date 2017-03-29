@@ -15,7 +15,9 @@ export default class Notifications extends SharedNotifications {
 
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
-      <TouchableHighlight onPress = {this._viewNotification.bind(this, rowData, rowID)}>
+      <TouchableHighlight
+        onPress = {this._viewNotification.bind(this, rowData, rowID)}
+        onLongPress = {this._deleteNotification.bind(this, rowData, rowID)}>
         <Text style = {[styles.text1, {backgroundColor: rowData.Status ? 'grey': 'white'}]}
           numberOfLines={3}>
           {rowData.Message}, <Text style={{color: '#1A237E'}}>{rowData.Date}</Text> at <Text style={{color: '#1A237E'}}>{rowData.Time}</Text>

@@ -214,7 +214,7 @@ export default class EventPage extends SharedEventPage {
             date={this.state.date}
             mode="datetime"
             minimumDate = {new Date()}
-            onDateChange={this.onDateChange}
+            onDateChange={this._onDateChange.bind(this)}
           />}
         </View>
 
@@ -239,7 +239,7 @@ export default class EventPage extends SharedEventPage {
         {this.state.typePickerVisible && this.state.host &&
         <PickerIOS
           selectedValue = {this.state.type}
-          onValueChange={(value) => this.setState({type : value})}>
+          onValueChange={this._onTypeChange.bind(this)}>
           {Constants.eventTypes.map((e) => (
             <PickerIOS.Item
               key= 'key'

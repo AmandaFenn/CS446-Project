@@ -14,7 +14,7 @@ export default class EventPage extends Component {
       avatarSource : null,
       location : '',
       private: false,
-      type: 'Eatings',
+      type: Constants.eventTypes[0],
       date: new Date(),
       guestVote: true,
       unlimited: true,
@@ -31,6 +31,7 @@ export default class EventPage extends Component {
       locationModified: false,
       dateModified: false,
       timeModified: false,
+      typeModified: false,
       voteModified: false,
       capModified: false,
       host: true,
@@ -107,6 +108,11 @@ export default class EventPage extends Component {
     });
 
     if (!this.state.host) {
+      this._readDescription(snapshot)
+      this._readDate(snapshot)
+      this._readLocation(snapshot)
+      this._readGuestVote(snapshot)
+      this._readType(snapshot)
       this._readCap(snapshot)
       this._member(snapshot)
     }
@@ -165,6 +171,42 @@ export default class EventPage extends Component {
     return check
   }
 
+  _readDescription(snapshot) {
+    var description = snapshot.child('Description').val()
+    this.setState({
+      description: description
+    })
+  }
+
+  _readDate(snapshot) {
+    var snapshotdata = snapshot.val()
+    var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
+    this.setState({
+      date: date,
+    })
+  }
+
+  _readLocation(snapshot) {
+    var location = snapshot.child('Location').val()
+    this.setState({
+      location: location
+    })
+  }
+
+  _readGuestVote(snapshot) {
+    var guestVote = snapshot.child('GuestCanCreateVotes').val()
+    this.setState({
+      guestVote: guestVote
+    })
+  }
+
+  _readType(snapshot) {
+    var type = snapshot.child('Type').val()
+    this.setState({
+      type: type
+    })
+  }
+
   _readCap(snapshot) {
     var cap = snapshot != undefined ? snapshot.child('Cap').val() : -1
     if (cap > 0) {
@@ -175,7 +217,7 @@ export default class EventPage extends Component {
     } else {
       this.setState({
         unlimited: true,
-        limited: this.state.guests
+        limited: snapshot.child('Participants').numChildren()
       })
     }
   }
@@ -187,11 +229,17 @@ export default class EventPage extends Component {
     })
   }
 
+
+
   _initDataRead(snapshot) {
+    this._readDescription(snapshot)
+    this._readDate(snapshot)
+    this._readLocation(snapshot)
+    this._readGuestVote(snapshot)
+    this._readType(snapshot)
     this._readCap(snapshot)
     this._member(snapshot)
     var snapshotdata = snapshot.val()
-    var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
     var status = snapshot.child('Participants/' + this.props.fbId + '/Status').val()
     var GeoCoordinate = snapshot.child('Participants' + this.props.fbId + '/Location').val()
 
@@ -199,12 +247,8 @@ export default class EventPage extends Component {
       name: snapshotdata.Name,
       hostId: snapshotdata.HostID,
       private: snapshotdata.Private,
-      description: snapshotdata.Description,
-      location: snapshotdata.Location,
-      date: date,
       status: status!=null ? status : -1,
-      guestVote: snapshotdata.GuestCanCreateVotes,
-      GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate
+      GeoCoordinate: GeoCoordinate ? GeoCoordinate : this.state.GeoCoordinate,
     })
   }
 
@@ -245,11 +289,14 @@ export default class EventPage extends Component {
     if (this.state.locationModified) {
       newData['Location'] = this.state.location
     }
+    if (this.state.typeModified) {
+      newData['Type'] = this.state.type
+    }
     if (this.state.voteModified) {
       newData['GuestCanCreateVotes'] = this.state.guestVote
     }
     if (this.state.capModified) {
-      newData['Cap'] = this.state.limited
+      newData['Cap'] = this.state.unlimited ? -1 : this.state.limited
     }
     eventRef.update(newData)
   }
@@ -260,6 +307,7 @@ export default class EventPage extends Component {
       this.state.dateModified ||
       this.state.timeModified ||
       this.state.locationModified ||
+      this.state.typeModified ||
       this.state.voteModified ||
       this.state.capModified) &&
       !this._checkInfo()) {
@@ -289,12 +337,22 @@ export default class EventPage extends Component {
                       this.props.name + Constants.messages[2] + this.state.name)
   }
 
-  onDateChange = (date) => {
-    this.setState({date: date});
+  _onDateChange(date) {
+    this.setState({
+      date: date,
+      dateModified: true
+    });
   };
 
   _onDatePress() {
     this.setState({datePickerVisible: !this.state.datePickerVisible});
+  }
+
+  _onTypeChange(value) {
+    this.setState({
+      type: value,
+      typeModified: true
+    })
   }
 
   _onTypePress() {

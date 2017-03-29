@@ -9,14 +9,16 @@ import {
   ListView,
   Modal
 } from 'react-native';
+
 import SharedVotePage from '../sharedComps/VotePage';
 import Vote from './Vote'
+import {renderSeparator} from '../utils/HelpFuncs';
 
 export default class VotePage extends SharedVotePage {
   constructor(props) {
     super(props)
-  }  
-  
+  }
+
   _updateNav() {
     this.props.navigator.replace({
       component: VotePage,
@@ -26,7 +28,7 @@ export default class VotePage extends SharedVotePage {
       passProps: this.props
     });
   }
-  
+
   _renderVote(rowData, sectionID, rowID, highlightRow) {
     return (
       <View style = {styles.profile}>
@@ -54,24 +56,23 @@ export default class VotePage extends SharedVotePage {
           visible={this.state.modalVisible}
           onRequestClose={() => {alert("Modal has been closed.")}}
           >
-          <View style={{backgroundColor: 'red'}}>
-            <Vote
-              stylePlusButtonImage={{width:30, height: 30}}
-              createMode={this.state.createMode}
-              fbId = {this.props.fbId}
-              votesRef = {this.state.votesRef}
-              voteId = {this.state.selectedVoteId}
-              topic = {this.state.seletedVoteTopic}
-              modalParent = {this}
-            />
-          </View>
+          <Vote
+            stylePlusButtonImage={{width:30, height: 30}}
+            createMode={this.state.createMode}
+            fbId = {this.props.fbId}
+            votesRef = {this.state.votesRef}
+            voteId = {this.state.selectedVoteId}
+            topic = {this.state.seletedVoteTopic}
+            modalParent = {this}
+          />
         </Modal>
         <View style={styles.container2}>
           <ListView
             dataSource={this.state.votesDataSource}
             renderRow={this._renderVote.bind(this)}
             enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
+            automaticallyAdjustContentInsets={false}
+            renderSeparator={renderSeparator}/>
           </View>
       </View>
     );
@@ -86,14 +87,14 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 70,
+    paddingTop: 65,
     paddingBottom:10,
   },
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: '#C5CAE9',
-    padding: 10
+    padding: 5,
+    backgroundColor: '#808000',
   },
   profile: {
     flex : 1,

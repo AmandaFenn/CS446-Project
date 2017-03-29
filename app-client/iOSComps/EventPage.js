@@ -59,6 +59,7 @@ export default class EventPage extends SharedEventPage {
       title: 'Votes',
       passProps: {
         firebaseApp : this.props.firebaseApp,
+        title: 'Pollings',
         fbId : this.props.fbId,
         host: this.state.host,
         eventId : this.props.eventId,

@@ -17,7 +17,7 @@ export default class CreateEvent extends Component {
       location : '',
       date: date,
       guestVote: true,
-      type: 'Eatings',
+      type: Constants.eventTypes[0],
       unlimited: true,
       limited: 1,
       private: false,

@@ -8,9 +8,12 @@ import {
   TouchableHighlight,
   TextInput,
   ListView,
+  PickerIOS,
+  Switch
 } from 'react-native';
 import SharedSearchEvent from '../sharedComps/SearchEvent';
 import EventPage from '../iOSComps/EventPage';
+import Constants from '../utils/Constants'
 
 export default class SearchEvent extends SharedSearchEvent {
   constructor(props){
@@ -65,6 +68,42 @@ export default class SearchEvent extends SharedSearchEvent {
 
         <View style = {{height:5}}/>
 
+        <View style = {styles.search}>
+          <View style={{flex: 4, flexDirection: 'row'}}>
+            <Text style={styles.title}>Category: </Text>
+            <Text style={[styles.title, this.state.all ? {} : {color:'grey'}]}>All</Text>
+          </View>
+          <View style={{flex: 2}}>
+            <Switch
+              onValueChange={this._onSwitchAll.bind(this)}
+              value={this.state.all}/>
+          </View>
+          <View style={{flex: 6}}>
+            <TouchableHighlight
+              style={styles.type}
+              onPress={this._onTypePress.bind(this)}
+              underlayColor = 'lightgray'>
+              <Text style={[styles.typetext, !this.state.all ? {} : {color:'grey'}]}> {this.state.type} </Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+
+        {this.state.typePickerVisible && <View style = {styles.emptyview1}>
+          <PickerIOS
+            selectedValue = {this.state.type}
+            onValueChange={this._onTypeChange.bind(this)}>
+            {Constants.eventTypes.map((e) => (
+              <PickerIOS.Item
+                key= 'key'
+                value= {e}
+                label= {e}
+              />
+            ))}
+          </PickerIOS>
+        </View>}
+
+        <View style = {{height:5}}/>
+
         <View style={styles.container2}>
           <ListView
             dataSource={this.state.searchEvents}
@@ -85,6 +124,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 5,
+    paddingTop: 70,
+    paddingBottom: 55
   },
   container1: {
     flex: 2,
@@ -103,13 +145,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5
   },
   button: {
-    fontSize: 15,
-    fontWeight: '600',
-    width: 200,
-    color: '#fffff0',
-    backgroundColor: '#303F9F',
-    textAlign: 'center',
-    paddingVertical:10
+    height:40,
+    width: 80,
+    justifyContent:'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(5, 123, 253, 1.0)'
   },
   text: {
     color: '#fffff0',
@@ -121,6 +161,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: 360,
     height: 40
   },
   searchtextinput: {
@@ -144,6 +185,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: 'white',
     height: 40
+  },
+  emptyview1: {
+    width: 360
+  },
+  typetext: {
+    fontSize:30,
+    fontWeight: '300'
   },
 });
 

@@ -14,7 +14,8 @@ export default class SearchEvent extends Component {
       searchEventIds: [],
       eventsRef : this.props.firebaseApp.database().ref('Events/'),
       all: true,
-      type: Constants.eventTypes[0]
+      type: Constants.eventTypes[0],
+      typePickerVisible: false
     }
   }
 
@@ -41,7 +42,7 @@ export default class SearchEvent extends Component {
     var type = this.state.type
     snapshot.forEach(function(data) {
       var dataVal = data.val()
-      if ((all || dataVal.Type.includes(type)) && (dataVal.Name.includes(searchName) || dataVal.Location.includes(searchName))) {
+      if (!dataVal.Private && (all || dataVal.Type.includes(type)) && (dataVal.Name.includes(searchName) || dataVal.Location.includes(searchName))) {
         events.push(dataVal.Name)
         eventIds.push(data.key)
       }
@@ -64,8 +65,15 @@ export default class SearchEvent extends Component {
 
   _onSwitchAll(value) {
     this.setState({
-      all: value
+      all: value,
+      typePickerVisible: false
     })
+  }
+
+  _onTypePress() {
+    if (!this.state.all) {
+      this.setState({typePickerVisible: !this.state.typePickerVisible});
+    }
   }
 
   _onEvent(rowData, rowID) {

@@ -2,7 +2,7 @@ import React, { Component, } from 'react'
 import {
   AppRegistry,
 } from 'react-native';
-import {createListdataSource, sendNotification} from '../utils/HelpFuncs';
+import {createListdataSource, sendNotification, parseDateTime} from '../utils/HelpFuncs';
 import Constants from '../utils/Constants'
 
 export default class EventPage extends Component {
@@ -180,7 +180,7 @@ export default class EventPage extends Component {
 
   _readDate(snapshot) {
     var snapshotdata = snapshot.val()
-    var date = new Date(snapshotdata.Date + ' ' + snapshotdata.Time)
+    var date = parseDateTime(snapshotdata.Date, snapshotdata.Time)
     this.setState({
       date: date,
     })

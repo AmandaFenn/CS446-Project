@@ -47,3 +47,18 @@ export function renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
     />
   );
 }
+
+export function parseDateTime(date, time) {
+  var dates = date.split(/[^0-9]/)
+  var times = time.split(/[^0-9]/)
+  var parsedDate = date
+  var parsedTime = time
+  if (times.length > 3) {
+    parsedDate = dates[0] + '/' + dates[1] + '/' + dates[2]
+    if (times[3] == 'PM') {
+      times[0] = parseInt(times[0]) + 12
+    }
+    parsedTime = times[0] + ':' + times[1] + ':' + times[2]
+  }
+  return new Date(parsedDate + ' ' + parsedTime)
+}

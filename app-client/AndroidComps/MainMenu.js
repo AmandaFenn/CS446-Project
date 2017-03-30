@@ -7,7 +7,8 @@ import {
   Image,
   TouchableHighlight,
   ListView,
-  ActivityIndicator
+  ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import SharedMainMenu from '../sharedComps/MainMenu';
 
@@ -54,10 +55,13 @@ export default class MainMenu extends SharedMainMenu {
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight onPress = {this._onMyEvent.bind(this, rowData, rowID)}>
-        <Text style = {styles.text1}
-          numberOfLines={1}>
-          {rowData}
-        </Text>
+        <View style={styles.eventItem}>
+          <Text
+            style={styles.eventItemText}
+            numberOfLines={1}>
+            {rowData}
+          </Text>
+        </View>
       </TouchableHighlight>
     )
   }
@@ -79,30 +83,36 @@ export default class MainMenu extends SharedMainMenu {
         <View style={styles.container1}>
           <View style={styles.profile}>
             <Image source={{uri: this.props.pic}}
-              style={{width: 80, height: 80}}
-              boarderWidth="2"
-              borderColor="black"/>
-            <Text style={styles.text}>
+              style={styles.profilePicture}/>
+            <Text style={styles.profileName}>
               {this.props.name}
             </Text>
           </View>
-          <TouchableHighlight onPress = {this._onSearchEvent.bind(this)}>
-            <Text style={styles.button}> Find Events </Text>
+          <TouchableHighlight onPress={this._onSearchEvent.bind(this)}>
+            <Text style={styles.button}>Find Events</Text>
           </TouchableHighlight>
-          <TouchableHighlight onPress = {this._onCreateEvent.bind(this)}>
-            <Text style={styles.button}> Create Events </Text>
+          <TouchableHighlight onPress={this._onCreateEvent.bind(this)}>
+            <Text style={styles.button}>Create Event</Text>
           </TouchableHighlight>
         </View>
+        <View style={styles.myEventsLabel}>
+          <Text style={styles.myEventsText}>My Events</Text>
+          <View style={styles.myEventsHr}/>
+        </View>
         <View style={styles.container2}>
-          {this.state.loadingEvents ? <ActivityIndicator
-            animating={this.state.loadingEvents}
-            style={[styles.centering, {height: 80}]}
-            size="large"/> :
-          <ListView
-            dataSource={this.state.myevents}
-            renderRow={this._renderRow.bind(this)}
-            enableEmptySections={true}
-            renderSeparator={this._renderSeparator}/>}
+          {this.state.loadingEvents ?
+            <ActivityIndicator
+              animating={this.state.loadingEvents}
+              style={[styles.centering, {height: 80}]}
+              size="large"
+            /> :
+            <ListView
+              dataSource={this.state.myevents}
+              renderRow={this._renderRow.bind(this)}
+              enableEmptySections={true}
+              renderSeparator={this._renderSeparator}
+            />
+          }
         </View>
       </View>
     );
@@ -122,17 +132,24 @@ const styles = StyleSheet.create({
   },
   container1: {
     flex: 2,
-    justifyContent: 'space-around',
     alignItems: 'center',
   },
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: 'white',
   },
   profile: {
-    justifyContent: 'space-around',
     alignItems: 'center',
+  },
+  profilePicture: {
+    width: 80,
+    height: 80,
+  },
+  profileName: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: '300',
+    marginTop: 0,
   },
   button: {
     fontSize: 15,
@@ -141,21 +158,39 @@ const styles = StyleSheet.create({
     color: '#fffff0',
     backgroundColor: '#303F9F',
     textAlign: 'center',
-    paddingVertical:10
+    padding: 10,
+    margin: 7,
   },
-  text: {
-    color: '#212121',
-    fontSize: 20,
-    fontWeight: '300',
-    backgroundColor: 'transparent'
+  eventItem: {
+    borderColor: 'black',
+    borderWidth: 1.5,
+    borderStyle: 'solid',
+    borderRadius: 7,
+    margin: 12,
+    padding: 10,
   },
-  text1: {
+  eventItemText: {
     color: '#303F9F',
-    fontSize: 30,
-    fontFamily: 'sans-serif',
+    fontSize: 22,
+    //fontFamily: 'sans-serif',
     fontWeight: '300',
-    backgroundColor: 'transparent'
-  }
+    //backgroundColor: 'transparent',
+
+  },
+  myEventsLabel: {
+    margin: 10,
+    width: Dimensions.get('window').width - 20,
+    marginTop: 50,
+    marginBottom: 10,
+  },
+  myEventsHr: {
+    height: 2,
+    backgroundColor: 'black',
+    borderRadius: 5,
+  },
+  myEventsText: {
+    fontSize: 18,
+  },
 });
 
 AppRegistry.registerComponent('MainMenu', () => MainMenu);

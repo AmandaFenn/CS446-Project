@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent'
   },
   space: {
-    padding:6,
+    padding: 10,
   }
 });
 

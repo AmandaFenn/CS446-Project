@@ -16,11 +16,45 @@ export default class Vote extends SharedVote {
   constructor(props) {
     super(props)
   }
-
   _renderItem(rowData, sectionID, rowID, highlightRow) {
     return (
+      <View style = {styles.profile}>
+        <Text style = {styles.text1}> {rowData} </Text>
+        <Text style = {styles.count}> {this.state.voteItemScores[rowID]} </Text>
+        <View style={{flex:1}}>
+          {!this.props.createMode && <TouchableHighlight
+            style={{width: 30, height: 30}}
+            onPress={this._vote.bind(this, rowID)}>
+            <Image
+              style={{width: 30, height: 30}}
+              source={require('../img/like.png')} />
+          </TouchableHighlight>}
+        </View>
+        <View style={{flex:1}}>
+          {!this.props.createMode && <TouchableHighlight
+            style={{width: 30, height: 30}}
+            onPress={this._undoVote.bind(this, rowID)}>
+            <Image
+              style={{width: 30, height: 30}}
+              source={require('../img/unlike.png')} />
+          </TouchableHighlight>}
+        </View>
+        <View style={{flex:1}}>
+          <TouchableHighlight
+            style={{width: 30, height: 30}}
+            onPress={this._deleteItem.bind(this, rowID)}>
+            <Image
+              style={{width: 30, height: 30}}
+              source={require('../img/android_minus.png')} />
+          </TouchableHighlight>
+        </View>
+      </View>
+    )
+  }
+
+  render() {
+    return (
       <View style={styles.container}>
-        <StatusBar hidden={true}/>
         <View style={styles.topic}>
           <View style={{flex:2}}><Text style={styles.topictext}>Topic:</Text></View>
           <View style={{flex:7}}>
@@ -71,55 +105,6 @@ export default class Vote extends SharedVote {
       </View>
     )
   }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <View style={{flex:1}}><Text style={{color:'blue'}}>Topic:</Text></View>
-        <View style={{flex:1}}>
-          <TextInput
-            style={{flex:1}}
-            placeholder={this.props.createMode ? 'Type event name' : ''}
-            defaultValue={this.props.createMode ? '' : this.props.topic}
-            onChangeText={(text) => this.setState({voteTopicTmp : text})}
-            editable={this.props.createMode} />
-        </View>
-        <View style={styles.list}>
-          <ListView
-            dataSource={this.state.voteItemsDataSource}
-            renderRow={this._renderItem.bind(this)}
-            enableEmptySections={true}
-            automaticallyAdjustContentInsets={false} />
-        </View>
-        <View style={styles.buttons1}>
-          <TextInput
-            style={{flex:7}}
-            placeholder='Add vote item.'
-            onChangeText={(text) => this.setState({voteItemTmp : text})}
-          />
-          <TouchableHighlight
-            style={{flex:1}}
-            onPress={this._addItem.bind(this)}>
-            <Image
-              style={this.props.stylePlusButtonImage}
-              source={require('../img/android_plus.png')} />
-          </TouchableHighlight>
-        </View>
-        <View style={styles.buttons2}>
-          <TouchableHighlight
-            style={{flex:1}}
-            onPress={this._leaveModal.bind(this)}>
-            <Text style={{color: 'green'}}> Cancel </Text>
-          </TouchableHighlight>
-          {this.props.createMode && <TouchableHighlight
-            style={{flex:1}}
-            onPress={this._submit.bind(this)}>
-            <Text style={{color:'green'}}> Create </Text>
-          </TouchableHighlight>}
-        </View>
-      </View>
-    )
-  }
 }
 
 const styles = StyleSheet.create({
@@ -144,7 +129,7 @@ const styles = StyleSheet.create({
   },
   iteminput: {
     flex: 7,
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: '300',
     borderColor: '#add8e6',
     borderWidth: 1,
@@ -175,7 +160,7 @@ const styles = StyleSheet.create({
   },
   topicinput: {
     flex: 1,
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: '300',
     borderColor: 'gray',
     borderWidth: 1,

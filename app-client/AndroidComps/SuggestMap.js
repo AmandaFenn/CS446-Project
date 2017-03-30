@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    height: 400,
+    height: 440,
   },
   emptyview: {
     height: 40,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   suggestions: {
     width: 400,
-    height: 200,
+    height: 160,
     backgroundColor: '#C5CAE9',
     paddingHorizontal: 5,
     marginHorizontal: 7

@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import SharedEventPage from '../sharedComps/EventPage';
 import GeoLocation from './GeoLocation'
+import {renderSeparator} from '../utils/HelpFuncs';
 import Constants from '../utils/Constants'
 
 export default class EvengPage extends SharedEventPage {
@@ -45,7 +46,7 @@ export default class EvengPage extends SharedEventPage {
 
   _onVote() {
     this.props.navigator.push({
-      title: 'Votes',
+      title: 'Pollings',
       index: 7,
       passProps: {
         fbId : this.props.fbId,
@@ -134,19 +135,6 @@ export default class EvengPage extends SharedEventPage {
     )
   }
 
-  _renderSeparator(sectionID , rowID , adjacentRowHighlighted) {
-    return (
-      <View
-        key={`${sectionID}-${rowID}`}
-        style={{
-        height: adjacentRowHighlighted ? 4 : 1,
-        backgroundColor: adjacentRowHighlighted ? '#3F51B5' : '#C5CAE9',
-      }}
-      />
-    );
-  }
-
-
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -175,159 +163,221 @@ export default class EvengPage extends SharedEventPage {
           editable={this.state.host}
         />
 
-        <View style={styles.location}>
-          {(this.state.status == -1 || this.state.status == 1) && <TouchableHighlight
-            style={styles.button1}
-            onPress={this._onJoin.bind(this)}>
-            <Text style={styles.buttontext1}> {this.state.status > 0 ? 'Accept' : 'Join'} </Text>
-          </TouchableHighlight>}
+        <View style = {{height:5}}/>
 
-          {!this.state.host && this.state.status >= 0 && <TouchableHighlight
-            style={styles.button1}
-            onPress={this._onLeave.bind(this)}>
-            <Text style={styles.buttontext1}> Leave </Text>
-          </TouchableHighlight>}
+        <View style={styles.buttons}>
+          {(this.state.status == -1 || this.state.status == 1) && <View style = {styles.buttoncontainer}>
+            <TouchableHighlight
+              style={styles.button1}
+              onPress={this._onJoin.bind(this)}
+              underlayColor = 'lightgray'>
+              <View>
+                <Image source = {this.state.status > 0 ? require('../img/accept.png') : require('../img/add.png')} style = {styles.icon}/>
+                <Text style={styles.buttontext}> {this.state.status > 0 ? 'Accept' : 'Join'} </Text>
+              </View>
+            </TouchableHighlight>
+          </View>}
 
-          {this.state.host &&
-          <TouchableHighlight
+          {!this.state.host && this.state.status >= 0 && <View style = {styles.buttoncontainer}>
+            <TouchableHighlight
             style={styles.button1}
-            onPress={this._friend.bind(this)}>
-            <Text style={styles.buttontext1}> Invite </Text>
-          </TouchableHighlight>}
-
-          {this.state.status >= 0 && this.state.status < 2 && <TouchableHighlight
-            style={styles.button1}
-            onPress={this._onSuggest.bind(this)}>
-            <Text style={styles.buttontext1}> Suggest </Text>
-          </TouchableHighlight>}
-
-          {this.state.status == 0 && <TouchableHighlight
-            style={styles.button1}
-            onPress={this._onVote.bind(this)}>
-            <Text style={styles.buttontext1}> Vote </Text>
-          </TouchableHighlight>}
-
-          {this.state.host && <TouchableHighlight
-            style={styles.button1}
-            onPress={this._deleteEvent.bind(this)}
+            onPress={this._onLeave.bind(this)}
             underlayColor = 'lightgray'>
-            <Text style={styles.buttontext2}> Delete </Text>
-          </TouchableHighlight>}
+              <View>
+                <Image source = {require('../img/leave.png')} style = {styles.icon}/>
+                <Text style={styles.buttontext}> Leave </Text>
+              </View>
+            </TouchableHighlight>
+          </View>}
+
+          {this.state.host && <View style = {styles.buttoncontainer}>
+            <TouchableHighlight
+              style={styles.button1}
+              onPress={this._friend.bind(this)}
+              underlayColor = 'lightgray'>
+              <View>
+                <Image source = {require('../img/invite.png')} style = {styles.icon}/>
+                <Text style={styles.buttontext}> Invite </Text>
+              </View>
+            </TouchableHighlight>
+          </View>}
+
+          {this.state.status >= 0 && this.state.status < 2 && <View style = {styles.buttoncontainer}>
+            <TouchableHighlight
+              style={styles.button1}
+              onPress={this._onSuggest.bind(this)}
+              underlayColor = 'lightgray'>
+              <View>
+                <Image source = {require('../img/suggest.png')} style = {styles.icon}/>
+                <Text style={styles.buttontext}> Suggest </Text>
+              </View>
+            </TouchableHighlight>
+          </View>}
+
+          {this.state.status == 0 && <View style = {styles.buttoncontainer}>
+            <TouchableHighlight
+              style={styles.button1}
+              onPress={this._onVote.bind(this)}
+              underlayColor = 'lightgray'>
+              <View>
+               <Image source = {require('../img/vote.png')} style = {styles.icon}/>
+               <Text style={styles.buttontext}> Vote </Text>
+             </View>
+            </TouchableHighlight>
+          </View>}
+
+          {this.state.host && <View style = {styles.buttoncontainer}>
+            <TouchableHighlight
+              style={styles.button1}
+              onPress={this._deleteEvent.bind(this)}
+              underlayColor = 'lightgray'>
+              <View>
+                <Image source = {require('../img/delete.png')} style = {styles.icon}/>
+                <Text style={styles.buttontext}> Delete </Text>
+              </View>
+            </TouchableHighlight>
+          </View>}
         </View>
-        <View style={styles.emptyview}><Text style={styles.title1}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
+        <View style={styles.emptyview}><Text style={styles.title}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
-        <View style={styles.datetime}>
+        <View style={styles.datetimecontainer}>
           <TouchableHighlight
-            onPress={this.state.host ? this._showDatePicker.bind(this) : this._doNothing.bind(this)}>
+            style={styles.datetime}
+            onPress={this.state.host ? this._showDatePicker.bind(this) : this._doNothing.bind(this)}
+            underlayColor = 'lightgray'>
             <Text style={styles.text}>{this.state.date.toLocaleDateString()}</Text>
           </TouchableHighlight>
           <TouchableHighlight
-            onPress={this.state.host ? this._showTimePicker.bind(this) : this._doNothing.bind(this) }>
+            style={styles.datetime}
+            onPress={this.state.host ? this._showTimePicker.bind(this) : this._doNothing.bind(this) }
+            underlayColor = 'lightgray'>
             <Text style={styles.text}>{this.state.date.toLocaleTimeString()}</Text>
           </TouchableHighlight>
         </View>
 
-        <View style={styles.emptyview}><Text style={styles.title}>Location:</Text></View>
+        <View style = {{height:5}}/>
 
-        <TextInput
-          style={styles.textinput}
-          placeholder="Type event location"
-          defaultValue={this.state.location}
-          onChangeText={(text) => this.setState({location : text, locationModified: true})}
-          underlineColorAndroid = 'transparent'
-          editable={this.state.host}
-        />
-
-        <View style={styles.datetime}>
-          <View style={styles.emptyview}><Text style={styles.title}>Category:</Text></View>
-          <Picker
-            style={styles.emptyview, {width: 350}}
-            selectedValue = {this.state.type}
-            onValueChange={this._onTypeChange.bind(this)}
-            enabled = {this.state.host}>
-            {Constants.eventTypes.map((e) => (
-              <Picker.Item
-                key= 'key'
-                value= {e}
-                label= {e}
-              />
-            ))}
-          </Picker>
+        <View style = {styles.location}>
+          <View style={{flex: 3}}><Text style={styles.title}>Location:</Text></View>
+          <View style={{flex: 10}}>
+            <TextInput
+              style={styles.locationtextinput}
+              placeholder="Type event location"
+              defaultValue={this.state.location}
+              onChangeText={(text) => this.setState({location : text, locationModified: true})}
+              underlineColorAndroid = 'transparent'
+              editable={this.state.host}
+            />
+          </View>
         </View>
 
-        <View style={styles.emptyview}><Text style={styles.title1}>View Guest List:</Text></View>
+        <View style = {{height:5}}/>
+
+        <View style = {styles.location}>
+          <View style={{flex: 3}}><Text style={styles.title}>Category:</Text></View>
+          <View style={[{flex: 10, justifyContent: 'center'},styles.type]}>
+            <Picker
+              selectedValue = {this.state.type}
+              onValueChange={this._onTypeChange.bind(this)}
+              enabled = {this.state.host}>
+              {Constants.eventTypes.map((e) => (
+                <Picker.Item
+                  key= 'key'
+                  value= {e}
+                  label= {e}
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        <View style = {{height:5}}/>
 
         <TouchableHighlight
-          style={styles.datetime}
+          style={styles.number}
           onPress={this._guest.bind(this)}
           underlayColor = 'lightgray'>
           <Text style={styles.guest}> Guests: {this.state.guests} </Text>
         </TouchableHighlight>
 
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Vote allowed
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchVote.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.guestVote}
-            disabled={!this.state.host}/>
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Allow guests to create votes</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchVote.bind(this)}
+              value={this.state.guestVote}
+              disabled={!this.state.host}/>
+          </View>
         </View>
 
-        <View style={styles.unlimited}>
-          <Text style={styles.title}>
-            Unlimited number of people
-          </Text>
-          <Switch
-            onValueChange={this._onSwitchCap.bind(this)}
-            style={{marginTop: 5}}
-            value={this.state.unlimited}
-            disabled={!this.state.host}/>
+        <View style={styles.location}>
+          <View style={{flex: 6}}>
+            <Text style={styles.title}>Unlimited number of people</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Switch
+              onValueChange={this._onSwitchCap.bind(this)}
+              value={this.state.unlimited}
+              disabled={!this.state.host}/>
+          </View>
         </View>
+
+        <View style = {{height:5}}/>
 
         {!this.state.unlimited &&
-          <View style={styles.datetime}>
-            <View style={styles.emptyview}><Text style={styles.title}>Number of people: </Text></View>
-            <Picker
-              style={styles.emptyview, {width: 60}}
-              selectedValue={this.state.limited}
-              onValueChange={(value) => this.setState({limited:value, capModified:true})}
-              enabled={this.state.host} >
-              {this.state.numbers.map((n) => (
-                <Picker.Item
-                  key= 'key'
-                  value= {n}
-                  label= {n.toString()}
-                />
-              ))}
-            </Picker>
+          <View style = {styles.location}>
+            <View style={{flex: 3}}><Text style={styles.title}>Number of people:</Text></View>
+            <View style={[{flex: 4, justifyContent: 'center'},styles.type]}>
+              <Picker
+                selectedValue={this.state.limited}
+                onValueChange={(value) => this.setState({limited:value, capModified:true})}
+                enabled={this.state.host} >
+                {this.state.numbers.map((n) => (
+                  <Picker.Item
+                    key= 'key'
+                    value= {n}
+                    label= {n.toString()}
+                  />
+                ))}
+              </Picker>
+            </View>
           </View>
         }
 
-        {this.state.status == 0 && <TextInput
-          style={styles.textinput}
-          placeholder="Comment"
-          defaultValue={this.state.tmpComment}
-          onChangeText={(text) => this.setState({tmpComment : text})}
-          underlineColorAndroid = 'transparent'
-        />}
+        <View style = {{height:5}}/>
 
-        {this.state.status == 0 && <TouchableHighlight
-          style={styles.button2}
-          onPress={this._comment.bind(this)}
-          underlayColor = 'lightgray'>
-          <Text style={styles.buttontext2}> Comment </Text>
-        </TouchableHighlight>}
+        {this.state.status == 0 && <View style = {styles.location}>
+          <View style = {{flex: 3}}>
+            <TextInput
+              style={styles.commenttextinput}
+              placeholder="Comment"
+              defaultValue={this.state.tmpComment}
+              onChangeText={(text) => this.setState({tmpComment : text})}
+              underlineColorAndroid = 'transparent'
+            />
+          </View>
+            <View style = {{flex: 1}}>
+            <TouchableHighlight
+              style={{height:40, justifyContent:'center'}}
+              onPress={this._comment.bind(this)}
+              underlayColor = 'lightgray'>
+              <Text style={styles.commentbuttontext}> Comment </Text>
+            </TouchableHighlight>
+            </View>
+        </View>}
 
-        <View style={styles.container2}>
+        <View style = {{height:5}}/>
+
+        <View style={styles.comments}>
           <ListView
             dataSource={this.state.comments}
             renderRow={this._renderComments.bind(this)}
             enableEmptySections={true}
             automaticallyAdjustContentInsets={false}
-            renderSeparator={this._renderSeparator}/>
+            renderSeparator={renderSeparator}/>
         </View>
       </ScrollView>
     )
@@ -337,33 +387,27 @@ export default class EvengPage extends SharedEventPage {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'ghostwhite',
-    paddingTop: 60,
+    flexDirection: 'column',
+    alignItems: 'center',
     paddingHorizontal: 5,
-  },
-  container2: {
-    flex: 3,
-    width: 400,
+    paddingTop: 60
   },
   emptyview: {
+    width: 400,
     height: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  emptyview1: {
+    width: 400
   },
   title: {
     fontSize: 20,
-    paddingTop: 10,
-    color:'#455A64'
+    color:'rgba(5, 123, 253, 1.0)',
   },
-  title1: {
+  commentbuttontext: {
     fontSize: 20,
-    color:'#455A64'
-  },
-  guest: {
-    fontSize: 20,
-    color: 'black'
-  },
-  textinput: {
-    height: 30,
-    fontSize: 20,
-    padding: 5
+    color:'red',
   },
   description: {
     height: 120,
@@ -372,78 +416,112 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     backgroundColor: 'white',
     fontSize: 25,
-    padding: 5
+    padding: 5,
+    width: 400
+  },
+  datetimecontainer: {
+    flex : 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 40
   },
   datetime: {
-    flex:1,
-    flexDirection:'row'
+    borderColor: 'grey',
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    width: 200,
+    height: 40
   },
   text: {
     color: 'grey',
     fontSize: 25,
-    paddingHorizontal:10,
-    paddingTop: 3
+    padding: 3
   },
-  text1: {
-    color: '#fffff0',
+  buttons: {
+    flex : 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 80
+  },
+  buttoncontainer: {
+    flex:1,
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  button: {
+    width: 65,
+    height: 85
+  },
+  icon: {
+    width: 65,
+    height: 65
+  },
+  buttontext: {
+    fontSize: 15,
+    fontWeight: '300',
+    textAlign: 'center',
+    width: 65,
+    height: 20
+  },
+  location: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 40
+  },
+  locationtextinput: {
+    flex: 1,
     fontSize: 30,
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 5,
+  },
+  type: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    backgroundColor: 'white',
+    height: 40
+  },
+  number: {
+    height: 40,
+    width: 400,
+    borderColor: 'grey',
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    backgroundColor: 'white'
+  },
+  commenttextinput: {
+    flex: 1,
+    fontSize: 30,
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 5,
+  },
+  comments: {
+    width: 400,
+    backgroundColor: '#C5CAE9',
+    paddingHorizontal: 5
+  },
+  commenttext: {
+    color: '#fffff0',
+    fontSize: 40,
     fontWeight: '300',
     backgroundColor: 'transparent'
   },
-  unlimited: {
-    height: 40,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  location: {
-    flex : 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+  guest: {
+    fontSize:30,
+    fontWeight: '300',
   },
   buttonlayout: {
     flex : 1,
     flexDirection: 'row',
     justifyContent: 'space-between'
-  },
-  button: {
-    alignItems: 'center',
-    marginHorizontal: 110,
-    backgroundColor: 'lightgray',
-  },
-  button1: {
-    alignItems: 'center',
-    backgroundColor: 'lightgray',
-  },
-  button2: {
-    alignItems: 'center',
-    backgroundColor: 'lightgray',
-    marginHorizontal: 50,
-  },
-  buttontext: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: 'black',
-    textAlign: 'center',
-    paddingHorizontal: 5,
-    paddingTop:5,
-  },
-  buttontext1: {
-    fontSize: 15,
-    fontWeight: '300',
-    width:80,
-    color: 'black',
-    textAlign: 'center',
-    paddingVertical:10,
-    paddingHorizontal:5
-  },
-  buttontext2: {
-    fontSize: 15,
-    fontWeight: '300',
-    width:100,
-    color: 'black',
-    textAlign: 'center',
-    paddingVertical:10,
-    paddingHorizontal:5
   },
   comment: {
     flexDirection: 'row',
@@ -466,7 +544,6 @@ const styles = StyleSheet.create({
   comment_text: {
     flex: 9
   }
-
 });
 
 AppRegistry.registerComponent('EvengPage', () => EvengPage);

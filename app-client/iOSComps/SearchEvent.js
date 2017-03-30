@@ -7,7 +7,7 @@ import {
   Image,
   TouchableHighlight,
   TextInput,
-  ListView
+  ListView,
 } from 'react-native';
 import SharedSearchEvent from '../sharedComps/SearchEvent';
 import EventPage from '../iOSComps/EventPage';
@@ -21,7 +21,7 @@ export default class SearchEvent extends SharedSearchEvent {
     this.props.navigator.push({
       component: EventPage,
       title: rowData,
-      passProps: { 
+      passProps: {
         firebaseApp : this.props.firebaseApp,
         name : this.props.name,
         fbId : this.props.fbId,
@@ -29,33 +29,44 @@ export default class SearchEvent extends SharedSearchEvent {
       }
     });
   }
-  
+
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight onPress = {this._onEvent.bind(this, rowData, rowID)}>
-        <Text style = {styles.text} 
-          numberOfLines={1}> 
-          {rowData} 
+        <Text style = {styles.text}
+          numberOfLines={1}>
+          {rowData}
         </Text>
       </TouchableHighlight>
     )
   }
-  
+
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.container1}>
-          <TextInput
-            style={styles.textinput}
-            placeholder="Type event name."
-            onChangeText={(text) => this.setState({name : text})}
-          />
-          <TouchableHighlight onPress = {this._onSearch.bind(this)}>
-            <Text style={styles.button}> Search </Text>
-          </TouchableHighlight>
+        <View style = {styles.search}>
+          <View style = {{flex: 3}}>
+            <TextInput
+              style={styles.searchtextinput}
+              placeholder='Type event name or location.'
+              onChangeText={(text) => this.setState({name : text})}
+              underlineColorAndroid = 'transparent'
+            />
+          </View>
+            <View style = {{flex: 1, alignItems: 'flex-end'}}>
+            <TouchableHighlight
+              style={styles.button}
+              onPress={this._onSearch.bind(this)}
+              underlayColor = 'lightgray'>
+              <Text style={styles.searchbuttontext}> Search </Text>
+            </TouchableHighlight>
+          </View>
         </View>
+
+        <View style = {{height:5}}/>
+
         <View style={styles.container2}>
-          <ListView 
+          <ListView
             dataSource={this.state.searchEvents}
             renderRow={this._renderRow.bind(this)}
             enableEmptySections={true}
@@ -74,8 +85,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom:10,
   },
   container1: {
     flex: 2,
@@ -107,7 +116,35 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: '600',
     backgroundColor: 'transparent',
-  }
+  },
+  search: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 40
+  },
+  searchtextinput: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 5,
+  },
+  searchbuttontext: {
+    fontSize: 20,
+    color:'white',
+  },
+  title: {
+    fontSize: 20,
+    color:'rgba(5, 123, 253, 1.0)',
+  },
+  type: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    backgroundColor: 'white',
+    height: 40
+  },
 });
 
 AppRegistry.registerComponent('SearchEvent', () => SearchEvent);

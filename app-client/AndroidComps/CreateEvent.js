@@ -108,7 +108,7 @@ export default class CreateEvent extends SharedCreateEvent {
         <View style={styles.datetimecontainer}>
           <TouchableHighlight
             onPress={this._showDatePicker.bind(this)}>
-            <Text style={[styles.dateStyle, styles.inputField]}>{this.state.date.toLocaleDateString()}</Text>
+            <Text style={styles.inputField}>{this.state.date.toLocaleDateString()}</Text>
           </TouchableHighlight>
           <TouchableHighlight
             onPress={this._showTimePicker.bind(this)}>
@@ -311,8 +311,6 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     fontSize: 20,
-  },
-  dateStyle: {
   },
   timeStyle: {
     marginLeft: 10

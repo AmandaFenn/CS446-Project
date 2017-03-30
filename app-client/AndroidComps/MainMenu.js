@@ -168,15 +168,12 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     margin: 12,
     padding: 10,
-    backgroundColor: '#c6e2ec'
+    backgroundColor: '#d1dadd'
   },
   eventItemText: {
     color: '#303F9F',
     fontSize: 22,
-    //fontFamily: 'sans-serif',
     fontWeight: '300',
-    //backgroundColor: 'transparent',
-
   },
   myEventsLabel: {
     margin: 10,

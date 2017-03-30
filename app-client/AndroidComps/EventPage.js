@@ -155,7 +155,7 @@ export default class EventPage extends SharedEventPage {
 
         <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
-          style={styles.description}
+          style={styles.inputField}
           placeholder="Type event description!"
           defaultValue={this.state.description}
           onChangeText={(text) => this.setState({description : text, descriptionModified:true})}
@@ -163,7 +163,7 @@ export default class EventPage extends SharedEventPage {
           editable={this.state.host}
         />
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
         <View style={styles.buttons}>
           {(this.state.status == -1 || this.state.status == 1) && <View style = {styles.buttoncontainer}>
@@ -238,31 +238,32 @@ export default class EventPage extends SharedEventPage {
             </TouchableHighlight>
           </View>}
         </View>
-        <View style={styles.emptyview}><Text style={styles.title}>Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
+
+        <View style={styles.spacing}/>
+
+        <View style={styles.emptyview}><Text style={styles.title}>Event Type: {this.state.private ? 'Private' : 'Public'}</Text></View>
         <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
 
         <View style={styles.datetimecontainer}>
           <TouchableHighlight
-            style={styles.datetime}
             onPress={this.state.host ? this._showDatePicker.bind(this) : this._doNothing.bind(this)}
             underlayColor = 'lightgray'>
-            <Text style={styles.text}>{this.state.date.toLocaleDateString()}</Text>
+            <Text style={styles.inputField}>{this.state.date.toLocaleDateString()}</Text>
           </TouchableHighlight>
           <TouchableHighlight
-            style={styles.datetime}
             onPress={this.state.host ? this._showTimePicker.bind(this) : this._doNothing.bind(this) }
             underlayColor = 'lightgray'>
-            <Text style={styles.text}>{this.state.date.toLocaleTimeString()}</Text>
+            <Text style={[styles.timeStyle, styles.inputField]}>{this.state.date.toLocaleTimeString()}</Text>
           </TouchableHighlight>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
         <View style = {styles.location}>
           <View style={{flex: 3}}><Text style={styles.title}>Location:</Text></View>
           <View style={{flex: 10}}>
             <TextInput
-              style={styles.locationtextinput}
+              style={styles.inputField}
               placeholder="Type event location"
               defaultValue={this.state.location}
               onChangeText={(text) => this.setState({location : text, locationModified: true})}
@@ -272,11 +273,11 @@ export default class EventPage extends SharedEventPage {
           </View>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
         <View style = {styles.location}>
           <View style={{flex: 3}}><Text style={styles.title}>Category:</Text></View>
-          <View style={[{flex: 10, justifyContent: 'center'},styles.type]}>
+          <View style={[{flex: 8, justifyContent: 'center'},styles.category]}>
             <Picker
               selectedValue = {this.state.type}
               onValueChange={this._onTypeChange.bind(this)}
@@ -292,18 +293,17 @@ export default class EventPage extends SharedEventPage {
           </View>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
         <TouchableHighlight
-          style={styles.number}
           onPress={this._guest.bind(this)}
           underlayColor = 'lightgray'>
-          <Text style={styles.guest}> Guests: {this.state.guests} </Text>
+          <Text style={styles.textButton}> View Guest List ({this.state.guests}) </Text>
         </TouchableHighlight>
 
         <View style={styles.location}>
           <View style={{flex: 6}}>
-            <Text style={styles.title}>Allow guests to create votes</Text>
+            <Text style={styles.title}>Allow guests to vote</Text>
           </View>
           <View style={{flex: 1}}>
             <Switch
@@ -315,7 +315,7 @@ export default class EventPage extends SharedEventPage {
 
         <View style={styles.location}>
           <View style={{flex: 6}}>
-            <Text style={styles.title}>Unlimited number of people</Text>
+            <Text style={styles.title}>Unlimited event capacity</Text>
           </View>
           <View style={{flex: 1}}>
             <Switch
@@ -349,25 +349,26 @@ export default class EventPage extends SharedEventPage {
 
         <View style = {{height:5}}/>
 
-        {this.state.status == 0 && <View style = {styles.location}>
-          <View style = {{flex: 3}}>
+        {this.state.status == 0 &&
+          <View>
+          <View>
             <TextInput
-              style={styles.commenttextinput}
-              placeholder="Comment"
+              style={styles.inputField}
+              placeholder="Comment here"
               defaultValue={this.state.tmpComment}
               onChangeText={(text) => this.setState({tmpComment : text})}
               underlineColorAndroid = 'transparent'
             />
           </View>
-            <View style = {{flex: 1}}>
+          <View>
             <TouchableHighlight
-              style={{height:40, justifyContent:'center'}}
               onPress={this._comment.bind(this)}
               underlayColor = 'lightgray'>
-              <Text style={styles.commentbuttontext}> Comment </Text>
+              <Text style={styles.commentbuttontext}>Comment</Text>
             </TouchableHighlight>
-            </View>
-        </View>}
+          </View>
+          </View>
+        }
 
         <View style = {{height:5}}/>
 
@@ -386,11 +387,10 @@ export default class EventPage extends SharedEventPage {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'ghostwhite',
     flexDirection: 'column',
-    alignItems: 'center',
     paddingHorizontal: 5,
-    paddingTop: 60
+    paddingTop: 60,
+    margin: 15,
   },
   emptyview: {
     width: 400,
@@ -407,7 +407,12 @@ const styles = StyleSheet.create({
   },
   commentbuttontext: {
     fontSize: 20,
-    color:'red',
+    borderWidth: 1,
+    padding: 5,
+    borderRadius: 5,
+    width: 100,
+    marginTop: 10,
+    marginBottom: 50
   },
   description: {
     height: 120,
@@ -420,11 +425,7 @@ const styles = StyleSheet.create({
     width: 400
   },
   datetimecontainer: {
-    flex : 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 40
   },
   datetime: {
     borderColor: 'grey',
@@ -543,6 +544,38 @@ const styles = StyleSheet.create({
   },
   comment_text: {
     flex: 9
+  },
+  inputField: {
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderRadius: 4,
+    borderWidth: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    fontSize: 20,
+  },
+  spacing: {
+    height: 20,
+  },
+  timeStyle: {
+    marginLeft: 10
+  },
+  category: {
+    borderRadius: 4,
+    borderWidth: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    height: 40
+  },
+  textButton: {
+    fontSize: 25,
+    borderWidth: 1,
+    padding: 5,
+    borderRadius: 5,
   }
 });
 

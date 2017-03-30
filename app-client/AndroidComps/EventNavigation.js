@@ -72,7 +72,7 @@ var routeMapper = {
   LeftButton(route, navigator, index, navState) {
     return ( route.index > 1 ?
       <TouchableHighlight
-        style={{padding: 5}}
+        style={styles.navButton}
         onPress={() => {navigator.pop();}}
         underlayColor = 'white'>
         <Text style={styles.text}> Back </Text>
@@ -82,7 +82,7 @@ var routeMapper = {
   RightButton(route, navigator, index, navState) {
     return (
       <TouchableHighlight
-         style={{padding: 5}}
+         style={styles.navButton}
          onPress={route.RightButtonPress}
          underlayColor = 'white'>
          {route.RightButtonTitle != null ? <Text style={styles.text}> {route.RightButtonTitle} </Text> :
@@ -106,6 +106,10 @@ var routeMapper = {
      textAlign: 'center',
      alignItems: 'center'
    },
+   navButton: {
+     paddingLeft: 10,
+     paddingRight: 10
+   }
  });
 
 AppRegistry.registerComponent('EventNavigation', () => EventNavigation);

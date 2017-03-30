@@ -80,15 +80,14 @@ export default class CreateEvent extends SharedCreateEvent {
         <Image
           source={this.state.avatarSource}
           style = {{width:400, height:100}}
-          resizeMode={Image.resizeMode.stretch}/>
-
-        <View style = {{height:5}}/>
+          resizeMode={Image.resizeMode.stretch}
+        />
 
         <View style={styles.location}>
           <View style={{flex: 2}}><Text style={styles.title}>Name:</Text></View>
           <View style={{flex: 8}}>
-            <TextInput style={styles.locationtextinput}
-              placeholder="Type event name"
+            <TextInput style={styles.inputField}
+              placeholder="Event Name"
               onChangeText={(text) => this.setState({name : text})}/>
           </View>
           <View style={{flex: 1}}>
@@ -103,30 +102,28 @@ export default class CreateEvent extends SharedCreateEvent {
           </View>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
-        <View style={styles.emptyview}><Text style={styles.title}>Date and Time:</Text></View>
-
+        <View><Text style={styles.title}>Date and time:</Text></View>
         <View style={styles.datetimecontainer}>
           <TouchableHighlight
-            style={styles.datetime}
             onPress={this._showDatePicker.bind(this)}>
-            <Text style={styles.text}>{this.state.date.toLocaleDateString()}</Text>
+            <Text style={[styles.dateStyle, styles.inputField]}>{this.state.date.toLocaleDateString()}</Text>
           </TouchableHighlight>
           <TouchableHighlight
-            style={styles.datetime}
             onPress={this._showTimePicker.bind(this)}>
-            <Text style={styles.text}>{this.state.date.toLocaleTimeString()}</Text>
+            <Text style={[styles.timeStyle, styles.inputField]}>{this.state.date.toLocaleTimeString()}</Text>
           </TouchableHighlight>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
+        <View><Text style={styles.title}>Location:</Text></View>
         <View style={styles.location}>
-          <View style={{flex: 2}}><Text style={styles.title}>Location:</Text></View>
-          <View style={{flex: 6}}>
+
+          <View style={{flex: 7}}>
             <TextInput
-              style = {styles.locationtextinput}
+              style = {styles.inputField}
               placeholder="Type event location"
               onChangeText={(text) => this.setState({location : text})}
               />
@@ -143,11 +140,11 @@ export default class CreateEvent extends SharedCreateEvent {
           </View>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
         <View style = {styles.location}>
-          <View style={{flex: 3}}><Text style={styles.title}>Category:</Text></View>
-          <View style={[{flex: 10, justifyContent: 'center'},styles.type]}>
+          <View style={{flex: 4}}><Text style={styles.title}>Category:</Text></View>
+          <View style={[{flex: 10, justifyContent: 'center'}, styles.category]}>
             <Picker
               selectedValue = {this.state.type}
               onValueChange={(value) => this.setState({type : value})}>
@@ -162,11 +159,11 @@ export default class CreateEvent extends SharedCreateEvent {
           </View>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style={styles.spacing}/>
 
         <View style={styles.location}>
           <View style={{flex: 6}}>
-            <Text style={styles.title}>Private</Text>
+            <Text style={styles.title}>Private event</Text>
           </View>
           <View style={{flex: 1}}>
             <Switch
@@ -177,7 +174,7 @@ export default class CreateEvent extends SharedCreateEvent {
 
         <View style={styles.location}>
           <View style={{flex: 6}}>
-            <Text style={styles.title}>Guests can create votes</Text>
+            <Text style={styles.title}>Guests can vote</Text>
           </View>
           <View style={{flex: 1}}>
             <Switch
@@ -189,7 +186,7 @@ export default class CreateEvent extends SharedCreateEvent {
 
         <View style={styles.location}>
           <View style={{flex: 6}}>
-            <Text style={styles.title}>Unlimited number of people</Text>
+            <Text style={styles.title}>Unlimited event capacity</Text>
           </View>
           <View style={{flex: 1}}>
             <Switch
@@ -202,7 +199,7 @@ export default class CreateEvent extends SharedCreateEvent {
         {!this.state.unlimited &&
           <View style = {styles.location}>
             <View style={{flex: 3}}><Text style={styles.title}>Number of people:</Text></View>
-            <View style={[{flex: 4, justifyContent: 'center'},styles.type]}>
+            <View style={[{flex: 4, justifyContent: 'center'}, styles.category]}>
               <Picker
                 selectedValue = {this.state.limited}
                 onValueChange={(value) => this.setState({limited : value})}>
@@ -218,11 +215,12 @@ export default class CreateEvent extends SharedCreateEvent {
           </View>
         }
 
-        <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
+        <View style={styles.spacing}/>
 
+        <View style={styles.emptyview}><Text style={styles.title}>Description:</Text></View>
         <TextInput
-          style = {styles.description}
-          placeholder = "Type event description"
+          style={styles.inputField}
+          placeholder = "Event Description"
           onChangeText = {(text) => this.setState({description : text})}
           multiline={true}
           underlineColorAndroid = 'transparent'
@@ -235,17 +233,10 @@ export default class CreateEvent extends SharedCreateEvent {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'ghostwhite',
     flexDirection: 'column',
-    alignItems: 'center',
     paddingHorizontal: 5,
-    paddingTop: 60
-  },
-  emptyview: {
-    width: 400,
-    height: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingTop: 60,
+    margin: 15,
   },
   emptyview1: {
     width: 400
@@ -258,20 +249,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 40
-  },
-  locationtextinput: {
-    flex: 1,
-    fontSize: 30,
-    fontWeight: '300',
-    borderColor: 'gray',
-    borderWidth: 1,
-    padding: 5,
-  },
-  type: {
-    borderColor: 'grey',
-    borderWidth: 1,
-    backgroundColor: 'white',
     height: 40
   },
   number: {
@@ -304,11 +281,7 @@ const styles = StyleSheet.create({
     width: 400
   },
   datetimecontainer: {
-    flex : 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 40
   },
   datetime: {
     borderColor: 'grey',
@@ -328,6 +301,34 @@ const styles = StyleSheet.create({
     fontSize:30,
     fontWeight: '300',
   },
+  inputField: {
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderRadius: 4,
+    borderWidth: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    fontSize: 20,
+  },
+  dateStyle: {
+  },
+  timeStyle: {
+    marginLeft: 10
+  },
+  spacing: {
+    height: 20,
+  },
+  category: {
+    borderRadius: 4,
+    borderWidth: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    height: 40
+  }
 });
 
 AppRegistry.registerComponent('CreateEvent', () => CreateEvent);

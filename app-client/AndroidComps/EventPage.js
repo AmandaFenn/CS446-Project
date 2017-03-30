@@ -20,7 +20,7 @@ import GeoLocation from './GeoLocation'
 import {renderSeparator} from '../utils/HelpFuncs';
 import Constants from '../utils/Constants'
 
-export default class EvengPage extends SharedEventPage {
+export default class EventPage extends SharedEventPage {
   constructor(props) {
     super(props)
   }
@@ -546,4 +546,4 @@ const styles = StyleSheet.create({
   }
 });
 
-AppRegistry.registerComponent('EvengPage', () => EvengPage);
+AppRegistry.registerComponent('EventPage', () => EventPage);

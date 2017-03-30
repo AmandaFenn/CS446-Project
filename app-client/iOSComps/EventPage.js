@@ -533,4 +533,4 @@ const styles = StyleSheet.create({
   }
 });
 
-AppRegistry.registerComponent('EventPage', () => EvengPage);
+AppRegistry.registerComponent('EventPage', () => EventPage);

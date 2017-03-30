@@ -162,12 +162,13 @@ const styles = StyleSheet.create({
     margin: 7,
   },
   eventItem: {
-    borderColor: 'black',
-    borderWidth: 1.5,
+    borderColor: 'gray',
+    borderWidth: 1,
     borderStyle: 'solid',
     borderRadius: 7,
     margin: 12,
     padding: 10,
+    backgroundColor: '#c6e2ec'
   },
   eventItemText: {
     color: '#303F9F',

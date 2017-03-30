@@ -445,4 +445,4 @@ export default class EventPage extends Component {
 
 }
 
-AppRegistry.registerComponent('EventPage', () => EvengPage);
+AppRegistry.registerComponent('EventPage', () => EventPage);

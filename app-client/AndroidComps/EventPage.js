@@ -407,12 +407,13 @@ const styles = StyleSheet.create({
   },
   commentbuttontext: {
     fontSize: 20,
-    borderWidth: 1,
     padding: 5,
-    borderRadius: 5,
+    borderRadius: 3,
     width: 100,
     marginTop: 10,
-    marginBottom: 50
+    marginBottom: 50,
+    backgroundColor: 'rgba(5, 123, 253, 1.0)',
+    color: 'white'
   },
   description: {
     height: 120,

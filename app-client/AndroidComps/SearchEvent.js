@@ -34,7 +34,13 @@ export default class SearchEvent extends SharedSearchEvent {
   _renderRow(rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight onPress = {this._onEvent.bind(this, rowData, rowID)}>
-        <Text style = {styles.text} numberOfLines={1}> {rowData} </Text>
+        <View style={styles.eventItem}>
+          <Text
+            style={styles.eventItemText}
+            numberOfLines={1}>
+            {rowData}
+          </Text>
+        </View>
       </TouchableHighlight>
     )
   }
@@ -45,7 +51,7 @@ export default class SearchEvent extends SharedSearchEvent {
         <View style = {styles.search}>
           <View style = {{flex: 3}}>
             <TextInput
-              style={styles.searchtextinput}
+              style={styles.inputField}
               placeholder='Type event name or location.'
               onChangeText={(text) => this.setState({name : text})}
               underlineColorAndroid = 'transparent'
@@ -89,7 +95,7 @@ export default class SearchEvent extends SharedSearchEvent {
           </View>
         </View>
 
-        <View style = {{height:5}}/>
+        <View style = {{height:20}}/>
 
         <View style={styles.container2}>
           <ListView
@@ -127,7 +133,7 @@ const styles = StyleSheet.create({
   container2: {
     flex: 3,
     width: 400,
-    backgroundColor: '#C5CAE9'
+    //backgroundColor: '#C5CAE9'
   },
   button: {
     height:40,
@@ -169,6 +175,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: 'white',
     height: 40
+  },
+  inputField: {
+    fontWeight: '300',
+    borderColor: 'gray',
+    borderRadius: 4,
+    borderWidth: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    fontSize: 20,
+  },
+  eventItemText: {
+    color: '#303F9F',
+    fontSize: 22,
+    fontWeight: '300',
+  },
+  eventItem: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 7,
+    margin: 12,
+    padding: 10,
+    backgroundColor: '#d1dadd'
   },
 });
 
